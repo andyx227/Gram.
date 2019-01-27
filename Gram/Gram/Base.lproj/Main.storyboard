@@ -147,6 +147,9 @@
                                         <real key="value" value="1"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="loginPress:" destination="FHm-UB-HZ5" eventType="editingDidEnd" id="wSr-pM-I4d"/>
+                                </connections>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oJS-jf-p05">
                                 <rect key="frame" x="130" y="502" width="116" height="44"/>
@@ -162,6 +165,9 @@
                                         <integer key="value" value="2"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="loginPress:" destination="FHm-UB-HZ5" eventType="touchUpInside" id="hil-yY-HB2"/>
+                                </connections>
                             </button>
                         </subviews>
                         <constraints>
@@ -185,7 +191,6 @@
                         <viewLayoutGuide key="safeArea" id="kDD-1a-0vQ"/>
                     </view>
                     <connections>
-                        <outlet property="buttonLogin" destination="oJS-jf-p05" id="8e8-Z7-4Xb"/>
                         <outlet property="labelAppName" destination="Wis-sB-YPd" id="o7C-M2-EuR"/>
                         <outlet property="textPassword" destination="CfF-my-GMG" id="5ot-Vv-BeP"/>
                         <outlet property="textUsername" destination="yA6-xy-1VE" id="MuJ-Tr-TA3"/>
@@ -193,7 +198,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="AGa-8R-ysU" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-688.79999999999995" y="-15.742128935532236"/>
+            <point key="canvasLocation" x="-956" y="-15.742128935532236"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="yl2-sM-qoP">
@@ -216,8 +221,8 @@
     </scenes>
     <resources>
         <image name="first" width="30" height="30"/>
-        <image name="password_icon" width="180" height="180"/>
+        <image name="password_icon" width="50" height="50"/>
         <image name="second" width="30" height="30"/>
-        <image name="signin_icon" width="180" height="180"/>
+        <image name="signin_icon" width="50" height="50"/>
     </resources>
 </document>
