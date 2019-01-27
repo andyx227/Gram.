@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		1D61C87E6B0E966876C99531 /* Pods_Gram.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F0E4D5B960651DC082AE236 /* Pods_Gram.framework */; };
+		A11274DA21FD48AA00DA05D5 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11274D921FD48AA00DA05D5 /* LoginViewController.swift */; };
+		A11274E021FD76BE00DA05D5 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A11274DF21FD76BE00DA05D5 /* GoogleService-Info.plist */; };
 		A17D05C121FA53C300205E1D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17D05C021FA53C300205E1D /* AppDelegate.swift */; };
 		A17D05C321FA53C300205E1D /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17D05C221FA53C300205E1D /* FirstViewController.swift */; };
 		A17D05C521FA53C300205E1D /* SecondViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17D05C421FA53C300205E1D /* SecondViewController.swift */; };
@@ -20,6 +22,8 @@
 		4F0E4D5B960651DC082AE236 /* Pods_Gram.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Gram.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5769B2C714A24630E509E3F8 /* Pods-Gram.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Gram.release.xcconfig"; path = "Pods/Target Support Files/Pods-Gram/Pods-Gram.release.xcconfig"; sourceTree = "<group>"; };
 		62D3A713EE276D31FDAC2B1C /* Pods-Gram.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Gram.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Gram/Pods-Gram.debug.xcconfig"; sourceTree = "<group>"; };
+		A11274D921FD48AA00DA05D5 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		A11274DF21FD76BE00DA05D5 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		A17D05BD21FA53C300205E1D /* Gram.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Gram.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A17D05C021FA53C300205E1D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A17D05C221FA53C300205E1D /* FirstViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstViewController.swift; sourceTree = "<group>"; };
@@ -70,6 +74,8 @@
 				A17D05C921FA53C400205E1D /* Assets.xcassets */,
 				A17D05CB21FA53C400205E1D /* LaunchScreen.storyboard */,
 				A17D05CE21FA53C400205E1D /* Info.plist */,
+				A11274DF21FD76BE00DA05D5 /* GoogleService-Info.plist */,
+				A11274D921FD48AA00DA05D5 /* LoginViewController.swift */,
 			);
 			path = Gram;
 			sourceTree = "<group>";
@@ -102,6 +108,7 @@
 				A17D05B921FA53C300205E1D /* Sources */,
 				A17D05BA21FA53C300205E1D /* Frameworks */,
 				A17D05BB21FA53C300205E1D /* Resources */,
+				AD00DBEC00426DDCFC1D6285 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -151,6 +158,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A17D05CD21FA53C400205E1D /* LaunchScreen.storyboard in Resources */,
+				A11274E021FD76BE00DA05D5 /* GoogleService-Info.plist in Resources */,
 				A17D05CA21FA53C400205E1D /* Assets.xcassets in Resources */,
 				A17D05C821FA53C300205E1D /* Main.storyboard in Resources */,
 			);
@@ -181,6 +189,34 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		AD00DBEC00426DDCFC1D6285 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-Gram/Pods-Gram-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/DynamicBlurView/DynamicBlurView.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
+				"${BUILT_PRODUCTS_DIR}/TextFieldEffects/TextFieldEffects.framework",
+				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DynamicBlurView.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TextFieldEffects.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Gram/Pods-Gram-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -188,6 +224,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A11274DA21FD48AA00DA05D5 /* LoginViewController.swift in Sources */,
 				A17D05C521FA53C300205E1D /* SecondViewController.swift in Sources */,
 				A17D05C121FA53C300205E1D /* AppDelegate.swift in Sources */,
 				A17D05C321FA53C300205E1D /* FirstViewController.swift in Sources */,

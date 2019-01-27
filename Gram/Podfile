@@ -6,5 +6,8 @@ target 'Gram' do
   use_frameworks!
 
   # Pods for Gram
-
+  pod 'DynamicBlurView'
+  pod 'TextFieldEffects'
+  pod 'Firebase'
+  
 end
