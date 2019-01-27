@@ -9,6 +9,7 @@
 import UIKit
 import DynamicBlurView
 import TextFieldEffects
+import FirebaseAuth
 
 class LoginViewController: UIViewController {
     @IBOutlet weak var labelAppName: UILabel!  // "Gram."
@@ -37,6 +38,40 @@ class LoginViewController: UIViewController {
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+    }
+    
+
+    @IBAction func loginPress(_ sender: Any) {
+        
+        guard let password = textPassword.text else {
+            return
+        }
+        guard let email = textUsername.text else {
+            return
+        }
+        authenticate(email: email, password: password)
+    }
+    private func authenticate(email: String, password: String) {
+        Auth.auth().signIn(withEmail: email, password: password) {
+            user, error in
+            if error == nil && user != nil {
+                print("Login successful!")
+            } else {
+                let errorAlert = UIAlertController.init(title: "Login Error",
+                                                        message: "Your username or password was incorrect.",
+                                                        preferredStyle: .alert)
+                
+                errorAlert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"),
+                                                   style: .default,
+                                                   handler: { _ in
+                                                    NSLog("Login failed alert occured.")
+                }
+                    )
+                )
+                self.present(errorAlert, animated: true, completion: nil)
+                print("FirebaseAuth failed.")
+            }
+        }
     }
     
         /**************** Helper Functions Below *****************/

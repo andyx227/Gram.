@@ -9,5 +9,7 @@ target 'Gram' do
   pod 'DynamicBlurView'
   pod 'TextFieldEffects'
   pod 'Firebase'
-  
+  pod 'Firebase/Auth'
+  pod 'Firebase/Database'
+  pod 'Firebase/Firestore'
 end
