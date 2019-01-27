@@ -100,6 +100,7 @@
                             </label>
                             <textField opaque="NO" alpha="0.75" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="bezel" placeholder="username" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="yA6-xy-1VE" customClass="KaedeTextField" customModule="TextFieldEffects">
                                 <rect key="frame" x="78" y="348" width="274" height="41"/>
+                                <color key="backgroundColor" red="1" green="0.75880724590000004" blue="0.5746860399" alpha="0.73659567640000001" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="41" id="dr5-ed-mCB"/>
                                 </constraints>
@@ -112,9 +113,6 @@
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="placeholderFontScale">
                                         <real key="value" value="1"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="foregroundColor">
-                                        <color key="value" red="1" green="0.7588072458739572" blue="0.57468603993168899" alpha="0.73659567636986301" colorSpace="custom" customColorSpace="sRGB"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </textField>
@@ -134,21 +132,19 @@
                             </imageView>
                             <textField opaque="NO" alpha="0.75" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="bezel" placeholder="password" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="CfF-my-GMG" customClass="KaedeTextField" customModule="TextFieldEffects">
                                 <rect key="frame" x="78" y="403" width="274" height="41"/>
+                                <color key="backgroundColor" red="1" green="0.75880724590000004" blue="0.5746860399" alpha="0.73659567640000001" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="41" id="NAM-gV-NV6"/>
                                 </constraints>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" textContentType="password"/>
+                                <textInputTraits key="textInputTraits" secureTextEntry="YES" textContentType="password"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="placeholderColor">
                                         <color key="value" cocoaTouchSystemColor="darkTextColor"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="placeholderFontScale">
                                         <real key="value" value="1"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="foregroundColor">
-                                        <color key="value" red="1" green="0.75880724590000004" blue="0.5746860399" alpha="0.73659567640000001" colorSpace="custom" customColorSpace="sRGB"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </textField>
@@ -192,7 +188,7 @@
                         <outlet property="buttonLogin" destination="oJS-jf-p05" id="8e8-Z7-4Xb"/>
                         <outlet property="labelAppName" destination="Wis-sB-YPd" id="o7C-M2-EuR"/>
                         <outlet property="textPassword" destination="CfF-my-GMG" id="5ot-Vv-BeP"/>
-                        <outlet property="textUsername" destination="yA6-xy-1VE" id="pZX-sc-dIc"/>
+                        <outlet property="textUsername" destination="yA6-xy-1VE" id="MuJ-Tr-TA3"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="AGa-8R-ysU" userLabel="First Responder" sceneMemberID="firstResponder"/>

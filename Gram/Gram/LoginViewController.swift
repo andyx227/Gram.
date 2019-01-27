@@ -12,7 +12,7 @@ import TextFieldEffects
 
 class LoginViewController: UIViewController {
     @IBOutlet weak var labelAppName: UILabel!  // "Gram."
-    @IBOutlet weak var textUsername: UITextField!
+    @IBOutlet weak var textUsername: KaedeTextField!
     @IBOutlet weak var textPassword: KaedeTextField!
     @IBOutlet weak var buttonLogin: UIButton!
     
@@ -38,6 +38,7 @@ class LoginViewController: UIViewController {
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
     }
+    
     
         /**************** Helper Functions Below *****************/
     private func setBackgroundImage(_ imageName: String) -> UIImageView {
