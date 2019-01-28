@@ -54,13 +54,15 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     }
 
     // pass email to the next view
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?)
+    // TODO: Uncommenting this block of code will cause app to crash!
+    // Should segue to TabBarView by pressing login button instead.
+   /* override func prepare(for segue: UIStoryboardSegue, sender: Any?)
     {
         let barViewControllers = segue.destination as! UITabBarController
         let destinationViewController = barViewControllers.viewControllers?[0] as! FirstViewController
         destinationViewController.email = userEmail
 
-    }
+    }*/
 
     private func authenticate(email: String, password: String) {
 
