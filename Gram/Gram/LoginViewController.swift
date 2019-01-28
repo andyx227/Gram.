@@ -11,11 +11,12 @@ import DynamicBlurView
 import TextFieldEffects
 import FirebaseAuth
 
-class LoginViewController: UIViewController {
+class LoginViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var labelAppName: UILabel!  // "Gram."
     @IBOutlet weak var textUsername: KaedeTextField!
     @IBOutlet weak var textPassword: KaedeTextField!
     @IBOutlet weak var buttonLogin: UIButton!
+    var userEmail = ""
     
     override func viewWillAppear(_ animated: Bool) {
         let backgroundImageView = setBackgroundImage("login_background")
@@ -51,11 +52,26 @@ class LoginViewController: UIViewController {
         }
         authenticate(email: email, password: password)
     }
+    
+    // pass email to the next view
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?)
+    {
+        let barViewControllers = segue.destination as! UITabBarController
+        let destinationViewController = barViewControllers.viewControllers?[0] as! FirstViewController
+        destinationViewController.email = userEmail
+        
+    }
+    
     private func authenticate(email: String, password: String) {
+        
         Auth.auth().signIn(withEmail: email, password: password) {
             user, error in
             if error == nil && user != nil {
                 print("Login successful!")
+                // move to next view controller
+                self.userEmail = email
+                self.performSegue(withIdentifier: "loginToTabController", sender: self)
+                
             } else {
                 let errorAlert = UIAlertController.init(title: "Login Error",
                                                         message: "Your username or password was incorrect.",

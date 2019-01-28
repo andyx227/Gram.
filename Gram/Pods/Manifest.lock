@@ -115,6 +115,7 @@ DEPENDENCIES:
   - DynamicBlurView
   - Firebase
   - Firebase/Auth
+  - Firebase/Core
   - Firebase/Database
   - Firebase/Firestore
   - TextFieldEffects
@@ -162,6 +163,6 @@ SPEC CHECKSUMS:
   Protobuf: 1eb9700044745f00181c136ef21b8ff3ad5a0fd5
   TextFieldEffects: 7d372f58aeaf9acd9626bbf962680aef926b085d
 
-PODFILE CHECKSUM: 0ea89d88d341288b70fa811728318a5f4833fb51
+PODFILE CHECKSUM: 7677ea9747a74b9099a664e77ba832ed2cea3cad
 
 COCOAPODS: 1.5.3
