@@ -14,16 +14,18 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var labelAppName: UILabel!  // "Gram."
     @IBOutlet weak var textUsername: KaedeTextField!
     @IBOutlet weak var textPassword: KaedeTextField!
-    
+    @IBOutlet weak var buttonLogin: UIButton!
+    var userEmail = ""
+
     override func viewWillAppear(_ animated: Bool) {
         let _ = setBackgroundImage("background_login")
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         fadeInAnimation(labelAppName)
         hideKeyboard()  // Make sure user can hide keyboard when screen is tapped
-        
+
         // Listen for keyboard events
         NotificationCenter.default.addObserver(self, selector: #selector(shiftScreenUpForKeyboard(notification:)),
                                                name: UIResponder.keyboardWillShowNotification, object: nil)
@@ -32,16 +34,16 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         NotificationCenter.default.addObserver(self, selector: #selector(shiftScreenUpForKeyboard(notification:)),
                                                name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
     }
-    
+
     deinit {
         // Stop listening for keyboard hide/show events
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
     }
-    
+
     @IBAction func loginPress(_ sender: Any) {
-        
+
         guard let password = textPassword.text else {
             return
         }
@@ -50,16 +52,31 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         }
         authenticate(email: email, password: password)
     }
+
+    // pass email to the next view
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?)
+    {
+        let barViewControllers = segue.destination as! UITabBarController
+        let destinationViewController = barViewControllers.viewControllers?[0] as! FirstViewController
+        destinationViewController.email = userEmail
+
+    }
+
     private func authenticate(email: String, password: String) {
+
         Auth.auth().signIn(withEmail: email, password: password) {
             user, error in
             if error == nil && user != nil {
                 print("Login successful!")
+                // move to next view controller
+                self.userEmail = email
+                self.performSegue(withIdentifier: "loginToTabController", sender: self)
+
             } else {
                 let errorAlert = UIAlertController.init(title: "Login Error",
                                                         message: "Your username or password was incorrect.",
                                                         preferredStyle: .alert)
-                
+
                 errorAlert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"),
                                                    style: .default,
                                                    handler: { _ in
@@ -72,17 +89,17 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
             }
         }
     }
-    
+
         /**************** Helper Functions Below *****************/
     private func setBackgroundImage(_ imageName: String) -> UIImageView {
         let backgroundImageView = UIImageView(frame: UIScreen.main.bounds)
         backgroundImageView.image = UIImage(named: imageName)
         backgroundImageView.contentMode =  UIView.ContentMode.scaleAspectFill
         self.view.insertSubview(backgroundImageView, at: 0)
-        
+
         return backgroundImageView
     }
-    
+
     private func fadeInAnimation(_ view: UIView) {
         if view.alpha == 0.0 {
             UIView.animate(withDuration: 2.2, delay: 0.2, options: .curveEaseOut, animations: {
@@ -90,10 +107,10 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
             })
         }
     }
-    
+
     @objc private func shiftScreenUpForKeyboard(notification: Notification) {
         guard let keyboardRect = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else {return}
-        
+
         if  notification.name == UIResponder.keyboardWillShowNotification ||
             notification.name == UIResponder.keyboardWillChangeFrameNotification {
             // Shift the screen up by the height of the keyboard
@@ -111,7 +128,7 @@ extension UIViewController {
         tap.cancelsTouchesInView = false
         view.addGestureRecognizer(tap)
     }
-    
+
     @objc func dismissKeyboard() {  // Dismisses the keyboard
         view.endEditing(true)
     }
