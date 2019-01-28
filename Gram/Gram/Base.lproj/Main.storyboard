@@ -62,7 +62,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="503" y="118"/>
+            <point key="canvasLocation" x="522" y="-332"/>
         </scene>
         <!--Second-->
         <scene sceneID="wg7-f3-ORb">
@@ -99,7 +99,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4Nw-L8-lE0" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="503" y="817"/>
+            <point key="canvasLocation" x="522" y="367"/>
         </scene>
         <!--LoginViewController-->
         <scene sceneID="taT-CM-460">
@@ -246,7 +246,7 @@
                         <outlet property="labelAppName" destination="Wis-sB-YPd" id="o7C-M2-EuR"/>
                         <outlet property="textPassword" destination="CfF-my-GMG" id="5ot-Vv-BeP"/>
                         <outlet property="textUsername" destination="yA6-xy-1VE" id="MuJ-Tr-TA3"/>
-                        <segue destination="49e-Tb-3d3" kind="show" identifier="loginToTabController" id="N6e-Lm-z6O"/>
+                        <segue destination="49e-Tb-3d3" kind="presentation" identifier="loginToTabController" modalPresentationStyle="overFullScreen" id="N6e-Lm-z6O"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="AGa-8R-ysU" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -530,7 +530,7 @@
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="HuB-VB-40B" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-244" y="441"/>
+            <point key="canvasLocation" x="-497" y="-16"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="1a4-zN-f2b">
