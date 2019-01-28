@@ -10,6 +10,7 @@
 		1D61C87E6B0E966876C99531 /* Pods_Gram.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F0E4D5B960651DC082AE236 /* Pods_Gram.framework */; };
 		A11274DA21FD48AA00DA05D5 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11274D921FD48AA00DA05D5 /* LoginViewController.swift */; };
 		A11274E021FD76BE00DA05D5 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A11274DF21FD76BE00DA05D5 /* GoogleService-Info.plist */; };
+		A16A3E8B21FE5F2300E13C81 /* SignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16A3E8A21FE5F2300E13C81 /* SignUpViewController.swift */; };
 		A17D05C121FA53C300205E1D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17D05C021FA53C300205E1D /* AppDelegate.swift */; };
 		A17D05C321FA53C300205E1D /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17D05C221FA53C300205E1D /* FirstViewController.swift */; };
 		A17D05C521FA53C300205E1D /* SecondViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17D05C421FA53C300205E1D /* SecondViewController.swift */; };
@@ -24,6 +25,7 @@
 		62D3A713EE276D31FDAC2B1C /* Pods-Gram.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Gram.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Gram/Pods-Gram.debug.xcconfig"; sourceTree = "<group>"; };
 		A11274D921FD48AA00DA05D5 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		A11274DF21FD76BE00DA05D5 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		A16A3E8A21FE5F2300E13C81 /* SignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewController.swift; sourceTree = "<group>"; };
 		A17D05BD21FA53C300205E1D /* Gram.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Gram.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A17D05C021FA53C300205E1D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A17D05C221FA53C300205E1D /* FirstViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstViewController.swift; sourceTree = "<group>"; };
@@ -76,6 +78,7 @@
 				A17D05CE21FA53C400205E1D /* Info.plist */,
 				A11274DF21FD76BE00DA05D5 /* GoogleService-Info.plist */,
 				A11274D921FD48AA00DA05D5 /* LoginViewController.swift */,
+				A16A3E8A21FE5F2300E13C81 /* SignUpViewController.swift */,
 			);
 			path = Gram;
 			sourceTree = "<group>";
@@ -109,7 +112,6 @@
 				A17D05BA21FA53C300205E1D /* Frameworks */,
 				A17D05BB21FA53C300205E1D /* Resources */,
 				AD00DBEC00426DDCFC1D6285 /* [CP] Embed Pods Frameworks */,
-				71B794F79DFD97571950C37F /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -168,28 +170,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		71B794F79DFD97571950C37F /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-Gram/Pods-Gram-resources.sh",
-				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseFirestore/gRPCCertificates.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/gRPCCertificates.bundle",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Gram/Pods-Gram-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		A8F4CC18AA896D0DDA6F6EA2 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -221,7 +201,7 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-Gram/Pods-Gram-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/BoringSSL/openssl.framework",
+				"${BUILT_PRODUCTS_DIR}/BoringSSL-GRPC/openssl_grpc.framework",
 				"${BUILT_PRODUCTS_DIR}/DynamicBlurView/DynamicBlurView.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
@@ -236,7 +216,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/openssl.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/openssl_grpc.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DynamicBlurView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
@@ -263,6 +243,7 @@
 				A17D05C521FA53C300205E1D /* SecondViewController.swift in Sources */,
 				A17D05C121FA53C300205E1D /* AppDelegate.swift in Sources */,
 				A17D05C321FA53C300205E1D /* FirstViewController.swift in Sources */,
+				A16A3E8B21FE5F2300E13C81 /* SignUpViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

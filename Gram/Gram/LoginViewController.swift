@@ -7,19 +7,16 @@
 //
 
 import UIKit
-import DynamicBlurView
 import TextFieldEffects
 import FirebaseAuth
 
-class LoginViewController: UIViewController {
+class LoginViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var labelAppName: UILabel!  // "Gram."
     @IBOutlet weak var textUsername: KaedeTextField!
     @IBOutlet weak var textPassword: KaedeTextField!
-    @IBOutlet weak var buttonLogin: UIButton!
     
     override func viewWillAppear(_ animated: Bool) {
-        let backgroundImageView = setBackgroundImage("login_background")
-        blurBackgroundImage(backgroundImageView)  // Blur the background image
+        let _ = setBackgroundImage("background_login")
     }
     
     override func viewDidLoad() {
@@ -28,9 +25,12 @@ class LoginViewController: UIViewController {
         hideKeyboard()  // Make sure user can hide keyboard when screen is tapped
         
         // Listen for keyboard events
-        NotificationCenter.default.addObserver(self, selector: #selector(shiftScreenUpForKeyboard(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(shiftScreenUpForKeyboard(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(shiftScreenUpForKeyboard(notification:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(shiftScreenUpForKeyboard(notification:)),
+                                               name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(shiftScreenUpForKeyboard(notification:)),
+                                               name: UIResponder.keyboardWillHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(shiftScreenUpForKeyboard(notification:)),
+                                               name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
     }
     
     deinit {
@@ -40,7 +40,6 @@ class LoginViewController: UIViewController {
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
     }
     
-
     @IBAction func loginPress(_ sender: Any) {
         
         guard let password = textPassword.text else {
@@ -84,12 +83,6 @@ class LoginViewController: UIViewController {
         return backgroundImageView
     }
     
-    private func blurBackgroundImage(_ backgroundImage: UIImageView) {
-        let blurView = DynamicBlurView(frame: backgroundImage.bounds)
-        blurView.blurRadius = 7
-        backgroundImage.addSubview(blurView)
-    }
-    
     private func fadeInAnimation(_ view: UIView) {
         if view.alpha == 0.0 {
             UIView.animate(withDuration: 2.2, delay: 0.2, options: .curveEaseOut, animations: {
@@ -99,10 +92,9 @@ class LoginViewController: UIViewController {
     }
     
     @objc private func shiftScreenUpForKeyboard(notification: Notification) {
-        guard let keyboardRect = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue
-            else {return}
+        guard let keyboardRect = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else {return}
         
-        if notification.name == UIResponder.keyboardWillShowNotification ||
+        if  notification.name == UIResponder.keyboardWillShowNotification ||
             notification.name == UIResponder.keyboardWillChangeFrameNotification {
             // Shift the screen up by the height of the keyboard
             view.frame.origin.y = -keyboardRect.height

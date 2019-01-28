@@ -20,6 +20,7 @@
 
 #include "Firestore/core/src/firebase/firestore/util/filesystem.h"
 #include "Firestore/core/src/firebase/firestore/util/hard_assert.h"
+#include "Firestore/core/src/firebase/firestore/util/log.h"
 #include "Firestore/core/src/firebase/firestore/util/statusor.h"
 
 #import "Firestore/Source/Core/FSTFirestoreClient.h"
@@ -33,20 +34,51 @@ using util::ReadFile;
 using util::StatusOr;
 using util::StringFormat;
 
-std::string LoadGrpcRootCertificate() {
-  // TODO(varconst): uncomment these lines once it's possible to load the
-  // certificate from gRPC-C++ pod.
-  // NSBundle* bundle = [NSBundle bundleWithIdentifier:@"org.cocoapods.grpcpp"];
-  // HARD_ASSERT(bundle, "Could not find grpcpp bundle");
+NSString* FindPathToCertificatesFile() {
+  // Certificates file might be present in either the gRPC-C++ bundle or (for
+  // some projects) in the main bundle.
+  NSBundle* bundles[] = {
+      // Try to load certificates bundled by gRPC-C++.
+      [NSBundle bundleWithIdentifier:@"org.cocoapods.grpcpp"],
+      // Users manually adding resources to the project may add the
+      // certificate to the main application bundle. Note that `mainBundle` is
+      // nil for unit tests of library projects, so it cannot fully substitute
+      // for checking the framework bundle.
+      [NSBundle mainBundle],
+  };
 
-  // `mainBundle` may be nil in certain cases (e.g., unit tests).
-  NSBundle* bundle = [NSBundle bundleForClass:FSTFirestoreClient.class];
-  HARD_ASSERT(bundle, "Could not find Firestore bundle");
-  NSString* path =
-      [bundle pathForResource:@"gRPCCertificates.bundle/roots" ofType:@"pem"];
+  // search for the roots.pem file in each of these resource locations
+  NSString* possibleResources[] = {
+      @"gRPCCertificates.bundle/roots",
+      @"roots",
+  };
+
+  for (NSBundle* bundle : bundles) {
+    if (!bundle) {
+      continue;
+    }
+
+    for (NSString* resource : possibleResources) {
+      NSString* path = [bundle pathForResource:resource ofType:@"pem"];
+      if (path) {
+        LOG_DEBUG("%s.pem found in bundle %s", resource,
+                  [bundle bundleIdentifier]);
+        return path;
+      } else {
+        LOG_DEBUG("%s.pem not found in bundle %s", resource,
+                  [bundle bundleIdentifier]);
+      }
+    }
+  }
+
+  return nil;
+}
+
+std::string LoadGrpcRootCertificate() {
+  NSString* path = FindPathToCertificatesFile();
   HARD_ASSERT(
       path,
-      "Could not load root certificates from the bundle. SSL won't work.");
+      "Could not load root certificates from the bundle. SSL cannot work.");
 
   StatusOr<std::string> certificate = ReadFile(Path::FromNSString(path));
   HARD_ASSERT(
