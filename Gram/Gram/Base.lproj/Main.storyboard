@@ -57,12 +57,12 @@
                     </view>
                     <tabBarItem key="tabBarItem" title="First" image="first" id="acW-dT-cKf"/>
                     <connections>
-                        <outlet property="name" destination="nwh-wD-1b7" id="Dlb-i2-9Hy"/>
+                        <outlet property="nameLabel" destination="nwh-wD-1b7" id="qnO-7h-3Bc"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1996" y="-337.78110944527737"/>
+            <point key="canvasLocation" x="503" y="118"/>
         </scene>
         <!--Second-->
         <scene sceneID="wg7-f3-ORb">
@@ -99,7 +99,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4Nw-L8-lE0" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2935.1999999999998" y="342.27886056971516"/>
+            <point key="canvasLocation" x="503" y="817"/>
         </scene>
         <!--LoginViewController-->
         <scene sceneID="taT-CM-460">
@@ -530,7 +530,7 @@
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="HuB-VB-40B" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1248.8" y="-14.842578710644679"/>
+            <point key="canvasLocation" x="-244" y="441"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="1a4-zN-f2b">
