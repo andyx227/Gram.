@@ -22,7 +22,7 @@ class FirstViewController: UIViewController {
             print("Can't unwrap")
             return
         }
-        //nameLabel?.text = theEmail
+        nameLabel?.text = theEmail
         
         let db = Firestore.firestore()
         
@@ -31,16 +31,16 @@ class FirstViewController: UIViewController {
                 if let err = err {
                     print("Error getting documents: \(err)")
                 } else {
-//                    guard let qs = querySnapshot else {
-//                        return
-//                    }
-//                    for document in qs.documents {
-//                        guard let theName = document.get("name") else {
-//                            print("can't unwrap")
-//                            return
-//                        }
-//                        print("name is ", theName as! String)
-//                    }
+                    guard let qs = querySnapshot else {
+                        return
+                    }
+                    for document in qs.documents {
+                        guard let theName = document.get("name") else {
+                            print("can't unwrap")
+                            return
+                        }
+                        self.nameLabel?.text = theName as? String
+                    }
                 }
         }
 
