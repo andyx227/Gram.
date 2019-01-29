@@ -12,21 +12,17 @@ import FirebaseCore
 import FirebaseDatabase
 
 class FirstViewController: UIViewController {
-    var email:String?
+    var userEmail:String?
     @IBOutlet weak var nameLabel: UILabel!
     
     override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        guard let theEmail = email else {
+        guard let userEmail = userEmail else {
             print("Can't unwrap")
             return
         }
-        nameLabel?.text = theEmail
         
         let db = Firestore.firestore()
-        
-        db.collection("users").whereField("email", isEqualTo: theEmail)
+        db.collection("users").whereField("email", isEqualTo: userEmail)
             .getDocuments() { (querySnapshot, err) in
                 if let err = err {
                     print("Error getting documents: \(err)")
@@ -40,13 +36,13 @@ class FirstViewController: UIViewController {
                             return
                         }
                         self.nameLabel?.text = theName as? String
+                        self.fadeInAnimation(self.nameLabel, duration:1.5)
+                       
                     }
                 }
+               super.viewDidLoad()
         }
-
-        
     }
-
-
 }
+
 

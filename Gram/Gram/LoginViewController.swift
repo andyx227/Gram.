@@ -23,7 +23,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        fadeInAnimation(labelAppName)
+        fadeInAnimation(labelAppName, duration:2.2)
         hideKeyboard()  // Make sure user can hide keyboard when screen is tapped
 
         // Listen for keyboard events
@@ -59,7 +59,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let barViewControllers = segue.destination as! UITabBarController
         let destinationViewController = barViewControllers.viewControllers?[0] as! FirstViewController
-        destinationViewController.email = userEmail
+        destinationViewController.userEmail = userEmail
     }
 
     private func authenticate(email: String, password: String) {
@@ -100,13 +100,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         return backgroundImageView
     }
 
-    private func fadeInAnimation(_ view: UIView) {
-        if view.alpha == 0.0 {
-            UIView.animate(withDuration: 2.2, delay: 0.2, options: .curveEaseOut, animations: {
-                view.alpha = 1.0
-            })
-        }
-    }
+    
 
     @objc private func shiftScreenUpForKeyboard(notification: Notification) {
         guard let keyboardRect = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else {return}
@@ -131,5 +125,13 @@ extension UIViewController {
 
     @objc func dismissKeyboard() {  // Dismisses the keyboard
         view.endEditing(true)
+    }
+    
+    func fadeInAnimation(_ view: UIView, duration:Float) {
+        if view.alpha == 0.0 {
+            UIView.animate(withDuration: TimeInterval(duration), delay: 0.2, options: .curveEaseOut, animations: {
+                view.alpha = 1.0
+            })
+        }
     }
 }
