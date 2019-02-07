@@ -110,7 +110,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         if  notification.name == UIResponder.keyboardWillShowNotification ||
             notification.name == UIResponder.keyboardWillChangeFrameNotification {
             // Shift the screen up by the height of the keyboard
-            view.frame.origin.y = -keyboardRect.height
+            view.frame.origin.y = -keyboardRect.height + 30
         } else {
             // Keyboard is dismissed so return screen back to original height
             view.frame.origin.y = 0
