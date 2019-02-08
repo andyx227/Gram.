@@ -61,16 +61,14 @@ struct Api {
         let localFile = URL(fileURLWithPath: path)
         
         let profileRef = storageRef.child("images/profilePhotos/\(username)")
-        let path = URL(fileURLWithPath: Bundle.main.path(forResource: "image", ofType: "jpg") ?? "test")
-        
         // Upload the file to the path
-        profileRef.putFile(from: path, metadata: nil) { metadata, error in
+        profileRef.putFile(from: localFile, metadata: nil) { metadata, error in
             
             // You can also access to download URL after upload.
             storageRef.downloadURL { (url, error) in
                 guard let downloadURL = url else {
                     completion(nil, "An error has occurred obtaining profile photo url")
-                    error?.localizedDescription
+                    print(error?.localizedDescription ?? "error")
                     return
                 }
                 
