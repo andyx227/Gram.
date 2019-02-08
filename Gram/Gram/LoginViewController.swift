@@ -43,7 +43,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     }
 
     @IBAction func loginPress(_ sender: Any) {
-        
         guard let password = textPassword.text else {
             return
         }
