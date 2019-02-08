@@ -11,6 +11,7 @@ import FirebaseFirestore
 
 struct Api {
     static var db = Firestore.firestore()
+    
     struct profileInfo {
         var firstName : String
         var lastName : String
@@ -54,6 +55,28 @@ struct Api {
     static func searchUsers(name: String, completion: @escaping ApiCompletionList) {
         //TODO: use array contains function to check if
         //supplied name is a substring
+        let docRef = db.collection("users")
+        let query = docRef.whereField("username", isGreaterThan: name).whereField("username", isLessThan: name + "z").order(by: "username", descending: true)
+        
+        query.getDocuments { (querySnapshot, error) in
+            if let documents = querySnapshot?.documents {
+                var allDocs : [[String : Any]] = []
+                dump(documents)
+                dump(allDocs)
+                for document in documents {
+                    allDocs.append(document.data().mapValues { String.init(describing: $0)
+                        
+                    })
+                } //add all documents to a dictionary of dictionaries
+                //key is the name of the document (good for iterating through location
+                completion(allDocs, nil)
+            } else {
+                print("error type:")
+                dump(error!)
+                completion(nil, "Collection does not exist")
+            }
+
+        }
     }
     
     
