@@ -15,6 +15,7 @@ struct Api {
     struct profileInfo {
         var firstName : String
         var lastName : String
+        var username : String
         var email : String
     }
     
@@ -30,18 +31,28 @@ struct Api {
             "firstName" : user.firstName,
             "lastName" : user.lastName,
             "email" : user.email,
+            "username" : user.username,
             "profilePhoto" : "",
             "communities" : []
         ]
         
-        db.collection("users").document().setData(docData) { err in
-            if let err = err as? String {
-                completion(nil, err)
+        let userNameCheck = db.collection("users").whereField("username", isEqualTo: user.username)
+        userNameCheck.getDocuments { (querySnapshot, err) in
+            if querySnapshot?.count != 0 {
+                completion(nil, "username already exist")
+                print("username exists")
+            } else {
+                db.collection("users").document().setData(docData) { err in
+                    if let err = err as? String {
+                        completion(nil, err)
+                    }
+                    
+                    completion(["response": "good"], nil)
+                }
             }
-            
-            completion(["response": "good"], nil)
         }
     }
+    
     
     /**
      takes two userIDs, the logged in user and the user to
