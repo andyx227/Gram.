@@ -18,6 +18,13 @@ struct Api {
         var email : String
     }
     
+    struct userInfo {
+        var firstName : String
+        var lastName : String
+        var userName : String
+        var userID : String
+    }
+    
     static func signupUser(user:profileInfo, completion: @escaping ApiCompletion) {
         let docData: [String:Any] = [
             "firstName" : user.firstName,
@@ -52,24 +59,27 @@ struct Api {
      for the search string used
      Returns a list of user structs? should contain user info
     */
-    static func searchUsers(name: String, completion: @escaping ApiCompletionList) {
+    static func searchUsers(name: String, completion: @escaping ApiCompletionUserList) {
         //TODO: use array contains function to check if
         //supplied name is a substring
         let docRef = db.collection("users")
+        //query where name starts with the input info
         let query = docRef.whereField("username", isGreaterThan: name).whereField("username", isLessThan: name + "z").order(by: "username", descending: true)
         
         query.getDocuments { (querySnapshot, error) in
             if let documents = querySnapshot?.documents {
-                var allDocs : [[String : Any]] = []
                 dump(documents)
-                dump(allDocs)
+                var users : [userInfo] = []
                 for document in documents {
-                    allDocs.append(document.data().mapValues { String.init(describing: $0)
-                        
-                    })
-                } //add all documents to a dictionary of dictionaries
-                //key is the name of the document (good for iterating through location
-                completion(allDocs, nil)
+                    var docData = document.data().mapValues { String.init(describing: $0)}
+                    //unwrap into user object, potentially
+                    //if if fields empty
+                    let user = userInfo(firstName: docData["firstName"] ?? "", lastName: docData["lastName"] ?? "", userName: docData["username"] ?? "", userID: document.documentID)
+                    //append user object to list of
+                    //users that satisfy search requirement
+                    users.append(user)
+                }
+                completion(users, nil)
             } else {
                 print("error type:")
                 dump(error!)
@@ -82,4 +92,5 @@ struct Api {
     
     typealias ApiCompletion = ((_ response: [String: Any]?, _ error: String?) -> Void)
     typealias ApiCompletionList = ((_ response: [[String: Any]]?, _ error: String?) -> Void)
+    typealias ApiCompletionUserList = ((_ response: [userInfo]?, _ error: String?) -> Void)
 }

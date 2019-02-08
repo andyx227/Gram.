@@ -57,6 +57,7 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
         currentlySelectedTextField = textField
+        
     }
     
     /**************** Helper Functions Below *****************/
