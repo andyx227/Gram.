@@ -27,6 +27,7 @@ struct Api {
         var lastName : String
         var userName : String
         var userID : String
+        var following : Bool
     }
     
     static func signupUser(user:profileInfo, completion: @escaping ApiCompletion) {
@@ -108,9 +109,12 @@ struct Api {
     /**
      take a search string as arguement, like match equivalent
      for the search string used
-     Returns a list of user structs? should contain user info
+     takes userID of user doing search to determine if searched users are followed
+     by the searchee
+     Returns a list of user structs? should contain user info and whether or not
+     they are being followed by user
     */
-    static func searchUsers(name: String, completion: @escaping ApiCompletionUserList) {
+    static func searchUsers(name: String, userID: String, completion: @escaping ApiCompletionUserList) {
         //TODO: use array contains function to check if
         //supplied name is a substring
         let docRef = db.collection("users")
@@ -125,12 +129,27 @@ struct Api {
                     var docData = document.data().mapValues { String.init(describing: $0)}
                     //unwrap into user object, potentially
                     //if if fields empty
-                    let user = userInfo(firstName: docData["firstName"] ?? "", lastName: docData["lastName"] ?? "", userName: docData["username"] ?? "", userID: document.documentID)
+                    let user = userInfo(firstName: docData["firstName"] ?? "", lastName: docData["lastName"] ?? "", userName: docData["username"] ?? "", userID: document.documentID, following: false)
                     //append user object to list of
                     //users that satisfy search requirement
                     users.append(user)
                 }
-                completion(users, nil)
+                
+                findFollowers(userID: userID) { (userIDs, error) in
+                    if let userIDs = userIDs {
+                        for followingID in userIDs {
+                            for index in 0 ..< users.count {
+                                if users[index].userID == followingID {
+                                    users[index].following = true
+                                }
+                            }
+                        }
+                        completion(users, nil)
+                    } else {
+                        dump(error)
+                        completion(nil, "Error: could not operate on follower collection")
+                    }
+                }
             } else {
                 print("error type:")
                 dump(error!)
@@ -139,9 +158,39 @@ struct Api {
 
         }
     }
-    
+    /**
+     Takes a userID as arguement
+     returns all userIDs being followed by the given user
+    */
+    static func findFollowers(userID : String, completion : @escaping ApiCompletionUserIDs) {
+        let docRef = db.collection("followers")
+        //query where userID matches follower
+        let query = docRef.whereField("followerID", isEqualTo: userID)
+        
+        query.getDocuments { (querySnapshot, error) in
+            if let documents = querySnapshot?.documents {
+                dump(documents)
+                var userIDs : [String] = []
+                for document in documents {
+                    var docData = document.data().mapValues { String.init(describing: $0)}
+                    //unwrap into user object, potentially
+                    //if if fields empty
+                    if let followingID = docData["followingID"] {
+                        userIDs.append(followingID)
+                    }
+                }
+                completion(userIDs, nil)
+            } else {
+                print("error type:")
+                dump(error!)
+                completion(nil, "Collection does not exist")
+            }
+            
+        }
+    }
     
     typealias ApiCompletion = ((_ response: [String: Any]?, _ error: String?) -> Void)
     typealias ApiCompletionList = ((_ response: [[String: Any]]?, _ error: String?) -> Void)
     typealias ApiCompletionUserList = ((_ response: [userInfo]?, _ error: String?) -> Void)
+    typealias ApiCompletionUserIDs = ((_ response: [String]?, _ error: String?) -> Void)
 }
