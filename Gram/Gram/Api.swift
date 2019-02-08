@@ -8,9 +8,12 @@
 
 import Foundation
 import FirebaseFirestore
+import FirebaseStorage
+
 
 struct Api {
     static var db = Firestore.firestore()
+    static var storage = Storage.storage()
     
     struct profileInfo {
         var firstName : String
@@ -40,7 +43,6 @@ struct Api {
         userNameCheck.getDocuments { (querySnapshot, err) in
             if querySnapshot?.count != 0 {
                 completion(nil, "username already exist")
-                print("username exists")
             } else {
                 db.collection("users").document().setData(docData) { err in
                     if let err = err as? String {
@@ -53,6 +55,44 @@ struct Api {
         }
     }
     
+    static func uploadProfilePhoto(path: String, username: String, completion: @escaping ApiCompletion){
+        let storageRef = storage.reference()
+        let localFile = URL(fileURLWithPath: path)
+        
+        let profileRef = storageRef.child("images/profilePhotos/\(username)")
+        let path = URL(fileURLWithPath: Bundle.main.path(forResource: "image", ofType: "jpg") ?? "test")
+        
+        // Upload the file to the path
+        profileRef.putFile(from: path, metadata: nil) { metadata, error in
+            
+            // You can also access to download URL after upload.
+            storageRef.downloadURL { (url, error) in
+                guard let downloadURL = url else {
+                    completion(nil, "An error has occurred obtaining profile photo url")
+                    error?.localizedDescription
+                    return
+                }
+                
+                // set profilePhoto url in the user whose photo we are uploading
+                let docRef = db.collection("users")
+                let query = docRef.whereField("username", isEqualTo: username)
+                query.getDocuments(completion: { (querySnapshot, error) in
+                    if let documents = querySnapshot?.documents {
+                        dump(documents)
+                        if documents.count != 1 {
+                            completion(nil, "Not one username found when updating profile photo")
+                        }
+                        
+                        db.collection("users").document(documents[0].documentID).updateData(["profilePhoto": downloadURL])
+                        completion(["response" : "success"], nil)
+                        
+                    }
+                })
+                
+            }
+        }
+        
+    }
     
     /**
      takes two userIDs, the logged in user and the user to
