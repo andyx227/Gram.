@@ -15,6 +15,5 @@ class ProfileInfoCell: UITableViewCell {
     @IBOutlet weak var fullname: UILabel!
     @IBOutlet weak var username: UILabel!
     @IBOutlet weak var bio: UILabel!
-    
-    
+    @IBOutlet weak var btnEditProfile: UIButton!
 }
