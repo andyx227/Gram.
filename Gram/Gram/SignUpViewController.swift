@@ -52,16 +52,6 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func cancelSignUp(_ sender: Any) {  // When user presses "Cancel", go back to login screen
-        var path : String = ""
-        let resourcePath = Bundle.main.url(forResource: "image", withExtension: "jpg")
-        
-        Api.uploadProfilePhoto(path: resourcePath?.absoluteString ?? "test", username: "ghgd") { (response, error) in
-            if error == nil {
-                print("done")
-            } else {
-                print("error")
-            }
-        }
         navigationController?.popViewController(animated: true)
     }
     

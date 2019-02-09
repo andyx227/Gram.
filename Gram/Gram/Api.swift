@@ -123,10 +123,40 @@ struct Api {
      follow. maybe check if already following and if so
      unfollow the user to follow
     */
-    static func followUser(follower: String, following: String, completion: @escaping ApiCompletion) {
+    static func followUser(followerID: String, followingID: String, following : Bool, completion: @escaping ApiCompletion) {
         //TODO: potentially store doc ID (that is, our UserID)
         //for the users queried in the search as well as
         //the primary user
+        if following {
+            let docRef = db.collection("followers")
+            //query where name starts with the input info
+            let query = docRef.whereField("followerID",isEqualTo: followerID).whereField("followingID", isEqualTo: followingID)
+            
+            query.getDocuments { (querySnapshot, error) in
+                if let documents = querySnapshot?.documents {
+                    if documents.count == 0 {
+                        completion(nil, "User was not following")
+                    }
+                    db.collection("followers").document(documents[0].documentID).delete()
+                    completion(["response": "good"], nil)
+                } else {
+                    print("error type:")
+                    dump(error!)
+                    completion(nil, "Collection does not exist")
+                }
+            }
+            
+        } else {
+            let docData = ["followerID": followerID, "followingID": followingID]
+            db.collection("followers").document().setData(docData) { err in
+                if let err = err as? String {
+                    completion(nil, err)
+                }
+                
+                completion(["response": "good"], nil)
+            }
+        }
+        
     }
     
     /**
