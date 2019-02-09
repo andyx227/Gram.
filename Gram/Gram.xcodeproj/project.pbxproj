@@ -11,6 +11,8 @@
 		5D73C433220B7EA900E75875 /* Api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D73C432220B7EA900E75875 /* Api.swift */; };
 		A11274DA21FD48AA00DA05D5 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11274D921FD48AA00DA05D5 /* LoginViewController.swift */; };
 		A11274E021FD76BE00DA05D5 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A11274DF21FD76BE00DA05D5 /* GoogleService-Info.plist */; };
+		A12AC1F6220EB0B2000036E3 /* ProfileTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A12AC1F5220EB0B2000036E3 /* ProfileTableViewController.swift */; };
+		A12AC1F8220EB20B000036E3 /* ProfileInfoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A12AC1F7220EB20B000036E3 /* ProfileInfoCell.swift */; };
 		A16A3E8B21FE5F2300E13C81 /* SignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16A3E8A21FE5F2300E13C81 /* SignUpViewController.swift */; };
 		A17D05C121FA53C300205E1D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17D05C021FA53C300205E1D /* AppDelegate.swift */; };
 		A17D05C321FA53C300205E1D /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17D05C221FA53C300205E1D /* FirstViewController.swift */; };
@@ -27,6 +29,8 @@
 		62D3A713EE276D31FDAC2B1C /* Pods-Gram.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Gram.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Gram/Pods-Gram.debug.xcconfig"; sourceTree = "<group>"; };
 		A11274D921FD48AA00DA05D5 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		A11274DF21FD76BE00DA05D5 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		A12AC1F5220EB0B2000036E3 /* ProfileTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileTableViewController.swift; sourceTree = "<group>"; };
+		A12AC1F7220EB20B000036E3 /* ProfileInfoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileInfoCell.swift; sourceTree = "<group>"; };
 		A16A3E8A21FE5F2300E13C81 /* SignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewController.swift; sourceTree = "<group>"; };
 		A17D05BD21FA53C300205E1D /* Gram.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Gram.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A17D05C021FA53C300205E1D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -82,6 +86,8 @@
 				A11274D921FD48AA00DA05D5 /* LoginViewController.swift */,
 				A16A3E8A21FE5F2300E13C81 /* SignUpViewController.swift */,
 				5D73C432220B7EA900E75875 /* Api.swift */,
+				A12AC1F5220EB0B2000036E3 /* ProfileTableViewController.swift */,
+				A12AC1F7220EB20B000036E3 /* ProfileInfoCell.swift */,
 			);
 			path = Gram;
 			sourceTree = "<group>";
@@ -242,9 +248,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A12AC1F6220EB0B2000036E3 /* ProfileTableViewController.swift in Sources */,
 				5D73C433220B7EA900E75875 /* Api.swift in Sources */,
 				A11274DA21FD48AA00DA05D5 /* LoginViewController.swift in Sources */,
 				A17D05C521FA53C300205E1D /* SecondViewController.swift in Sources */,
+				A12AC1F8220EB20B000036E3 /* ProfileInfoCell.swift in Sources */,
 				A17D05C121FA53C300205E1D /* AppDelegate.swift in Sources */,
 				A17D05C321FA53C300205E1D /* FirstViewController.swift in Sources */,
 				A16A3E8B21FE5F2300E13C81 /* SignUpViewController.swift in Sources */,

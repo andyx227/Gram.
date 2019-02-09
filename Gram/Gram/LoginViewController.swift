@@ -42,7 +42,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
     }
 
-    @IBAction func loginPress(_ sender: Any) {f
+    @IBAction func loginPress(_ sender: Any) {
         guard let password = textPassword.text else {
             return
         }
