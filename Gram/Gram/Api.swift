@@ -10,6 +10,7 @@ import Foundation
 import FirebaseFirestore
 import FirebaseStorage
 
+var user: Api.profileInfo?
 
 struct Api {
     static var db = Firestore.firestore()
@@ -93,7 +94,24 @@ struct Api {
                 
             }
         }
+    }
+    
+    static func getProfilePhoto(completion: @escaping ApiCompletionURL){
+        guard let user = user else {
+            completion(nil,"Global user not set")
+            return
+        }
+        let docRef = db.collection("users")
+        let query = docRef.whereField("username", isEqualTo: user.username)
         
+        query.getDocuments { (querySnapshot, error) in
+            if let documents = querySnapshot?.documents {
+                dump(documents)
+                
+                var docData = documents[0].data().mapValues { String.init(describing: $0)}
+                completion((docData["profilePhoto"] ?? ""), nil)
+            }
+        }
     }
     
     /**
@@ -194,4 +212,5 @@ struct Api {
     typealias ApiCompletionList = ((_ response: [[String: Any]]?, _ error: String?) -> Void)
     typealias ApiCompletionUserList = ((_ response: [userInfo]?, _ error: String?) -> Void)
     typealias ApiCompletionUserIDs = ((_ response: [String]?, _ error: String?) -> Void)
+    typealias ApiCompletionURL = ((_ response: String?, _ error: String?) -> Void)
 }
