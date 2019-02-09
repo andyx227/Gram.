@@ -56,16 +56,15 @@ struct Api {
         }
     }
     
-    static func uploadProfilePhoto(path: String, username: String, completion: @escaping ApiCompletion){
+    static func uploadProfilePhoto(path: URL, username: String, completion: @escaping ApiCompletion){
         let storageRef = storage.reference()
-        let localFile = URL(fileURLWithPath: path)
-        
-        let profileRef = storageRef.child("images/profilePhotos/\(username)")
+
+        let profileRef = storageRef.child("images/profilePhotos/" + username)
         // Upload the file to the path
-        profileRef.putFile(from: localFile, metadata: nil) { metadata, error in
+        profileRef.putFile(from: path , metadata: nil) { metadata, error in
             
             // You can also access to download URL after upload.
-            storageRef.downloadURL { (url, error) in
+            profileRef.downloadURL { (url, error) in
                 guard let downloadURL = url else {
                     completion(nil, "An error has occurred obtaining profile photo url")
                     print(error?.localizedDescription ?? "error")
@@ -82,7 +81,7 @@ struct Api {
                             completion(nil, "Not one username found when updating profile photo")
                         }
                         
-                        db.collection("users").document(documents[0].documentID).updateData(["profilePhoto": downloadURL])
+                        db.collection("users").document(documents[0].documentID).setData(["profilePhoto": downloadURL.absoluteString], merge:true)
                         completion(["response" : "success"], nil)
                         
                     }
