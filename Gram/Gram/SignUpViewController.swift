@@ -54,43 +54,70 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func signUpButtonPressed(_ sender: UIButton) {
-        guard let theUsername = textUsername.text else {
-            errorLabel.text = "Username field cannot be empty"
-            return
-        }
-        Api.checkUserExists(username: theUsername) { (_, error) in
-            if error == nil {
-                // works, user not exists
-                guard let email = self.textEmail.text, let password = self.textPassword.text else {
-                    self.errorLabel.text = "Email/password cannot be empty"
-                    return
-                }
-                guard let firstname = self.textFirstName.text, let lastname = self.textLastName.text else {
-                    self.errorLabel.text = "Please enter your first and last name"
-                    return
-                }
-                Auth.auth().createUser(withEmail: email, password: password, completion: { (user, error) in
-                    guard let _ = user else {
-                        self.errorLabel.text = "login error"
-                        return
-                    }
-                    Api.signupUser(completion: { (response, error) in
-                        if error == nil {
-                            self.errorLabel.text = "Sign up success"
-                        }
-                        else {
-                            self.errorLabel.text = error
-                        }
-                    })
-                })
+        if let theUsername = textUsername.text {
+            if theUsername != "" {
+                print("username: ", theUsername)
                 
-                // initialize user global var
-                let profile = Api.profileInfo.init(firstName: firstname, lastName: lastname, username: theUsername, email: email)
-                user = profile
+                Api.checkUserExists(username: theUsername) { (_, error) in
+                    if error == nil {
+                        // works, user not exists
+                        if let email = self.textEmail.text, let password = self.textPassword.text {
+                            if password != self.textConfirmPassword.text {
+                                self.errorLabel.text = "Confirm password doesn't match password"
+                                return
+                            }
+                            
+                            if email == "" || password == "" {
+                                self.errorLabel.text = "Email/password cannot be empty"
+                                return
+                            }
+                            
+                            if password.count < 6 {
+                                self.errorLabel.text = "Password has to be at least 6 chars"
+                                return
+                            }
+                            
+                            guard let firstname = self.textFirstName.text, let lastname = self.textLastName.text else {
+                                return
+                            }
+                            if firstname == "" || lastname == "" {
+                                self.errorLabel.text = "Please enter your first and last name"
+                                return
+                            }
+                            
+                            Auth.auth().createUser(withEmail: email, password: password, completion: { (user_response, error) in
+                                guard let _ = user_response else {
+                                    self.errorLabel.text = "login error"
+                                    return
+                                }
+                                
+                                // initialize user global var
+                                let profile = Api.profileInfo.init(firstName: firstname, lastName: lastname, username: theUsername, email: email)
+                                user = profile
+                                
+                                Api.signupUser(completion: { (response, error) in
+                                    if error == nil {
+                                        self.errorLabel.text = "Sign up success"
+                                    }
+                                    else {
+                                        self.errorLabel.text = error
+                                    }
+                                })
+                            })
+                        }
+
+                    }
+                    else {
+                        self.errorLabel.text = error
+                    }
+                }
+                
             }
+            
             else {
-                self.errorLabel.text = error
+                errorLabel.text = "Username cannot be empty"
             }
+            
         }
         
     }
