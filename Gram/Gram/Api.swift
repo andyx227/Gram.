@@ -30,6 +30,17 @@ struct Api {
         var following : Bool
     }
     
+    static func checkUserExists(username: String, completion: @escaping ApiCompletion) {
+        let userNameCheck = db.collection("users").whereField("username", isEqualTo: username)
+        userNameCheck.getDocuments { (querySnapshot, err) in
+            if querySnapshot?.count != 0 {
+                completion(nil, "username already exist")
+            } else {
+                completion(["response":"success"], nil)
+            }
+        }
+    }
+    
     static func signupUser(user:profileInfo, completion: @escaping ApiCompletion) {
         let docData: [String:Any] = [
             "firstName" : user.firstName,
@@ -40,19 +51,12 @@ struct Api {
             "communities" : []
         ]
         
-        let userNameCheck = db.collection("users").whereField("username", isEqualTo: user.username)
-        userNameCheck.getDocuments { (querySnapshot, err) in
-            if querySnapshot?.count != 0 {
-                completion(nil, "username already exist")
-            } else {
-                db.collection("users").document().setData(docData) { err in
-                    if let err = err as? String {
-                        completion(nil, err)
-                    }
-                    
-                    completion(["response": "good"], nil)
-                }
+        db.collection("users").document().setData(docData) { err in
+            if let err = err as? String {
+                completion(nil, err)
             }
+            
+            completion(["response": "good"], nil)
         }
     }
     
