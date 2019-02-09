@@ -8,6 +8,7 @@
 
 import UIKit
 import TextFieldEffects
+import FirebaseAuth
 
 class SignUpViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var textFirstName: KaedeTextField!
@@ -17,6 +18,7 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var textPassword: KaedeTextField!
     @IBOutlet weak var textConfirmPassword: KaedeTextField!
     @IBOutlet weak var btnSignUp: UIButton!
+    @IBOutlet weak var errorLabel: UILabel!
     var currentlySelectedTextField: UITextField?
     
     override func viewWillAppear(_ animated: Bool) {
@@ -49,6 +51,48 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+    }
+    
+    @IBAction func signUpButtonPressed(_ sender: UIButton) {
+        guard let theUsername = textUsername.text else {
+            errorLabel.text = "Username field cannot be empty"
+            return
+        }
+        Api.checkUserExists(username: theUsername) { (_, error) in
+            if error == nil {
+                // works, user not exists
+                guard let email = self.textEmail.text, let password = self.textPassword.text else {
+                    self.errorLabel.text = "Email/password cannot be empty"
+                    return
+                }
+                guard let firstname = self.textFirstName.text, let lastname = self.textLastName.text else {
+                    self.errorLabel.text = "Please enter your first and last name"
+                    return
+                }
+                Auth.auth().createUser(withEmail: email, password: password, completion: { (user, error) in
+                    guard let _ = user else {
+                        self.errorLabel.text = "login error"
+                        return
+                    }
+                    Api.signupUser(completion: { (response, error) in
+                        if error == nil {
+                            self.errorLabel.text = "Sign up success"
+                        }
+                        else {
+                            self.errorLabel.text = error
+                        }
+                    })
+                })
+                
+                // initialize user global var
+                let profile = Api.profileInfo.init(firstName: firstname, lastName: lastname, username: theUsername, email: email)
+                user = profile
+            }
+            else {
+                self.errorLabel.text = error
+            }
+        }
+        
     }
     
     @IBAction func cancelSignUp(_ sender: Any) {  // When user presses "Cancel", go back to login screen

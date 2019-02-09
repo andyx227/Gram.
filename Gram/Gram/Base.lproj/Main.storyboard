@@ -469,6 +469,9 @@
                                                 <integer key="value" value="10"/>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="signUpButtonPressed:" destination="Q4c-tF-cPS" eventType="touchUpInside" id="90m-Pl-VF7"/>
+                                        </connections>
                                     </button>
                                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icon_username" translatesAutoresizingMaskIntoConstraints="NO" id="k3M-SI-z8I">
                                         <rect key="frame" x="10" y="197" width="39" height="37"/>
@@ -547,6 +550,13 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Dbh-ui-hb6">
+                                <rect key="frame" x="16" y="101" width="343" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <constraints>
                             <constraint firstItem="3EX-F9-96s" firstAttribute="leading" secondItem="TBd-KS-2ka" secondAttribute="leading" constant="8" id="CWi-EQ-4jS"/>
@@ -566,6 +576,7 @@
                     <navigationItem key="navigationItem" id="7aM-jF-mTm"/>
                     <connections>
                         <outlet property="btnSignUp" destination="UbC-7X-rca" id="3zp-HO-Wy3"/>
+                        <outlet property="errorLabel" destination="Dbh-ui-hb6" id="59J-Cm-cnN"/>
                         <outlet property="textConfirmPassword" destination="xhx-bR-jvn" id="SMg-Px-nCR"/>
                         <outlet property="textEmail" destination="3zD-Ic-GyF" id="RWH-kK-4aw"/>
                         <outlet property="textFirstName" destination="uuc-UW-2s3" id="d6m-ZT-tUA"/>
