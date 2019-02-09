@@ -53,6 +53,14 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "signupToTabController" {
+            let barViewControllers = segue.destination as! UITabBarController
+            let destinationViewController = barViewControllers.viewControllers?[0] as! FirstViewController
+            destinationViewController.userEmail = user?.email
+        }
+    }
+    
     @IBAction func signUpButtonPressed(_ sender: UIButton) {
         if let theUsername = textUsername.text {
             if theUsername != "" {
@@ -97,7 +105,8 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
                                 
                                 Api.signupUser(completion: { (response, error) in
                                     if error == nil {
-                                        self.errorLabel.text = "Sign up success"
+                                        self.errorLabel.text = "Sign up success!"
+                                        self.performSegue(withIdentifier: "signupToTabController", sender: self)
                                     }
                                     else {
                                         self.errorLabel.text = error
@@ -111,7 +120,6 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
                         self.errorLabel.text = error
                     }
                 }
-                
             }
             
             else {

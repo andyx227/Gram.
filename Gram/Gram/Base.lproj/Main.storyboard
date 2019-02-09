@@ -721,6 +721,7 @@
                         <outlet property="textLastName" destination="ici-CH-xYv" id="RYv-Fr-gnI"/>
                         <outlet property="textPassword" destination="xZP-DT-haC" id="xiZ-FN-p1i"/>
                         <outlet property="textUsername" destination="oas-Hy-yX8" id="1P8-se-Yu0"/>
+                        <segue destination="49e-Tb-3d3" kind="show" identifier="signupToTabController" id="BWx-km-74Z"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="UZf-9r-QxG" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -731,6 +732,7 @@
         <scene sceneID="yl2-sM-qoP">
             <objects>
                 <tabBarController id="49e-Tb-3d3" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="aC4-h6-fMT"/>
                     <tabBar key="tabBar" contentMode="scaleToFill" id="W28-zg-YXA">
                         <rect key="frame" x="0.0" y="975" width="768" height="49"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
@@ -776,4 +778,7 @@
         <image name="icon_username" width="180" height="180"/>
         <image name="second" width="30" height="30"/>
     </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="BWx-km-74Z"/>
+    </inferredMetricsTieBreakers>
 </document>

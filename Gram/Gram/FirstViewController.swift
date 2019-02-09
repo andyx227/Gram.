@@ -20,6 +20,7 @@ class FirstViewController: UIViewController {
             print("Can't unwrap")
             return
         }
+        print("email: ", userEmail)
         
         let db = Firestore.firestore()
         db.collection("users").whereField("email", isEqualTo: userEmail)
@@ -31,7 +32,7 @@ class FirstViewController: UIViewController {
                         return
                     }
                     for document in qs.documents {
-                        guard let theName = document.get("name") else {
+                        guard let theName = document.get("firstName") else {
                             print("can't unwrap")
                             return
                         }
