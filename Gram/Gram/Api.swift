@@ -42,7 +42,11 @@ struct Api {
         }
     }
     
-    static func signupUser(user:profileInfo, completion: @escaping ApiCompletion) {
+    static func signupUser(completion: @escaping ApiCompletionURL) {
+        guard let user = user else {
+            completion(nil,"Global user not set")
+            return
+        }
         let docData: [String:Any] = [
             "firstName" : user.firstName,
             "lastName" : user.lastName,
@@ -57,7 +61,7 @@ struct Api {
                 completion(nil, err)
             }
             
-            completion(["response": "good"], nil)
+            completion("success", nil)
         }
     }
     
