@@ -43,6 +43,17 @@ struct Api {
         }
     }
     
+    static func checkEmailExists(email: String, completion: @escaping ApiCompletionURL) {
+        let emailCheck = db.collection("users").whereField("email", isEqualTo: email)
+        emailCheck.getDocuments { (querySnapshot, err) in
+            if querySnapshot?.count != 0 {
+                completion(nil, "email already exist")
+            } else {
+                completion("success", nil)
+            }
+        }
+    }
+    
     static func signupUser(completion: @escaping ApiCompletionURL) {
         guard let user = user else {
             completion(nil,"Global user not set")
@@ -53,6 +64,26 @@ struct Api {
             "lastName" : user.lastName,
             "email" : user.email,
             "username" : user.username,
+            "profilePhoto" : "",
+            "communities" : []
+        ]
+        
+        db.collection("users").document().setData(docData) { err in
+            if let err = err as? String {
+                completion(nil, err)
+            }
+            
+            completion("success", nil)
+        }
+    }
+    
+    static func signupGoogleUser(profile: profileInfo, completion: @escaping ApiCompletionURL) {
+
+        let docData: [String:Any] = [
+            "firstName" : profile.firstName,
+            "lastName" : profile.lastName,
+            "email" : profile.email,
+            "username" : profile.email,
             "profilePhoto" : "",
             "communities" : []
         ]
