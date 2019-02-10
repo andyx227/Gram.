@@ -16,5 +16,5 @@ class PhotoCardCell: UITableViewCell {
     @IBOutlet weak var date: UILabel!
     @IBOutlet weak var photo: UIImageView!
     @IBOutlet weak var photoHeightConstraint: NSLayoutConstraint!
-    @IBOutlet weak var photoWidthConstraint: NSLayoutConstraint!
+    @IBOutlet weak var caption: UILabel!
 }
