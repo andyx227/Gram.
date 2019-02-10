@@ -9,8 +9,9 @@
 import UIKit
 import TextFieldEffects
 import FirebaseAuth
+import GoogleSignIn
 
-class LoginViewController: UIViewController, UITextFieldDelegate {
+class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDelegate {
     @IBOutlet weak var labelAppName: UILabel!  // "Gram."
     @IBOutlet weak var textUsername: KaedeTextField!
     @IBOutlet weak var textPassword: KaedeTextField!
@@ -26,6 +27,10 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         fadeInAnimation(labelAppName, duration:2.2)
         hideKeyboard()  // Make sure user can hide keyboard when screen is tapped
 
+        // Google sign in, set the UI delegate of the GIDSignIn object
+        GIDSignIn.sharedInstance().uiDelegate = self
+        GIDSignIn.sharedInstance().signIn()
+        
         // Listen for keyboard events
         NotificationCenter.default.addObserver(self, selector: #selector(shiftScreenUpForKeyboard(notification:)),
                                                name: UIResponder.keyboardWillShowNotification, object: nil)
