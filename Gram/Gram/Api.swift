@@ -66,10 +66,14 @@ struct Api {
         }
     }
     
-    static func uploadProfilePhoto(path: URL, username: String, completion: @escaping ApiCompletion){
+    static func uploadProfilePhoto(path: URL, completion: @escaping ApiCompletion){
+        guard let user = user else {
+            completion(nil, "User has not been set")
+            return
+        }
         let storageRef = storage.reference()
 
-        let profileRef = storageRef.child("images/profilePhotos/" + username)
+        let profileRef = storageRef.child("images/profilePhotos/" + user.username)
         // Upload the file to the path
         profileRef.putFile(from: path , metadata: nil) { metadata, error in
             
@@ -81,22 +85,13 @@ struct Api {
                     return
                 }
                 
-                // set profilePhoto url in the user whose photo we are uploading
-                let docRef = db.collection("users")
-                let query = docRef.whereField("username", isEqualTo: username)
-                query.getDocuments(completion: { (querySnapshot, error) in
-                    if let documents = querySnapshot?.documents {
-                        dump(documents)
-                        if documents.count != 1 {
-                            completion(nil, "Not one username found when updating profile photo")
-                        }
-                        
-                        db.collection("users").document(documents[0].documentID).setData(["profilePhoto": downloadURL.absoluteString], merge:true)
+                db.collection("users").document(user.userID).setData(["profilePhoto": downloadURL.absoluteString], merge:true, completion: { (error) in
+                    if let _ = error {
+                        completion(nil, "An error occurred on set profile photo url")
+                    } else {
                         completion(["response" : "success"], nil)
-                        
                     }
                 })
-                
             }
         }
     }
