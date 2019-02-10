@@ -56,38 +56,66 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     // TODO: Uncommenting this block of code will cause app to crash!
     // Should segue to TabBarView by pressing login button instead.
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "loginToTabController" {
+        /*if segue.identifier == "loginToTabController" {
             let barViewControllers = segue.destination as! UITabBarController
             let destinationViewController = barViewControllers.viewControllers?[0] as! FirstViewController
             
             destinationViewController.userEmail = userEmail
-        }
+        }*/
     }
 
     private func authenticate(email: String, password: String) {
 
-        Auth.auth().signIn(withEmail: email, password: password) {
-            user, error in
-            if error == nil && user != nil {
-                print("Login successful!")
-                // move to next view controller
-                self.userEmail = email
-                self.performSegue(withIdentifier: "loginToTabController", sender: self)
+        let alert = UIAlertController(title: nil, message: "Logging in...", preferredStyle: .alert)
+        
+        let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
+        loadingIndicator.hidesWhenStopped = true
+        loadingIndicator.style = UIActivityIndicatorView.Style.gray
+        loadingIndicator.startAnimating();
+        
+        alert.view.addSubview(loadingIndicator)
+        present(alert, animated: true, completion: nil)
 
-            } else {
-                let errorAlert = UIAlertController.init(title: "Login Error",
-                                                        message: "Your username or password was incorrect.",
-                                                        preferredStyle: .alert)
+        DispatchQueue.main.async {
+            Auth.auth().signIn(withEmail: email, password: password) {
+                user, error in
+                if error == nil && user != nil {
+                    print("Login successful!")
+                    // move to next view controller
+                    self.userEmail = email
+                    Api.setUserWithEmail(email: email, completion: { (reponse, error) in
+                        if let _ = error {
+                            let errorAlert = UIAlertController.init(title: "Login Error",
+                                                                    message: "An error occurred getting user info",
+                                                                    preferredStyle: .alert)
+                            errorAlert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"),
+                                                               style: .default,
+                                                               handler: { _ in
+                                                                NSLog("Login failed alert occured.")
+                            }))
+                        }
+                        
+                        self.dismiss(animated: true, completion: nil)
+                        self.performSegue(withIdentifier: "loginToTabController", sender: self)
+                    })
+                    
+                    
 
-                errorAlert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"),
-                                                   style: .default,
-                                                   handler: { _ in
-                                                    NSLog("Login failed alert occured.")
-                }
+                } else {
+                    let errorAlert = UIAlertController.init(title: "Login Error",
+                                                            message: "Your username or password was incorrect.",
+                                                            preferredStyle: .alert)
+
+                    errorAlert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"),
+                                                       style: .default,
+                                                       handler: { _ in
+                                                        NSLog("Login failed alert occured.")
+                    }
+                        )
                     )
-                )
-                self.present(errorAlert, animated: true, completion: nil)
-                print("FirebaseAuth failed.")
+                    self.present(errorAlert, animated: true, completion: nil)
+                    print("FirebaseAuth failed.")
+                }
             }
         }
     }
