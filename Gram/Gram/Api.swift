@@ -32,13 +32,13 @@ struct Api {
         var following : Bool
     }
     
-    static func checkUserExists(username: String, completion: @escaping ApiCompletion) {
+    static func checkUserExists(username: String, completion: @escaping ApiCompletionURL) {
         let userNameCheck = db.collection("users").whereField("username", isEqualTo: username)
         userNameCheck.getDocuments { (querySnapshot, err) in
             if querySnapshot?.count != 0 {
                 completion(nil, "username already exist")
             } else {
-                completion(["response":"success"], nil)
+                completion("success", nil)
             }
         }
     }
@@ -66,6 +66,31 @@ struct Api {
         }
     }
     
+    /**
+     Takes in an authenticated user's email and sets up the appropriate global user variable
+    */
+    static func setUserWithEmail(email: String, completion: @escaping ApiCompletionURL) {
+        
+        let docRef = db.collection("users")
+        let query = docRef.whereField("email", isEqualTo: email)
+        
+        query.getDocuments { (querySnapshot, error) in
+            if let documents = querySnapshot?.documents {
+                dump(documents)
+                
+                var docData = documents[0].data().mapValues { String.init(describing: $0)}
+                let loadedProfile = Api.profileInfo.init(firstName: docData["firstName"] ?? "", lastName: docData["lastName"] ?? "", username: docData["username"] ?? "", email: docData["email"] ?? "", userID: documents[0].documentID)
+                user = loadedProfile
+                completion("success", nil)
+            } else {
+                completion(nil, "Error on retrieving user data")
+            }
+        }
+    }
+    
+    /**
+     Given a path to an image stored locally, upload the image to the logged in user and set the profile photo field as the url of the photo uploaded
+    */
     static func uploadProfilePhoto(path: URL, completion: @escaping ApiCompletion){
         guard let user = user else {
             completion(nil, "User has not been set")
@@ -96,11 +121,15 @@ struct Api {
         }
     }
     
+    /**
+     Returns the url of the profile photo for the logged in user
+    */
     static func getProfilePhoto(completion: @escaping ApiCompletionURL){
         guard let user = user else {
             completion(nil,"Global user not set")
             return
         }
+        
         let docRef = db.collection("users")
         let query = docRef.whereField("username", isEqualTo: user.username)
         
@@ -110,6 +139,8 @@ struct Api {
                 
                 var docData = documents[0].data().mapValues { String.init(describing: $0)}
                 completion((docData["profilePhoto"] ?? ""), nil)
+            } else {
+                completion(nil, "Error retrieving for profile photo")
             }
         }
     }
