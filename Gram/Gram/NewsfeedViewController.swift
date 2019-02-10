@@ -31,7 +31,23 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
             return
         }
         
-        //Api.searchUsers(name: searchText, userID: , completion: <#T##Api.ApiCompletionUserList##Api.ApiCompletionUserList##([Api.userInfo]?, String?) -> Void#>)
+        Api.searchUsers(name: searchText) { (peopleList, error) in
+            guard let _ = error else {
+                self.searchPeopleTableView.isHidden = true  // Hide People Search TableView
+                self.newsfeedTableView.isHidden = false  // Show Newsfeed
+                return
+            }
+            
+            if let peopleList = peopleList {
+                self.people = peopleList
+                self.newsfeedTableView.isHidden = true  // Hide newsfeed TableView in order to show the People Search TableView
+                self.searchPeopleTableView.isHidden = false
+                self.searchPeopleTableView.reloadData()
+            } else {
+                self.searchPeopleTableView.isHidden = true  // Hide People Search TableView
+                self.newsfeedTableView.isHidden = false  // Show Newsfeed
+            }
+        }
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
