@@ -98,8 +98,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
                         self.dismiss(animated: true, completion: nil)
                         self.performSegue(withIdentifier: "loginToTabController", sender: self)
                     })
-                    
-                    
 
                 } else {
                     let errorAlert = UIAlertController.init(title: "Login Error",
