@@ -100,7 +100,7 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
                                 }
                                 
                                 // initialize user global var
-                                let profile = Api.profileInfo.init(firstName: firstname, lastName: lastname, username: theUsername, email: email)
+                                let profile = Api.profileInfo.init(firstName: firstname, lastName: lastname, username: theUsername, email: email, userID: "")
                                 user = profile
                                 
                                 Api.signupUser(completion: { (response, error) in

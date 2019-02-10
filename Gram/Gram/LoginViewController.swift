@@ -59,6 +59,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         if segue.identifier == "loginToTabController" {
             let barViewControllers = segue.destination as! UITabBarController
             let destinationViewController = barViewControllers.viewControllers?[0] as! FirstViewController
+            
             destinationViewController.userEmail = userEmail
         }
     }

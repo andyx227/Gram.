@@ -21,6 +21,7 @@ struct Api {
         var lastName : String
         var username : String
         var email : String
+        var userID : String
     }
     
     struct userInfo {
@@ -167,7 +168,7 @@ struct Api {
      Returns a list of user structs? should contain user info and whether or not
      they are being followed by user
     */
-    static func searchUsers(name: String, userID: String, completion: @escaping ApiCompletionUserList) {
+    static func searchUsers(name: String, completion: @escaping ApiCompletionUserList) {
         //TODO: use array contains function to check if
         //supplied name is a substring
         let docRef = db.collection("users")
@@ -182,13 +183,13 @@ struct Api {
                     var docData = document.data().mapValues { String.init(describing: $0)}
                     //unwrap into user object, potentially
                     //if if fields empty
-                    let user = userInfo(firstName: docData["firstName"] ?? "", lastName: docData["lastName"] ?? "", userName: docData["username"] ?? "", userID: document.documentID, following: false)
+                    let currUser = userInfo(firstName: docData["firstName"] ?? "", lastName: docData["lastName"] ?? "", userName: docData["username"] ?? "", userID: document.documentID, following: false)
                     //append user object to list of
                     //users that satisfy search requirement
-                    users.append(user)
+                    users.append(currUser)
                 }
                 
-                findFollowers(userID: userID) { (userIDs, error) in
+                findFollowers() { (userIDs, error) in
                     if let userIDs = userIDs {
                         for followingID in userIDs {
                             for index in 0 ..< users.count {
@@ -215,11 +216,11 @@ struct Api {
      Takes a userID as arguement
      returns all userIDs being followed by the given user
     */
-    static func findFollowers(userID : String, completion : @escaping ApiCompletionUserIDs) {
+    static func findFollowers(completion : @escaping ApiCompletionUserIDs) {
+        let userID = user!.userID
         let docRef = db.collection("followers")
         //query where userID matches follower
         let query = docRef.whereField("followerID", isEqualTo: userID)
-        
         query.getDocuments { (querySnapshot, error) in
             if let documents = querySnapshot?.documents {
                 dump(documents)
@@ -240,6 +241,10 @@ struct Api {
             }
             
         }
+    }
+    
+    static func getUser(email : String, completion : @escaping ApiCompletion) {
+        
     }
     
     typealias ApiCompletion = ((_ response: [String: Any]?, _ error: String?) -> Void)

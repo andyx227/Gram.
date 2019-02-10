@@ -31,15 +31,11 @@ class FirstViewController: UIViewController {
                     guard let qs = querySnapshot else {
                         return
                     }
-                    for document in qs.documents {
-                        guard let theName = document.get("firstName") else {
-                            print("can't unwrap")
-                            return
-                        }
-                        self.nameLabel?.text = theName as? String
-                        self.fadeInAnimation(self.nameLabel, duration:1.5)
-                       
-                    }
+                    let document = qs.documents[0]
+                    var docData = document.data().mapValues { String.init(describing: $0)}
+                    user = Api.profileInfo.init(firstName: docData["firstName"] ?? "", lastName: docData["firstName"] ?? "", username: docData["firstName"] ?? "", email: docData["email"] ?? "", userID: document.documentID)
+                    self.nameLabel?.text = user?.firstName
+                    self.fadeInAnimation(self.nameLabel, duration:1.5)
                 }
                super.viewDidLoad()
         }
