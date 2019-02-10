@@ -124,10 +124,11 @@ struct Api {
      follow. maybe check if already following and if so
      unfollow the user to follow
     */
-    static func followUser(followerID: String, followingID: String, following : Bool, completion: @escaping ApiCompletion) {
+    static func followUser(followingID: String, following : Bool, completion: @escaping ApiCompletion) {
         //TODO: potentially store doc ID (that is, our UserID)
         //for the users queried in the search as well as
         //the primary user
+        let followerID = user!.userID
         if following {
             let docRef = db.collection("followers")
             //query where name starts with the input info
