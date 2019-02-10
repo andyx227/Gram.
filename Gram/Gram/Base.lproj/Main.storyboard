@@ -75,7 +75,7 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Z4z-qK-gRl">
                                 <rect key="frame" x="0.0" y="30" width="375" height="60"/>
                                 <subviews>
-                                    <searchBar contentMode="redraw" searchBarStyle="minimal" placeholder="Search People" showsSearchResultsButton="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mvz-xl-Eum">
+                                    <searchBar contentMode="redraw" searchBarStyle="minimal" placeholder="Search People" translatesAutoresizingMaskIntoConstraints="NO" id="mvz-xl-Eum">
                                         <rect key="frame" x="48" y="-1" width="327" height="62"/>
                                         <textInputTraits key="textInputTraits"/>
                                         <scopeButtonTitles>

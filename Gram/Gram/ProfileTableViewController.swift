@@ -30,15 +30,29 @@ class ProfileTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        profile = [ProfileInfo.init(profilePhoto: UIImage(named: "profile_photo")!, fullname: "Andy Xue", username: "@prestococo", bio: "I mountain climb in my spare time!")]
-        photos = [PhotoCard.init(profilePhoto: UIImage(named: "profile_photo")!, username: "prestococo", date: "February 27, 1996", photo: UIImage(named:"mountain")!, caption: "How do I get down from here?! #mountainclimbing"), PhotoCard.init(profilePhoto: UIImage(named:"profile_photo")!, username: "prestococo", date: "January 12, 2019", photo: UIImage(named: "tower")!, caption: "Paris is the best! #travel @mostrowski :)")]
+        profile = [ProfileInfo.init(profilePhoto: UIImage(named: "profile_photo")!,
+                                    fullname: "Andy Xue",
+                                    username: "@prestococo",
+                                    bio: "I mountain climb in my spare time!")
+        ]
+        
+        photos = [PhotoCard.init(profilePhoto: UIImage(named: "profile_photo")!,
+                                 username: "prestococo",
+                                 date: "February 27, 1996",
+                                 photo: UIImage(named:"mountain")!,
+                                 caption: "How do I get down from here?! #mountainclimbing"),
+                  
+                  PhotoCard.init(profilePhoto: UIImage(named:"profile_photo")!,
+                                 username: "prestococo",
+                                 date: "January 12, 2019",
+                                 photo: UIImage(named: "tower")!,
+                                 caption: "Paris is the best! #travel @mostrowski :)")
+        ]
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return profile.count + photos.count
     }
-    
-
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.row == 0 {
