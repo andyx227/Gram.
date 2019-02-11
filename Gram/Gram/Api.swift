@@ -77,26 +77,6 @@ struct Api {
         }
     }
     
-    static func signupGoogleUser(profile: profileInfo, completion: @escaping ApiCompletionURL) {
-
-        let docData: [String:Any] = [
-            "firstName" : profile.firstName,
-            "lastName" : profile.lastName,
-            "email" : profile.email,
-            "username" : profile.email,
-            "profilePhoto" : "",
-            "communities" : []
-        ]
-        
-        db.collection("users").document().setData(docData) { err in
-            if let err = err as? String {
-                completion(nil, err)
-            }
-            
-            completion("success", nil)
-        }
-    }
-    
     /**
      Takes in an authenticated user's email and sets up the appropriate global user variable
     */

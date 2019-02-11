@@ -23,6 +23,7 @@
 		A17D05C821FA53C300205E1D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A17D05C621FA53C300205E1D /* Main.storyboard */; };
 		A17D05CA21FA53C400205E1D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A17D05C921FA53C400205E1D /* Assets.xcassets */; };
 		A17D05CD21FA53C400205E1D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A17D05CB21FA53C400205E1D /* LaunchScreen.storyboard */; };
+		A1DE5B1D22113C2800CF49DE /* PickUsernameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1DE5B1C22113C2800CF49DE /* PickUsernameViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +47,7 @@
 		A17D05C921FA53C400205E1D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A17D05CC21FA53C400205E1D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A17D05CE21FA53C400205E1D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A1DE5B1C22113C2800CF49DE /* PickUsernameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickUsernameViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +83,7 @@
 		A17D05BF21FA53C300205E1D /* Gram */ = {
 			isa = PBXGroup;
 			children = (
+				A1DE5B1B22113BCB00CF49DE /* Custom Cells */,
 				A17D05C021FA53C300205E1D /* AppDelegate.swift */,
 				A17D05C221FA53C300205E1D /* FirstViewController.swift */,
 				A17D05C421FA53C300205E1D /* SecondViewController.swift */,
@@ -93,12 +96,20 @@
 				A16A3E8A21FE5F2300E13C81 /* SignUpViewController.swift */,
 				5D73C432220B7EA900E75875 /* Api.swift */,
 				A12AC1F5220EB0B2000036E3 /* ProfileTableViewController.swift */,
-				A12AC1F7220EB20B000036E3 /* ProfileInfoCell.swift */,
-				A12AC1F9220EC880000036E3 /* PhotoCardCell.swift */,
 				A12AC1FB220FA3A1000036E3 /* NewsfeedViewController.swift */,
-				A12AC1FD221018B2000036E3 /* PeopleCell.swift */,
+				A1DE5B1C22113C2800CF49DE /* PickUsernameViewController.swift */,
 			);
 			path = Gram;
+			sourceTree = "<group>";
+		};
+		A1DE5B1B22113BCB00CF49DE /* Custom Cells */ = {
+			isa = PBXGroup;
+			children = (
+				A12AC1F7220EB20B000036E3 /* ProfileInfoCell.swift */,
+				A12AC1F9220EC880000036E3 /* PhotoCardCell.swift */,
+				A12AC1FD221018B2000036E3 /* PeopleCell.swift */,
+			);
+			path = "Custom Cells";
 			sourceTree = "<group>";
 		};
 		B3655014BE92E307F10BB72E /* Frameworks */ = {
@@ -292,6 +303,7 @@
 				A12AC1FA220EC880000036E3 /* PhotoCardCell.swift in Sources */,
 				A17D05C321FA53C300205E1D /* FirstViewController.swift in Sources */,
 				A12AC1FE221018B2000036E3 /* PeopleCell.swift in Sources */,
+				A1DE5B1D22113C2800CF49DE /* PickUsernameViewController.swift in Sources */,
 				A16A3E8B21FE5F2300E13C81 /* SignUpViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

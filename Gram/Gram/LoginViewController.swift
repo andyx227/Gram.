@@ -15,8 +15,9 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
     @IBOutlet weak var labelAppName: UILabel!  // "Gram."
     @IBOutlet weak var textUsername: KaedeTextField!
     @IBOutlet weak var textPassword: KaedeTextField!
-    @IBOutlet weak var buttonLogin: UIButton!
+    @IBOutlet weak var googleLoginButton: UIButton!
     var userEmail = ""
+    var googleSignInListenerHandle: AuthStateDidChangeListenerHandle?
 
     override func viewWillAppear(_ animated: Bool) {
         let _ = setBackgroundImage("background_login")
@@ -27,7 +28,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
         fadeInAnimation(labelAppName, duration:2.2)
         hideKeyboard()  // Make sure user can hide keyboard when screen is tapped
 
-        // Google sign in, set the UI delegate of the GIDSignIn object
+        // Google sign in
         GIDSignIn.sharedInstance().uiDelegate = self
         GIDSignIn.sharedInstance().signIn()
         
@@ -57,20 +58,38 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
         authenticate(email: email, password: password)
     }
 
-    // pass email to the next view
-    // TODO: Uncommenting this block of code will cause app to crash!
-    // Should segue to TabBarView by pressing login button instead.
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        /*if segue.identifier == "loginToTabController" {
-            let barViewControllers = segue.destination as! UITabBarController
-            let destinationViewController = barViewControllers.viewControllers?[0] as! FirstViewController
-
-            destinationViewController.userEmail = userEmail
-        }*/
+    @IBAction func loginWithGoogle(_ sender: Any) {
+        googleLoginButton.isEnabled = false  // Prevent user from pressing button multiple times!
+        googleSignInListenerHandle = Auth.auth().addStateDidChangeListener({ (auth: Auth, user: User?) in
+            if let user = user {  // User has a Google account!
+                Api.checkEmailExists(email: user.email!, completion: { (response, error) in
+                    if let _ = error {  // Email already exists, sign user in immediately
+                        Api.setUserWithEmail(email: user.email!, completion: { (response, error) in
+                            if let _ = error {
+                                print("Error — Api could not set up user via setUserWithEmail()")
+                                self.googleLoginButton.isEnabled = true  // Re-enable Google login button
+                                Auth.auth().removeStateDidChangeListener(self.googleSignInListenerHandle!)
+                                return
+                            }
+                            if let _ = response {
+                                Auth.auth().removeStateDidChangeListener(self.googleSignInListenerHandle!)
+                                self.performSegue(withIdentifier: "loginToTabController", sender: self)
+                            }
+                        }) // Api.setUserWithEmail()
+                    }
+                    if let _ = response {  // Email doesn't exist, so bring user to PickUsernameViewController
+                        self.googleLoginButton.isEnabled = true
+                        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                        let pickUsernameVC = storyboard.instantiateViewController(withIdentifier: "pickUsernameViewController") as! PickUsernameViewController
+                        Auth.auth().removeStateDidChangeListener(self.googleSignInListenerHandle!)
+                        self.navigationController?.pushViewController(pickUsernameVC, animated: true)
+                    }
+                })  // Api.checkEmailExists()
+            }
+        })
     }
 
     private func authenticate(email: String, password: String) {
-
         let alert = UIAlertController(title: nil, message: "Logging in...", preferredStyle: .alert)
 
         let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
@@ -95,9 +114,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
                                                                     preferredStyle: .alert)
                             errorAlert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"),
                                                                style: .default,
-                                                               handler: { _ in
-                                                                NSLog("Login failed alert occured.")
-                            }))
+                                                               handler: { _ in NSLog("Login failed alert occured.")}))
                         }
 
                         self.dismiss(animated: true, completion: nil)
@@ -111,11 +128,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
 
                     errorAlert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"),
                                                        style: .default,
-                                                       handler: { _ in
-                                                        NSLog("Login failed alert occured.")
-                    }
-                        )
-                    )
+                                                       handler: { _ in NSLog("Login failed alert occured.")}))
                     self.present(errorAlert, animated: true, completion: nil)
                     print("FirebaseAuth failed.")
                 }

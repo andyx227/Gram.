@@ -26,75 +26,35 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
     }
     
     @available(iOS 9.0, *)
-    func application(_ application: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any])
-        -> Bool {
-            return GIDSignIn.sharedInstance().handle(url, sourceApplication:options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String, annotation: [:])
+    func application(_ application: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool {
+        return GIDSignIn.sharedInstance().handle(url,
+                                                 sourceApplication:options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String,
+                                                 annotation: [:])
     }
     
     func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
-        return GIDSignIn.sharedInstance().handle(url, sourceApplication: sourceApplication, annotation: annotation)
+        return GIDSignIn.sharedInstance().handle(url,
+                                                 sourceApplication: sourceApplication,
+                                                 annotation: annotation)
     }
 
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error?) {
        
-        if error != nil {
+        if let _ = error {
             print("error during google sign in")
             return
-        }
-        else { //success
-            if let email = user.profile.email {
-                
-                Api.checkEmailExists(email: email) { (_, error) in
-                    if error == nil {
-                        //email not exists, create user
-                        Auth.auth().createUser(withEmail: email, password: "", completion: { (_, error) in
-                            if error != nil {
-                                print("error in creating Google user")
-                            }
-                            // initialize user global var
-                            let profile = Api.profileInfo.init(firstName: user.profile.givenName, lastName: user.profile.familyName, username: email, email: email, userID: "")
-                            
-                            Api.signupGoogleUser(profile: profile, completion: { (_, error) in
-                                if error != nil {
-                                    print("error in signup google user")
-                                }
-                                else {
-                                    print("sign up google user success!")
-                                    //can't perform segue in here
-                                    //self.performSegue(withIdentifier: "loginToTabController", sender: self)
-                                }
-                            })
-                        })
-                    }
-                    
-                    else { // email exists, set global user
-                        Api.setUserWithEmail(email: email) { (_, error) in
-                            if error != nil {
-                                print("error after calling set user with email in app delegate")
-                            }
-                            else {
-                                print("google login success: ", email)
-                                //can't perform segue in here
-                                //self.performSegue(withIdentifier: "loginToTabController", sender: self)
-                            }
-                        }
-                    }
-                }
-            }
         }
         
         guard let authentication = user.authentication else { return }
         let credential = GoogleAuthProvider.credential(withIDToken: authentication.idToken, accessToken: authentication.accessToken)
         print("Google credential: ", credential)
-        
+
         Auth.auth().signInAndRetrieveData(with: credential) { (authResult, error) in
-            if error != nil {
+            if let _ = error {
                 print("Error during authentication")
                 return
             }
-            // User is signed in
-            // ...
-            print("Google user is signed in")
+            print("Google user is signed in")  // User is signed in
         }
     }
     
