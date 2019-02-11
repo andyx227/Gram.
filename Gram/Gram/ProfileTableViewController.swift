@@ -23,14 +23,15 @@ struct PhotoCard {
     var caption: String?
 }
 
-class ProfileTableViewController: UITableViewController {
-    var profile = [ProfileInfo]()
+class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate {
+    var profile = [Api.profileInfo]()
     var photos = [PhotoCard]()
+    var following: Bool = false  // Assume false always (this var only used when viewing another user's profile
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        profile = [ProfileInfo.init(profilePhoto: UIImage(named: "profile_photo")!,
+        /*profile = [ProfileInfo.init(profilePhoto: UIImage(named: "profile_photo")!,
                                     fullname: "Andy Xue",
                                     username: "@prestococo",
                                     bio: "I mountain climb in my spare time!")
@@ -47,7 +48,34 @@ class ProfileTableViewController: UITableViewController {
                                  date: "January 12, 2019",
                                  photo: UIImage(named: "tower")!,
                                  caption: "Paris is the best! #travel @mostrowski :)")
-        ]
+        ]*/
+    }
+    
+    func didChangeFollowStatus(_ sender: ProfileInfoCell) {
+        guard let tappedIndexPath = self.tableView.indexPath(for: sender) else { return }
+        
+        if sender.isFollowing {
+            Api.followUser(followingID: sender.userID, following: true) { (response, error) in
+                if let _ = error {
+                    print("Issue encountered when trying to UNFOLLOW a user with id: \(sender.userID).")
+                }
+                if let _ = response {
+                    print("Successfully UNFOLLOWED user with id: \(sender.userID).")
+                }
+            }
+            self.following = false
+        } else {
+            Api.followUser(followingID: sender.userID, following: false) { (response, error) in
+                if let _ = error {
+                    print("Issue encountered when trying to FOLLOW a user with id: \(sender.userID).")
+                }
+                if let _ = response {
+                    print("Successfully FOLLOWED user with id: \(sender.userID).")
+                }
+            }
+            self.following = true
+        }
+        self.tableView.reloadRows(at: [tappedIndexPath], with: .none)
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -58,20 +86,40 @@ class ProfileTableViewController: UITableViewController {
         if indexPath.row == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "profileInfoCell", for: indexPath) as! ProfileInfoCell
 
+            cell.delegate = self
             // Set "Edit Profile" button style
-            cell.btnEditProfile.layer.cornerRadius = 10
-            cell.btnEditProfile.layer.borderColor = UIColor.black.cgColor
+            cell.changeFollowStatus.layer.cornerRadius = 10
+            cell.changeFollowStatus.layer.borderColor = UIColor.black.cgColor
             // Set profile photo to be round
-            cell.profilePhoto.image = profile[indexPath.row].profilePhoto
+            //cell.profilePhoto.image = profile[indexPath.row].profilePhoto
             cell.profilePhoto.layer.cornerRadius = cell.profilePhoto.frame.height / 2
             cell.profilePhoto.clipsToBounds = true
             // Set other profile information in its respective Labels
-            cell.fullname.text = profile[indexPath.row].fullname
+            cell.fullname.text = profile[indexPath.row].firstName + " " + profile[indexPath.row].lastName
             cell.username.text = profile[indexPath.row].username
-            if let bio = profile[indexPath.row].bio {
-                cell.bio.text = bio
-            }
+            //if let bio = profile[indexPath.row].bio {
+            //    cell.bio.text = bio
+            //}
+            cell.userID = profile[indexPath.row].userID
+            cell.isFollowing = self.following
+            
+            if user?.userID != profile[indexPath.row].userID {  // Looking at another user's profile
+                cell.changeFollowStatus.isHidden = false  // Show the follow/unfollow button
+                if self.following {
+                    cell.changeFollowStatus.setTitle("Unfollow", for: .normal)
+                    cell.changeFollowStatus.titleLabel?.textAlignment = .center
+                    cell.followingIcon.isHidden = false
+                } else {
+                    cell.changeFollowStatus.setTitle("Follow", for: .normal)
 
+                    cell.changeFollowStatus.titleLabel?.textAlignment = .center
+                    cell.followingIcon.isHidden = true
+                }
+            } else {  // Looking at our own profile
+                cell.changeFollowStatus.isHidden = true  // Hide the follow/unfollow button
+                cell.followingIcon.isHidden = true
+            }
+            
             return cell
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "photoCardCell", for: indexPath) as! PhotoCardCell
