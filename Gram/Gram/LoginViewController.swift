@@ -30,7 +30,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
 
         // Google sign in
         GIDSignIn.sharedInstance().uiDelegate = self
-        GIDSignIn.sharedInstance().signIn()
         
         // Listen for keyboard events
         NotificationCenter.default.addObserver(self, selector: #selector(shiftScreenUpForKeyboard(notification:)),
@@ -60,6 +59,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
 
     @IBAction func loginWithGoogle(_ sender: Any) {
         googleLoginButton.isEnabled = false  // Prevent user from pressing button multiple times!
+        GIDSignIn.sharedInstance().signIn()
         googleSignInListenerHandle = Auth.auth().addStateDidChangeListener({ (auth: Auth, user: User?) in
             if let user = user {  // User has a Google account!
                 Api.checkEmailExists(email: user.email!, completion: { (response, error) in
