@@ -19,6 +19,7 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var textConfirmPassword: KaedeTextField!
     @IBOutlet weak var btnSignUp: UIButton!
     @IBOutlet weak var errorLabel: UILabel!
+    @IBOutlet weak var loadingIndicator: UIActivityIndicatorView!
     var currentlySelectedTextField: UITextField?
     
     override func viewWillAppear(_ animated: Bool) {
@@ -37,6 +38,9 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
         textPassword.delegate = self
         textConfirmPassword.delegate = self
         
+        loadingIndicator.isHidden = true  // Hide loading indicator
+        errorLabel.isHidden = true  // Hide error message Label
+        
         // Listen for keyboard events
         NotificationCenter.default.addObserver(self, selector: #selector(shiftScreenUpForKeyboard(notification:)),
                                                name: UIResponder.keyboardWillShowNotification, object: nil)
@@ -53,35 +57,37 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "signupToTabController" {
-            let barViewControllers = segue.destination as! UITabBarController
-            let destinationViewController = barViewControllers.viewControllers?[0] as! FirstViewController
-            destinationViewController.userEmail = user?.email
-        }
-    }
-    
     @IBAction func signUpButtonPressed(_ sender: UIButton) {
+        self.loadingIndicator.isHidden = false
+        self.loadingIndicator.startAnimating()
+        self.btnSignUp.isEnabled = false
+        self.errorLabel.isHidden = true
+        
         if let theUsername = textUsername.text {
             if theUsername != "" {
-                print("username: ", theUsername)
-                
                 Api.checkUserExists(username: theUsername) { (_, error) in
+                    self.loadingIndicator.isHidden = true
+                    self.loadingIndicator.stopAnimating()
+                    self.btnSignUp.isEnabled = true
+                    
                     if error == nil {
                         // works, user not exists
                         if let email = self.textEmail.text, let password = self.textPassword.text {
                             if password != self.textConfirmPassword.text {
-                                self.errorLabel.text = "Confirm password doesn't match password"
+                                self.errorLabel.text = "Password mismatch — please try again."
+                                self.errorLabel.isHidden = false
                                 return
                             }
                             
                             if email == "" || password == "" {
                                 self.errorLabel.text = "Email/password cannot be empty"
+                                self.errorLabel.isHidden = false
                                 return
                             }
                             
                             if password.count < 6 {
-                                self.errorLabel.text = "Password has to be at least 6 chars"
+                                self.errorLabel.text = "Password must be at least 6 characters"
+                                self.errorLabel.isHidden = false
                                 return
                             }
                             
@@ -90,44 +96,51 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
                             }
                             if firstname == "" || lastname == "" {
                                 self.errorLabel.text = "Please enter your first and last name"
+                                self.errorLabel.isHidden = false
                                 return
                             }
                             
                             Auth.auth().createUser(withEmail: email, password: password, completion: { (user_response, error) in
                                 guard let _ = user_response else {
-                                    self.errorLabel.text = "login error"
+                                    self.errorLabel.text = "An internal error has occurred. Please try again."
+                                    self.errorLabel.isHidden = false
                                     return
                                 }
                                 
                                 // initialize user global var
-                                let profile = Api.profileInfo.init(firstName: firstname, lastName: lastname, username: theUsername, email: email, userID: "")
+                                let profile = Api.profileInfo.init(firstName: firstname,
+                                                                   lastName: lastname,
+                                                                   username: theUsername,
+                                                                   email: email,
+                                                                   userID: "")
                                 user = profile
                                 
                                 Api.signupUser(completion: { (response, error) in
                                     if error == nil {
-                                        self.errorLabel.text = "Sign up success!"
                                         self.performSegue(withIdentifier: "signupToTabController", sender: self)
                                     }
                                     else {
-                                        self.errorLabel.text = error
+                                        self.errorLabel.text = "An internal error has occurred. Please try again."
+                                        self.errorLabel.isHidden = false
                                     }
                                 })
                             })
                         }
-
                     }
                     else {
-                        self.errorLabel.text = error
+                        self.errorLabel.text = "The username \"\(theUsername)\" already exists. Please choose another username"
+                        self.errorLabel.isHidden = false
                     }
                 }
             }
-            
             else {
                 errorLabel.text = "Username cannot be empty"
+                self.loadingIndicator.isHidden = true
+                self.loadingIndicator.stopAnimating()
+                self.btnSignUp.isEnabled = true
+                self.errorLabel.isHidden = false
             }
-            
         }
-        
     }
     
     @IBAction func cancelSignUp(_ sender: Any) {  // When user presses "Cancel", go back to login screen

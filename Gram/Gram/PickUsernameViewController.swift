@@ -18,14 +18,16 @@ class PickUsernameViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        dismissKeyboard()
-        loadingIndicator.isHidden = true
+        let _ = setBackgroundImage("background_login")
+        self.hideKeyboard()
+        self.loadingIndicator.isHidden = true
         self.errorLabel.isHidden = true
     }
     
     
     @IBAction func confirmUsername(_ sender: Any) {
         loadingIndicator.isHidden = false
+        loadingIndicator.startAnimating()
         confirmUsername.isEnabled = false
         
         if let username = username.text {
@@ -33,6 +35,7 @@ class PickUsernameViewController: UIViewController {
                 if let _ = error {
                     self.errorLabel.text = "\"\(username)\" already exists. Please try again."
                     self.loadingIndicator.isHidden = true
+                    self.loadingIndicator.stopAnimating()
                     self.confirmUsername.isEnabled = true
                     self.errorLabel.isHidden = false
                 }
@@ -51,6 +54,7 @@ class PickUsernameViewController: UIViewController {
                             print("Error — could not successfully sign up current user who is using social media sign-up!")
                             self.errorLabel.text = "An internal error has occured. Please try again."
                             self.loadingIndicator.isHidden = true
+                            self.loadingIndicator.stopAnimating()
                             self.confirmUsername.isEnabled = true
                             self.errorLabel.isHidden = false
                         }
@@ -63,6 +67,7 @@ class PickUsernameViewController: UIViewController {
         }
     }
     
+    /***** Helper Functions Below *****/
     private func extractUserInfo(_ user: User) -> Api.profileInfo {
         var profile: Api.profileInfo
         var userEmail: String = ""
@@ -96,5 +101,14 @@ class PickUsernameViewController: UIViewController {
                                        userID: "")
         
         return profile
+    }
+    
+    private func setBackgroundImage(_ imageName: String) -> UIImageView {
+        let backgroundImageView = UIImageView(frame: UIScreen.main.bounds)
+        backgroundImageView.image = UIImage(named: imageName)
+        backgroundImageView.contentMode =  UIView.ContentMode.scaleAspectFill
+        self.view.insertSubview(backgroundImageView, at: 0)
+        
+        return backgroundImageView
     }
 }
