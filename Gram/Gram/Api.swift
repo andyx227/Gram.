@@ -177,6 +177,54 @@ struct Api {
     }
     
     /**
+     takes userID as arguement, defaults to current user
+     returns int of number of users following the specified user
+     */
+    static func numberFollowed(userID: String? = nil, completion: @escaping ApiCompletionInt) {
+        var id = userID ?? ""
+        if id == "" {
+            id = user!.userID
+        }
+        
+        let docRef = db.collection("followers")
+        let query = docRef.whereField("followerID",isEqualTo: id)
+        
+        query.getDocuments { (querySnapshot, error) in
+            if let documents = querySnapshot?.documents {
+                completion(documents.count, nil)
+            } else {
+                print("error type:")
+                dump(error!)
+                completion(nil, "Collection does not exist")
+            }
+        }
+    }
+    
+    /**
+     takes userID as arguement, defaults to current user
+     returns int of number of users followed by specified user
+    */
+    static func numberFollowing(userID: String? = nil, completion: @escaping ApiCompletionInt) {
+        var id = userID ?? ""
+        if id == "" {
+            id = user!.userID
+        }
+        
+        let docRef = db.collection("followers")
+        let query = docRef.whereField("followingID",isEqualTo: id)
+        
+        query.getDocuments { (querySnapshot, error) in
+            if let documents = querySnapshot?.documents {
+                completion(documents.count, nil)
+            } else {
+                print("error type:")
+                dump(error!)
+                completion(nil, "Collection does not exist")
+            }
+        }
+    }
+    
+    /**
      takes two userIDs, the logged in user and the user to
      follow. maybe check if already following and if so
      unfollow the user to follow
@@ -310,4 +358,5 @@ struct Api {
     typealias ApiCompletionUserList = ((_ response: [userInfo]?, _ error: String?) -> Void)
     typealias ApiCompletionUserIDs = ((_ response: [String]?, _ error: String?) -> Void)
     typealias ApiCompletionURL = ((_ response: String?, _ error: String?) -> Void)
+    typealias ApiCompletionInt = ((_ response: Int?, _ error: String?) -> Void)
 }
