@@ -103,6 +103,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
         DispatchQueue.main.async {
             Auth.auth().signIn(withEmail: email, password: password) {
                 user, error in
+                
                 if error == nil && user != nil {
                     print("Login successful!")
                     // move to next view controller
@@ -116,7 +117,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
                                                                style: .default,
                                                                handler: { _ in NSLog("Login failed alert occured.")}))
                         }
-
                         self.dismiss(animated: true, completion: nil)
                         self.performSegue(withIdentifier: "loginToTabController", sender: self)
                     })
@@ -129,8 +129,14 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
                     errorAlert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"),
                                                        style: .default,
                                                        handler: { _ in NSLog("Login failed alert occured.")}))
-                    self.present(errorAlert, animated: true, completion: nil)
-                    print("FirebaseAuth failed.")
+                    
+                    DispatchQueue.main.async {
+                        self.dismiss(animated: true, completion: {
+                            self.present(errorAlert, animated: true, completion: nil)
+                        })
+                        
+                        print("FirebaseAuth failed.")
+                    }
                 }
             }
         }
