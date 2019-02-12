@@ -29,6 +29,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
         hideKeyboard()  // Make sure user can hide keyboard when screen is tapped
 
         // Google sign in
+        //GIDSignIn.sharedInstance().signIn()
         GIDSignIn.sharedInstance().uiDelegate = self
         
         // Listen for keyboard events
@@ -38,6 +39,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
                                                name: UIResponder.keyboardWillHideNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(shiftScreenUpForKeyboard(notification:)),
                                                name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+        
+        googleLoginButton.isEnabled = true
     }
 
     deinit {
@@ -59,7 +62,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
 
     @IBAction func loginWithGoogle(_ sender: Any) {
         googleLoginButton.isEnabled = false  // Prevent user from pressing button multiple times!
-        GIDSignIn.sharedInstance().signIn()
         googleSignInListenerHandle = Auth.auth().addStateDidChangeListener({ (auth: Auth, user: User?) in
             if let user = user {  // User has a Google account!
                 Api.checkEmailExists(email: user.email!, completion: { (response, error) in
@@ -95,7 +97,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
         let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
         loadingIndicator.hidesWhenStopped = true
         loadingIndicator.style = UIActivityIndicatorView.Style.gray
-        loadingIndicator.startAnimating();
+        loadingIndicator.startAnimating()
 
         alert.view.addSubview(loadingIndicator)
         present(alert, animated: true, completion: nil)

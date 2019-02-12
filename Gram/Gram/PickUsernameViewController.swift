@@ -31,6 +31,14 @@ class PickUsernameViewController: UIViewController {
         confirmUsername.isEnabled = false
         
         if let username = username.text {
+            if username == "" {
+                errorLabel.text = "Please enter a username"
+                self.loadingIndicator.isHidden = true
+                self.loadingIndicator.stopAnimating()
+                self.confirmUsername.isEnabled = true
+                return
+            }
+            
             Api.checkUserExists(username: username) { (response, error) in
                 if let _ = error {
                     self.errorLabel.text = "\"\(username)\" already exists. Please try again."

@@ -35,7 +35,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
                                     fullname: "Andy Xue",
                                     username: "@prestococo",
                                     bio: "I mountain climb in my spare time!")
-        ]
+        ]*/
         
         photos = [PhotoCard.init(profilePhoto: UIImage(named: "profile_photo")!,
                                  username: "prestococo",
@@ -48,7 +48,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
                                  date: "January 12, 2019",
                                  photo: UIImage(named: "tower")!,
                                  caption: "Paris is the best! #travel @mostrowski :)")
-        ]*/
+        ]
     }
     
     func didChangeFollowStatus(_ sender: ProfileInfoCell) {
@@ -96,7 +96,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             cell.profilePhoto.clipsToBounds = true
             // Set other profile information in its respective Labels
             cell.fullname.text = profile[indexPath.row].firstName + " " + profile[indexPath.row].lastName
-            cell.username.text = profile[indexPath.row].username
+            cell.username.text = "@" + profile[indexPath.row].username
             //if let bio = profile[indexPath.row].bio {
             //    cell.bio.text = bio
             //}
