@@ -27,7 +27,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
     var profile = [Api.profileInfo]()
     var photos = [PhotoCard]()
     var following: Bool = false  // Assume false always (this var only used when viewing another user's profile
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -75,6 +75,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             }
             self.following = true
         }
+        self.getNumFollowed(forUserId: sender.userID, displayInCell: sender)  // Update number of followers
         self.tableView.reloadRows(at: [tappedIndexPath], with: .none)
     }
 
@@ -103,6 +104,10 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             cell.bio.text = "User will be allowed to edit their bio in future miletone."
             //}
             cell.userID = profile[indexPath.row].userID
+            // Set number of followers and following
+            self.getNumFollowing(forUserId: profile[indexPath.row].userID, displayInCell: cell)
+            self.getNumFollowed(forUserId: profile[indexPath.row].userID, displayInCell: cell)
+            
             cell.isFollowing = self.following
             
             if user?.userID != profile[indexPath.row].userID {  // Looking at another user's profile
@@ -193,6 +198,32 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
         }
         
         return attributedCaptionString
+    }
+    
+    private func getNumFollowed(forUserId userId: String?, displayInCell cell: ProfileInfoCell) {
+        Api.numberFollowed(userID: userId) { (numFollowers, error) in
+            if let _ = error {
+                UIView.performWithoutAnimation { cell.numFollowers.text = String(-1) }
+                return
+            }
+            if let followers = numFollowers {
+                UIView.performWithoutAnimation { cell.numFollowers.text = String(followers) }
+                return
+            }
+        }
+    }
+    
+    private func getNumFollowing(forUserId userId: String?, displayInCell cell: ProfileInfoCell) {
+        Api.numberFollowing(userID: userId) { (numFollowing, error) in
+            if let _ = error {
+                UIView.performWithoutAnimation { cell.numFollowing.text = String(-1) }
+                return
+            }
+            if let following = numFollowing {
+                UIView.performWithoutAnimation { cell.numFollowing.text = String(following) }
+                return
+            }
+        }
     }
 }
 

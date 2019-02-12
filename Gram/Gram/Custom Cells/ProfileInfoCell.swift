@@ -21,6 +21,8 @@ class ProfileInfoCell: UITableViewCell {
     @IBOutlet weak var bio: UILabel!
     @IBOutlet weak var changeFollowStatus: UIButton!
     @IBOutlet weak var followingIcon: UIImageView!
+    @IBOutlet weak var numFollowers: UILabel!
+    @IBOutlet weak var numFollowing: UILabel!
     var userID: String = ""
     var isFollowing: Bool = false  // Always assume not following first
     var delegate: ProfileInfoCellDelegate?
