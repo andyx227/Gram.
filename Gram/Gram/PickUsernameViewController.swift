@@ -67,7 +67,7 @@ class PickUsernameViewController: UIViewController {
                             self.errorLabel.isHidden = false
                         }
                         if let _ = response {  // Sign up successful! Segue to Newsfeed ViewController
-                            self.performSegue(withIdentifier: "pickUsernameToTabController", sender: self)
+                            self.transitionToNewsfeedView()
                         }
                     })
                 }

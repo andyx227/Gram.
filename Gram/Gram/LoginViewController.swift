@@ -17,7 +17,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
     @IBOutlet weak var textPassword: KaedeTextField!
     @IBOutlet weak var googleLoginButton: UIButton!
     var userEmail = ""
-    var googleSignInListenerHandle: AuthStateDidChangeListenerHandle?
 
     override func viewWillAppear(_ animated: Bool) {
         let _ = setBackgroundImage("background_login")
@@ -25,11 +24,11 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        fadeInAnimation(labelAppName, duration:2.2)
+        fadeInAnimation(labelAppName, duration: 2.2)
         hideKeyboard()  // Make sure user can hide keyboard when screen is tapped
 
         // Google sign in
-        //GIDSignIn.sharedInstance().signIn()
+        GIDSignIn.sharedInstance()?.signInSilently()
         GIDSignIn.sharedInstance().uiDelegate = self
 
         // Listen for keyboard events
@@ -39,8 +38,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
                                                name: UIResponder.keyboardWillHideNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(shiftScreenUpForKeyboard(notification:)),
                                                name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
-
-        googleLoginButton.isEnabled = true
     }
 
     deinit {
@@ -61,15 +58,23 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
     }
 
     @IBAction func loginWithGoogle(_ sender: Any) {
-        googleLoginButton.isEnabled = false  // Prevent user from pressing button multiple times!
-        googleSignInListenerHandle = Auth.auth().addStateDidChangeListener({ (auth: Auth, user: User?) in
+        // In viewDidLoad(), user should have been signed-in silently. If that didn't work
+        // for some reason, prompt the user to sign in via Google if they wish.
+        if Auth.auth().currentUser == nil { GIDSignIn.sharedInstance()?.signIn() }
+        
+        // Use if-let to prevent the create of multiple listeners!
+        if let _ = AuthenticationListeners.googleAuthenticationListener { return }
+        
+        AuthenticationListeners.googleAuthenticationListener = Auth.auth().addStateDidChangeListener({ (auth: Auth, user: User?) in
             if let user = user {  // User has a Google account!
+                self.googleLoginButton.isEnabled = false  // Prevent user from pressing button multiple times!
+                self.googleLoginButton.alpha = 0.5
                 let alert = UIAlertController(title: nil, message: "Logging in...", preferredStyle: .alert)
 
                 let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
                 loadingIndicator.hidesWhenStopped = true
                 loadingIndicator.style = UIActivityIndicatorView.Style.gray
-                loadingIndicator.startAnimating();
+                loadingIndicator.startAnimating()
 
                 alert.view.addSubview(loadingIndicator)
                 self.present(alert, animated: true, completion: nil)
@@ -80,24 +85,30 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
                             if let _ = error {
                                 print("Error — Api could not set up user via setUserWithEmail()")
                                 self.googleLoginButton.isEnabled = true  // Re-enable Google login button
-                                Auth.auth().removeStateDidChangeListener(self.googleSignInListenerHandle!)
+                                self.googleLoginButton.alpha = 1
+                                Auth.auth().removeStateDidChangeListener(AuthenticationListeners.googleAuthenticationListener!)
                                 return
                             }
                             if let _ = response {
-                                Auth.auth().removeStateDidChangeListener(self.googleSignInListenerHandle!)
-                                self.performSegue(withIdentifier: "loginToTabController", sender: self)
+                                Auth.auth().removeStateDidChangeListener(AuthenticationListeners.googleAuthenticationListener!)
+                                self.transitionToNewsfeedView()
                             }
                         }) // Api.setUserWithEmail()
                     }
                     if let _ = response {  // Email doesn't exist, so bring user to PickUsernameViewController
                         self.googleLoginButton.isEnabled = true
+                        self.googleLoginButton.alpha = 1
                         let storyboard = UIStoryboard(name: "Main", bundle: nil)
                         let pickUsernameVC = storyboard.instantiateViewController(withIdentifier: "pickUsernameViewController") as! PickUsernameViewController
-                        Auth.auth().removeStateDidChangeListener(self.googleSignInListenerHandle!)
                         self.navigationController?.pushViewController(pickUsernameVC, animated: true)
+                        Auth.auth().removeStateDidChangeListener(AuthenticationListeners.googleAuthenticationListener!)
                     }
                 })  // Api.checkEmailExists()
                 self.dismiss(animated: true, completion: nil)
+            } else {  // There was an error signing in using Google...
+                print("Error — Google sign-in failed.")
+                self.googleLoginButton.isEnabled = true
+                self.googleLoginButton.alpha = 1
             }
         })
     }
@@ -129,9 +140,10 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
                             errorAlert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"),
                                                                style: .default,
                                                                handler: { _ in NSLog("Login failed alert occured.")}))
+                            return
                         }
                         self.dismiss(animated: true, completion: nil)
-                        self.performSegue(withIdentifier: "loginToTabController", sender: self)
+                        self.transitionToNewsfeedView()
                     })
 
                 } else {
@@ -195,6 +207,27 @@ extension UIViewController {
             UIView.animate(withDuration: TimeInterval(duration), delay: 0.2, options: .curveEaseOut, animations: {
                 view.alpha = 1.0
             })
+        }
+    }
+    
+    func transitionToNewsfeedView() {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let tabBarController = storyboard.instantiateViewController(withIdentifier: "tabBarController")
+        self.present(tabBarController, animated: true, completion: nil)
+    }
+    
+    func changeStatusBarColor(forView viewController: UIViewController) {
+        if viewController is NewsfeedViewController {
+            // Change status bar color to RGB value -> 247, 245, 233
+            let statusBar: UIView = UIApplication.shared.value(forKey: "statusBar") as! UIView
+            if statusBar.responds(to:#selector(setter: UIView.backgroundColor)) {
+                statusBar.backgroundColor = UIColor(red: 247/255, green: 245/255, blue: 233/255, alpha: 1)
+            }
+        } else if viewController is ProfileTableViewController {
+            let statusBar: UIView = UIApplication.shared.value(forKey: "statusBar") as! UIView
+            if statusBar.responds(to:#selector(setter: UIView.backgroundColor)) {
+                statusBar.backgroundColor = UIColor.white
+            }
         }
     }
 }

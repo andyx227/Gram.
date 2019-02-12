@@ -17,7 +17,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.dismissKeyboard()
+        self.hideKeyboard()
         newsfeedTableView.delegate = self
         newsfeedTableView.dataSource = self
         searchPeopleTableView.delegate = self
@@ -31,13 +31,14 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
         if viewController is NewsfeedViewController {
             let newsfeedVC = viewController as! NewsfeedViewController
+            changeStatusBarColor(forView: newsfeedVC)
             newsfeedVC.searchBarPeople.text = ""
-            newsfeedVC.searchBarPeople.resignFirstResponder()
             newsfeedVC.searchPeopleTableView.isHidden = true
             newsfeedVC.newsfeedTableView.isHidden = false
             
         } else if viewController is ProfileTableViewController {
             let profileVC = viewController as! ProfileTableViewController
+            changeStatusBarColor(forView: profileVC)
             profileVC.profile = [user!]
             profileVC.tableView.reloadData()
         }
@@ -125,6 +126,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
         profileTab.following = people[indexPath.row].following
         profileTab.tableView.reloadData()
         self.tabBarController?.selectedViewController = profileTab
+        changeStatusBarColor(forView: profileTab)
         tableView.deselectRow(at: indexPath, animated: true)  // Deselect the row
     }
 }

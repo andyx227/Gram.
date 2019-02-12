@@ -37,14 +37,14 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
                                     bio: "I mountain climb in my spare time!")
         ]*/
         
-        photos = [PhotoCard.init(profilePhoto: UIImage(named: "profile_photo")!,
-                                 username: "prestococo",
-                                 date: "February 27, 1996",
+        photos = [PhotoCard.init(profilePhoto: UIImage(named: "A")!,
+                                 username: user!.username,
+                                 date: "December 1, 2018",
                                  photo: UIImage(named:"mountain")!,
                                  caption: "How do I get down from here?! #mountainclimbing"),
                   
-                  PhotoCard.init(profilePhoto: UIImage(named:"profile_photo")!,
-                                 username: "prestococo",
+                  PhotoCard.init(profilePhoto: UIImage(named: "A")!,
+                                 username: user!.username,
                                  date: "January 12, 2019",
                                  photo: UIImage(named: "tower")!,
                                  caption: "Paris is the best! #travel @mostrowski :)")
@@ -83,6 +83,8 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let firstLetterOfFirstName = String(profile.first!.firstName.first!)
+        
         if indexPath.row == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "profileInfoCell", for: indexPath) as! ProfileInfoCell
 
@@ -91,14 +93,14 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             cell.changeFollowStatus.layer.cornerRadius = 10
             cell.changeFollowStatus.layer.borderColor = UIColor.black.cgColor
             // Set profile photo to be round
-            //cell.profilePhoto.image = profile[indexPath.row].profilePhoto
+            cell.profilePhoto.image = UIImage(named: firstLetterOfFirstName)
             cell.profilePhoto.layer.cornerRadius = cell.profilePhoto.frame.height / 2
             cell.profilePhoto.clipsToBounds = true
             // Set other profile information in its respective Labels
             cell.fullname.text = profile[indexPath.row].firstName + " " + profile[indexPath.row].lastName
             cell.username.text = "@" + profile[indexPath.row].username
             //if let bio = profile[indexPath.row].bio {
-            //    cell.bio.text = bio
+            cell.bio.text = "User will be allowed to edit their bio in future miletone."
             //}
             cell.userID = profile[indexPath.row].userID
             cell.isFollowing = self.following
@@ -106,14 +108,17 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             if user?.userID != profile[indexPath.row].userID {  // Looking at another user's profile
                 cell.changeFollowStatus.isHidden = false  // Show the follow/unfollow button
                 if self.following {
-                    cell.changeFollowStatus.setTitle("Unfollow", for: .normal)
-                    cell.changeFollowStatus.titleLabel?.textAlignment = .center
-                    cell.followingIcon.isHidden = false
+                    UIView.performWithoutAnimation {
+                        cell.changeFollowStatus.setTitle("Unfollow", for: .normal)
+                        cell.changeFollowStatus.titleLabel?.textAlignment = .center
+                        cell.followingIcon.isHidden = false
+                    }
                 } else {
-                    cell.changeFollowStatus.setTitle("Follow", for: .normal)
-
-                    cell.changeFollowStatus.titleLabel?.textAlignment = .center
-                    cell.followingIcon.isHidden = true
+                    UIView.performWithoutAnimation {
+                        cell.changeFollowStatus.setTitle("Follow", for: .normal)
+                        cell.changeFollowStatus.titleLabel?.textAlignment = .center
+                        cell.followingIcon.isHidden = true
+                    }
                 }
             } else {  // Looking at our own profile
                 cell.changeFollowStatus.isHidden = true  // Hide the follow/unfollow button
@@ -124,12 +129,16 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "photoCardCell", for: indexPath) as! PhotoCardCell
             
+            // TODO: Temporarily using the method below to retrieve username
+            // Remove later!
+            let username = profile.first!.username
+            
             // Set profile photo to be round
-            cell.profilePhoto.image = photos[indexPath.row - 1].profilePhoto
+            cell.profilePhoto.image = UIImage(named: firstLetterOfFirstName)
             cell.profilePhoto.layer.cornerRadius = cell.profilePhoto.frame.height / 2
             cell.profilePhoto.clipsToBounds = true
             
-            cell.username.text = photos[indexPath.row - 1].username
+            cell.username.text = username
             cell.date.text = photos[indexPath.row - 1].date
             
             // Scale photos before displaying them in UIImageView
@@ -140,7 +149,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             
             // Format caption before displaying
             if let caption = photos[indexPath.row - 1].caption {
-                cell.caption.attributedText = formatCaption(caption, user: photos[indexPath.row - 1].username)
+                cell.caption.attributedText = formatCaption(caption, user: username)
             }
             
             return cell
