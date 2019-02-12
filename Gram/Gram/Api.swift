@@ -160,7 +160,7 @@ struct Api {
      takes userID as arguement, defaults to current user
      returns int of number of users following the specified user
      */
-    static func numberFollowed(userID: String? = nil, completion: @escaping ApiCompletionInt) {
+    static func numberFollowing(userID: String? = nil, completion: @escaping ApiCompletionInt) {
         var id = userID ?? ""
         if id == "" {
             id = user!.userID
@@ -184,7 +184,7 @@ struct Api {
      takes userID as arguement, defaults to current user
      returns int of number of users followed by specified user
     */
-    static func numberFollowing(userID: String? = nil, completion: @escaping ApiCompletionInt) {
+    static func numberFollowed(userID: String? = nil, completion: @escaping ApiCompletionInt) {
         var id = userID ?? ""
         if id == "" {
             id = user!.userID
