@@ -59,9 +59,19 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
 
     @IBAction func loginWithGoogle(_ sender: Any) {
         googleLoginButton.isEnabled = false  // Prevent user from pressing button multiple times!
-        GIDSignIn.sharedInstance().signIn()
+        GIDSignIn.sharedInstance()?.signIn()
         googleSignInListenerHandle = Auth.auth().addStateDidChangeListener({ (auth: Auth, user: User?) in
             if let user = user {  // User has a Google account!
+                let alert = UIAlertController(title: nil, message: "Logging in...", preferredStyle: .alert)
+                
+                let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
+                loadingIndicator.hidesWhenStopped = true
+                loadingIndicator.style = UIActivityIndicatorView.Style.gray
+                loadingIndicator.startAnimating();
+                
+                alert.view.addSubview(loadingIndicator)
+                self.present(alert, animated: true, completion: nil)
+                
                 Api.checkEmailExists(email: user.email!, completion: { (response, error) in
                     if let _ = error {  // Email already exists, sign user in immediately
                         Api.setUserWithEmail(email: user.email!, completion: { (response, error) in
@@ -85,6 +95,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
                         self.navigationController?.pushViewController(pickUsernameVC, animated: true)
                     }
                 })  // Api.checkEmailExists()
+                self.dismiss(animated: true, completion: nil)
             }
         })
     }
@@ -151,9 +162,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
 
         return backgroundImageView
     }
-
-
-
+    
     @objc private func shiftScreenUpForKeyboard(notification: Notification) {
         guard let keyboardRect = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else {return}
 
