@@ -27,6 +27,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
     var profile = [Api.profileInfo]()
     var photos = [PhotoCard]()
     var following: Bool = false  // Assume false always (this var only used when viewing another user's profile
+    var firstTimeLoadingView = false  // Set to true when user clicks on a profile to view
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,7 +53,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
     }
     
     func didChangeFollowStatus(_ sender: ProfileInfoCell) {
-        guard let tappedIndexPath = self.tableView.indexPath(for: sender) else { return }
+        guard let _ = self.tableView.indexPath(for: sender) else { return }
         
         if sender.isFollowing {
             Api.followUser(followingID: sender.userID, following: true) { (response, error) in
@@ -75,8 +76,9 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             }
             self.following = true
         }
-        self.getNumFollowed(forUserId: sender.userID, displayInCell: sender)  // Update number of followers
-        self.tableView.reloadRows(at: [tappedIndexPath], with: .none)
+        //self.getNumFollowed(forUserId: sender.userID, displayInCell: sender)  // Update number of followers
+        //self.tableView.reloadRows(at: [tappedIndexPath], with: .none)
+        self.tableView.reloadData()
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -104,9 +106,14 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             cell.bio.text = "User will be allowed to edit their bio in future miletone."
             //}
             cell.userID = profile[indexPath.row].userID
-            // Set number of followers and following
-            self.getNumFollowing(forUserId: profile[indexPath.row].userID, displayInCell: cell)
-            self.getNumFollowed(forUserId: profile[indexPath.row].userID, displayInCell: cell)
+            // Set number of followers and following if loading view for the first time
+            print(firstTimeLoadingView)
+            if firstTimeLoadingView {
+                print("should print if true")
+                self.getNumFollowing(forUserId: profile[indexPath.row].userID, displayInCell: cell)
+                self.getNumFollowed(forUserId: profile[indexPath.row].userID, displayInCell: cell)
+                firstTimeLoadingView = false
+            }
             
             cell.isFollowing = self.following
             
@@ -201,26 +208,32 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
     }
     
     private func getNumFollowed(forUserId userId: String?, displayInCell cell: ProfileInfoCell) {
+        cell.numFollowers.alpha = 0.0
+        
         Api.numberFollowed(userID: userId) { (numFollowers, error) in
             if let _ = error {
                 UIView.performWithoutAnimation { cell.numFollowers.text = String(-1) }
                 return
             }
             if let followers = numFollowers {
-                UIView.performWithoutAnimation { cell.numFollowers.text = String(followers) }
+                cell.numFollowers.text = String(followers)
+                self.fadeInAnimation(cell.numFollowers, duration: 0.8)
                 return
             }
         }
     }
     
     private func getNumFollowing(forUserId userId: String?, displayInCell cell: ProfileInfoCell) {
+        cell.numFollowing.alpha = 0.0
+        
         Api.numberFollowing(userID: userId) { (numFollowing, error) in
             if let _ = error {
                 UIView.performWithoutAnimation { cell.numFollowing.text = String(-1) }
                 return
             }
             if let following = numFollowing {
-                UIView.performWithoutAnimation { cell.numFollowing.text = String(following) }
+                cell.numFollowing.text = String(following)
+                self.fadeInAnimation(cell.numFollowing, duration: 0.8)
                 return
             }
         }

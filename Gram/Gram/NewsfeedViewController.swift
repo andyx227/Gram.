@@ -40,6 +40,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
             let profileVC = viewController as! ProfileTableViewController
             changeStatusBarColor(forView: profileVC)
             profileVC.profile = [user!]
+            profileVC.firstTimeLoadingView = true
             profileVC.tableView.reloadData()
         }
     }
@@ -124,6 +125,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
         let profileTab = self.tabBarController?.viewControllers![2] as! ProfileTableViewController
         profileTab.profile = selectedUser
         profileTab.following = people[indexPath.row].following
+        profileTab.firstTimeLoadingView = true
         profileTab.tableView.reloadData()
         self.tabBarController?.selectedViewController = profileTab
         changeStatusBarColor(forView: profileTab)
