@@ -14,6 +14,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
     @IBOutlet weak var newsfeedTableView: UITableView!
     @IBOutlet weak var searchPeopleTableView: UITableView!
     var people = [Api.userInfo]()
+    var photos = [PhotoCard]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,6 +27,19 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
         searchBarPeople.autocapitalizationType = .none
         self.tabBarController?.delegate = self
         self.tabBarController?.selectedIndex = 0
+        
+        photos = [PhotoCard.init(profilePhoto: UIImage(named: "A")!,
+                                 username: user!.username,
+                                 date: "December 1, 2018",
+                                 photo: UIImage(named:"mountain")!,
+                                 caption: "How do I get down from here?! #mountainclimbing"),
+                  
+                  PhotoCard.init(profilePhoto: UIImage(named: "A")!,
+                                 username: user!.username,
+                                 date: "January 12, 2019",
+                                 photo: UIImage(named: "tower")!,
+                                 caption: "Paris is the best! #travel @mostrowski :)")
+        ]
     }
     
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
@@ -86,7 +100,9 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
             }
             return people.count
         } else if tableView == self.newsfeedTableView {
-            return 0
+            self.searchPeopleTableView.isHidden = true
+            self.newsfeedTableView.isHidden = false
+            return photos.count
         } else {  // Should NEVER reach this case!
             return 0
         }
@@ -107,6 +123,30 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
             return cell
         } else if tableView == self.newsfeedTableView {
             let cell = tableView.dequeueReusableCell(withIdentifier: "photoCardCell", for: indexPath) as! PhotoCardCell
+            // TODO: Temporarily using the method below to retrieve username
+            // Remove later!
+            let username = user!.username
+            
+            // Set profile photo to be round
+            let firstLetterOfFirstName = String(user!.firstName.first!)
+            cell.profilePhoto.image = UIImage(named: firstLetterOfFirstName)
+            cell.profilePhoto.layer.cornerRadius = cell.profilePhoto.frame.height / 2
+            cell.profilePhoto.clipsToBounds = true
+            
+            cell.username.text = username
+            cell.date.text = photos[indexPath.row].date
+            
+            // Scale photos before displaying them in UIImageView
+            let photo = photos[indexPath.row].photo
+            let ratio = photo.getCropRatio()
+            cell.photoHeightConstraint.constant = UIScreen.main.bounds.width / ratio
+            cell.photo.image = photos[indexPath.row].photo
+            
+            // Format caption before displaying
+            if let caption = photos[indexPath.row].caption {
+                cell.caption.attributedText = self.formatCaption(caption, user: username)
+            }
+            
             return cell
         } else {  // This case should never be reached!
             let cell = tableView.dequeueReusableCell(withIdentifier: "ShouldNeverDequeueCellHere!")
@@ -130,5 +170,44 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
         self.tabBarController?.selectedViewController = profileTab
         changeStatusBarColor(forView: profileTab)
         tableView.deselectRow(at: indexPath, animated: true)  // Deselect the row
+    }
+    
+    /****** Helper Functions *****/
+    private func formatCaption(_ caption: String, user username: String) -> NSAttributedString {
+        let usernameAttributes: [NSAttributedString.Key: Any] = [
+            NSAttributedString.Key.font: UIFont(name: "HelveticaNeue-Bold", size: 13)!
+        ]
+        let captionAttributes: [NSAttributedString.Key: Any] = [
+            NSAttributedString.Key.font: UIFont(name: "HelveticaNeue-Light", size: 13)!
+        ]
+        let hashtagAttributes: [NSAttributedString.Key: Any] = [
+            NSAttributedString.Key.foregroundColor: UIColor(red: 51/255, green: 153/255, blue: 255/255, alpha: 1),
+            NSAttributedString.Key.font: UIFont(name: "HelveticaNeue-Light", size: 13)!
+        ]
+        
+        // Set attribute to username (font will be HelveticaNeue-Bold)
+        let attributedUsername = NSAttributedString(string: username, attributes: usernameAttributes)
+        
+        // Set attribute to actual caption
+        let attributedCaptionString = NSMutableAttributedString()
+        attributedCaptionString.append(attributedUsername)  // First, include the username in the caption
+        attributedCaptionString.append(NSAttributedString(string: " "))
+        
+        // Tokenize photo caption, delimited by whitespace
+        let tokenized_caption = caption.components(separatedBy: " ")
+        var attributedToken: NSAttributedString
+        for token in tokenized_caption {
+            if token.contains("#") {  // Hashtags should be in blue
+                attributedToken = NSAttributedString(string: token, attributes: hashtagAttributes)
+            } else if token.contains("@") {  // Tagged username should have bolded text
+                attributedToken = NSAttributedString(string: token, attributes: usernameAttributes)
+            } else {
+                attributedToken = NSAttributedString(string: token, attributes: captionAttributes)
+            }
+            attributedCaptionString.append(attributedToken)
+            attributedCaptionString.append(NSAttributedString(string: " "))
+        }
+        
+        return attributedCaptionString
     }
 }
