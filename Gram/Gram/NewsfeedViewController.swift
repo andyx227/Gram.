@@ -155,6 +155,8 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if tableView == self.newsfeedTableView { return }
+        
         let selectedUser = [Api.profileInfo.init(firstName: people[indexPath.row].firstName,
                                                  lastName: people[indexPath.row].lastName,
                                                  username: people[indexPath.row].userName,
