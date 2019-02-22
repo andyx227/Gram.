@@ -24,6 +24,7 @@
 		A17D05CA21FA53C400205E1D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A17D05C921FA53C400205E1D /* Assets.xcassets */; };
 		A17D05CD21FA53C400205E1D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A17D05CB21FA53C400205E1D /* LaunchScreen.storyboard */; };
 		A1A221072212B2E300A9A2EC /* AuthenticationListeners.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A221062212B2E300A9A2EC /* AuthenticationListeners.swift */; };
+		A1D621AA221F4AD000E7B68B /* EditProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D621A9221F4AD000E7B68B /* EditProfileViewController.swift */; };
 		A1DE5B1D22113C2800CF49DE /* PickUsernameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1DE5B1C22113C2800CF49DE /* PickUsernameViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -49,6 +50,7 @@
 		A17D05CC21FA53C400205E1D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A17D05CE21FA53C400205E1D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A1A221062212B2E300A9A2EC /* AuthenticationListeners.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationListeners.swift; sourceTree = "<group>"; };
+		A1D621A9221F4AD000E7B68B /* EditProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileViewController.swift; sourceTree = "<group>"; };
 		A1DE5B1C22113C2800CF49DE /* PickUsernameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickUsernameViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -101,6 +103,7 @@
 				A12AC1FB220FA3A1000036E3 /* NewsfeedViewController.swift */,
 				A1DE5B1C22113C2800CF49DE /* PickUsernameViewController.swift */,
 				A1A221062212B2E300A9A2EC /* AuthenticationListeners.swift */,
+				A1D621A9221F4AD000E7B68B /* EditProfileViewController.swift */,
 			);
 			path = Gram;
 			sourceTree = "<group>";
@@ -302,6 +305,7 @@
 				A17D05C521FA53C300205E1D /* SecondViewController.swift in Sources */,
 				A12AC1F8220EB20B000036E3 /* ProfileInfoCell.swift in Sources */,
 				A12AC1FC220FA3A1000036E3 /* NewsfeedViewController.swift in Sources */,
+				A1D621AA221F4AD000E7B68B /* EditProfileViewController.swift in Sources */,
 				A1A221072212B2E300A9A2EC /* AuthenticationListeners.swift in Sources */,
 				A17D05C121FA53C300205E1D /* AppDelegate.swift in Sources */,
 				A12AC1FA220EC880000036E3 /* PhotoCardCell.swift in Sources */,

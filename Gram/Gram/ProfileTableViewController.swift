@@ -80,6 +80,12 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
         //self.tableView.reloadRows(at: [tappedIndexPath], with: .none)
         self.tableView.reloadData()
     }
+    
+    func navigateToEditProfileViewController() {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let editProfileVC = storyboard.instantiateViewController(withIdentifier: "editProfileViewController") as! EditProfileViewController
+        self.navigationController?.pushViewController(editProfileVC, animated: true)
+    }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return profile.count + photos.count
@@ -88,7 +94,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let firstLetterOfFirstName = String(profile.first!.firstName.first!)
         
-        if indexPath.row == 0 {
+        if indexPath.row == 0 {  // This cell displays the profile info
             let cell = tableView.dequeueReusableCell(withIdentifier: "profileInfoCell", for: indexPath) as! ProfileInfoCell
 
             cell.delegate = self
@@ -118,7 +124,6 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             cell.isFollowing = self.following
             
             if user?.userID != profile[indexPath.row].userID {  // Looking at another user's profile
-                cell.changeFollowStatus.isHidden = false  // Show the follow/unfollow button
                 if self.following {
                     UIView.performWithoutAnimation {
                         cell.changeFollowStatus.setTitle("Unfollow", for: .normal)
@@ -133,12 +138,13 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
                     }
                 }
             } else {  // Looking at our own profile
-                cell.changeFollowStatus.isHidden = true  // Hide the follow/unfollow button
+                cell.changeFollowStatus.setTitle("Edit Profile", for: .normal)
+                cell.changeFollowStatus.titleLabel?.textAlignment = .center
                 cell.followingIcon.isHidden = true
             }
             
             return cell
-        } else {
+        } else {  // The remaining cells are the "PhotoCard" cells
             let cell = tableView.dequeueReusableCell(withIdentifier: "photoCardCell", for: indexPath) as! PhotoCardCell
             
             // TODO: Temporarily using the method below to retrieve username

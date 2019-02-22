@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 
 protocol ProfileInfoCellDelegate {
+    func navigateToEditProfileViewController()
     func didChangeFollowStatus(_ sender: ProfileInfoCell)
 }
 
@@ -28,11 +29,18 @@ class ProfileInfoCell: UITableViewCell {
     var delegate: ProfileInfoCellDelegate?
     
     /**
-     * Allows logged-in user to follow/unfollow another user.
-     * This function is connected to a button that will only show up when viewing
-     * another user's profile (i.e. you cannot follow/unfollow yourself).
+     * When looking at user's own profile, pressing
+     * the button will allow user to edit their profile.
+     *
+     * When looking at another user's profile, logged-in
+     * user can follow/unfollow that user by pressing
+     * the button.
      */
-    @IBAction func changeFollowStatus(_ sender: Any) {
-        delegate?.didChangeFollowStatus(self)
+    @IBAction func buttonPressed(_ sender: Any) {
+        if userID == user?.userID {  // Viewing our own profile
+            delegate?.navigateToEditProfileViewController()
+        } else {  // Viewing another user's profile
+            delegate?.didChangeFollowStatus(self)
+        }
     }
 }

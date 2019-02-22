@@ -213,7 +213,7 @@ extension UIViewController {
     func transitionToNewsfeedView() {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let tabBarController = storyboard.instantiateViewController(withIdentifier: "tabBarController")
-        self.present(tabBarController, animated: true, completion: nil)
+        self.navigationController?.pushViewController(tabBarController, animated: true)
     }
     
     func changeStatusBarColor(forView viewController: UIViewController) {
