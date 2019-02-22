@@ -317,6 +317,7 @@ struct Api {
             
         }
     }
+    
     static func likePost(postID : String, postType : String, completion : @escaping ApiCompletion) {
         let userID = user!.userID
         let docRef = db.collection("likes")
@@ -339,7 +340,36 @@ struct Api {
         }
     }
     
-    
+    /**
+     Updates the firestore user object with changable fields
+     (not including profile photo)
+     Expects that the global user object is being changed and
+     uses it for the update
+    */
+    static func updateUser(completion : @escaping ApiCompletion) {
+        guard let user = user else {
+            completion(nil,"Global user not set")
+            return
+        }
+        
+        let docData: [String:Any] = [
+            "firstName" : user.firstName,
+            "lastName" : user.lastName,
+            "username" : user.username,
+            "summary" : user.summary
+        ]
+        
+        let docRef = db.collection("users").document(user.userID)
+        
+        docRef.updateData(docData) { err in
+            if let _ = err {
+                completion(nil, "Could not update data")
+            } else {
+                completion(["response" : "success"], nil)
+            }
+            
+        }
+    }
     
     static func getUser(email : String, completion : @escaping ApiCompletion) {
         
