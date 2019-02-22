@@ -21,6 +21,7 @@ struct Api {
         var lastName : String
         var username : String
         var email : String
+        var summary : String
         var userID : String
     }
     
@@ -90,7 +91,7 @@ struct Api {
                 dump(documents)
                 
                 var docData = documents[0].data().mapValues { String.init(describing: $0)}
-                let loadedProfile = Api.profileInfo.init(firstName: docData["firstName"] ?? "", lastName: docData["lastName"] ?? "", username: docData["username"] ?? "", email: docData["email"] ?? "", userID: documents[0].documentID)
+                let loadedProfile = Api.profileInfo.init(firstName: docData["firstName"] ?? "", lastName: docData["lastName"] ?? "", username: docData["username"] ?? "", email: docData["email"] ?? "", summary: docData["summary"] ?? "", userID: documents[0].documentID)
                 user = loadedProfile
                 completion("success", nil)
             } else {
@@ -155,12 +156,11 @@ struct Api {
             }
         }
     }
-    
     /**
      takes userID as arguement, defaults to current user
-     returns int of number of users following the specified user
+     returns dictionary of number of users followed and following the specified user
      */
-    static func numberFollowing(userID: String? = nil, completion: @escaping ApiCompletionInt) {
+    static func followCounts(userID: String? = nil, completion: @escaping ApiCompletion) {
         var id = userID ?? ""
         if id == "" {
             id = user!.userID
@@ -170,32 +170,22 @@ struct Api {
         let query = docRef.whereField("followerID",isEqualTo: id)
         
         query.getDocuments { (querySnapshot, error) in
-            if let documents = querySnapshot?.documents {
-                completion(documents.count, nil)
-            } else {
-                print("error type:")
-                dump(error!)
-                completion(nil, "Collection does not exist")
-            }
-        }
-    }
-    
-    /**
-     takes userID as arguement, defaults to current user
-     returns int of number of users followed by specified user
-    */
-    static func numberFollowed(userID: String? = nil, completion: @escaping ApiCompletionInt) {
-        var id = userID ?? ""
-        if id == "" {
-            id = user!.userID
-        }
-        
-        let docRef = db.collection("followers")
-        let query = docRef.whereField("followingID",isEqualTo: id)
-        
-        query.getDocuments { (querySnapshot, error) in
-            if let documents = querySnapshot?.documents {
-                completion(documents.count, nil)
+            if let followedDocuments = querySnapshot?.documents {
+                let followedCount = followedDocuments.count
+                
+                let docRef = db.collection("followers")
+                let query = docRef.whereField("followingID",isEqualTo: id)
+                
+                query.getDocuments { (querySnapshot, error) in
+                    if let followersDocuments = querySnapshot?.documents {
+                        let followersCount = followersDocuments.count
+                        completion(["followed" : followedCount, "followers" : followersCount], nil)
+                    } else {
+                        print("error type:")
+                        dump(error!)
+                        completion(nil, "Collection does not exist")
+                    }
+                }
             } else {
                 print("error type:")
                 dump(error!)
@@ -305,7 +295,6 @@ struct Api {
     static func findFollowers(completion : @escaping ApiCompletionUserIDs) {
         let userID = user!.userID
         let docRef = db.collection("followers")
-        //query where userID matches follower
         let query = docRef.whereField("followerID", isEqualTo: userID)
         query.getDocuments { (querySnapshot, error) in
             if let documents = querySnapshot?.documents {
@@ -328,6 +317,29 @@ struct Api {
             
         }
     }
+    static func likePost(postID : String, postType : String, completion : @escaping ApiCompletion) {
+        let userID = user!.userID
+        let docRef = db.collection("likes")
+        let query = docRef.whereField("postID", isEqualTo: postID).whereField("postType", isEqualTo: postType)
+        query.getDocuments { (querySnapshot, error) in
+            if let documents = querySnapshot?.documents {
+                if documents.count == 0 {
+                    let postData = ["postID" : postID, "postType" : postType, "userID" : userID]
+                    docRef.document().setData(postData)
+                    completion(["response" : "success"], nil)
+                } else {
+                    docRef.document(documents[0].documentID).delete()
+                    completion(["response" : "success"], nil)
+                }
+            } else {
+                print("error type:")
+                dump(error!)
+                completion(nil, "Collection does not exist")
+            }
+        }
+    }
+    
+    
     
     static func getUser(email : String, completion : @escaping ApiCompletion) {
         
