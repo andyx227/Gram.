@@ -112,6 +112,7 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
                                                                    lastName: lastname,
                                                                    username: theUsername,
                                                                    email: email,
+                                                                   summary: "",
                                                                    userID: "")
                                 user = profile
                                 

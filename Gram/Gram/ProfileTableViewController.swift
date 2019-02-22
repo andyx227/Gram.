@@ -112,12 +112,10 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             cell.bio.text = "User will be allowed to edit their bio in future miletone."
             //}
             cell.userID = profile[indexPath.row].userID
+            
             // Set number of followers and following if loading view for the first time
-            print(firstTimeLoadingView)
             if firstTimeLoadingView {
-                print("should print if true")
-                self.getNumFollowing(forUserId: profile[indexPath.row].userID, displayInCell: cell)
-                self.getNumFollowed(forUserId: profile[indexPath.row].userID, displayInCell: cell)
+                self.getNumFollowersAndFollowing(forUserId: profile[indexPath.row].userID, displayInCell: cell)
                 firstTimeLoadingView = false
             }
             
@@ -213,32 +211,19 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
         return attributedCaptionString
     }
     
-    private func getNumFollowed(forUserId userId: String?, displayInCell cell: ProfileInfoCell) {
+    private func getNumFollowersAndFollowing(forUserId userId: String?, displayInCell cell: ProfileInfoCell) {
         cell.numFollowers.alpha = 0.0
+        cell.numFollowing.alpha = 0.0
         
-        Api.numberFollowed(userID: userId) { (numFollowers, error) in
+        Api.followCounts(userID: userId) { (counts, error) in
             if let _ = error {
                 UIView.performWithoutAnimation { cell.numFollowers.text = String(-1) }
                 return
             }
-            if let followers = numFollowers {
-                cell.numFollowers.text = String(followers)
+            if let counts = counts as? [String: Int] {
+                cell.numFollowers.text = String(counts["followers"]!)
+                cell.numFollowing.text = String(counts["followed"]!)
                 self.fadeInAnimation(cell.numFollowers, duration: 0.8)
-                return
-            }
-        }
-    }
-    
-    private func getNumFollowing(forUserId userId: String?, displayInCell cell: ProfileInfoCell) {
-        cell.numFollowing.alpha = 0.0
-        
-        Api.numberFollowing(userID: userId) { (numFollowing, error) in
-            if let _ = error {
-                UIView.performWithoutAnimation { cell.numFollowing.text = String(-1) }
-                return
-            }
-            if let following = numFollowing {
-                cell.numFollowing.text = String(following)
                 self.fadeInAnimation(cell.numFollowing, duration: 0.8)
                 return
             }

@@ -161,6 +161,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                                                  lastName: people[indexPath.row].lastName,
                                                  username: people[indexPath.row].userName,
                                                  email: "",
+                                                 summary: "",  // TODO: userInfo should include a summary field too, using empty string for now
                                                  userID: people[indexPath.row].userID)
         ]
 

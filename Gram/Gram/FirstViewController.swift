@@ -33,7 +33,7 @@ class FirstViewController: UIViewController {
                     }
                     let document = qs.documents[0]
                     var docData = document.data().mapValues { String.init(describing: $0)}
-                    user = Api.profileInfo.init(firstName: docData["firstName"] ?? "", lastName: docData["firstName"] ?? "", username: docData["firstName"] ?? "", email: docData["email"] ?? "", userID: document.documentID)
+                    user = Api.profileInfo.init(firstName: docData["firstName"] ?? "", lastName: docData["firstName"] ?? "", username: docData["firstName"] ?? "", email: docData["email"] ?? "", summary: "", userID: document.documentID)
                     self.nameLabel?.text = user?.firstName
                     self.fadeInAnimation(self.nameLabel, duration:1.5)
                 }
