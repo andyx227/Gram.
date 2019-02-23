@@ -15,6 +15,31 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
     @IBOutlet weak var searchPeopleTableView: UITableView!
     var people = [Api.userInfo]()
     var photos = [PhotoCard]()
+    var imageURL: URL?
+    
+    // create a popup that allows user to select image from either camera or photo library
+    @IBAction func addPhotoPressed(_ sender: UIButton) {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        let camera = UIAlertAction(title: "Camera", style: .default) { (action) in
+            //print("Get photo from camera")
+            self.camera()
+        }
+        alert.addAction(camera)
+        
+        let photoLibrary = UIAlertAction(title: "Photo Library", style: .default) { (action) in
+            //print("Get photo from photo library")
+            self.photoLibrary()
+        }
+        alert.addAction(photoLibrary)
+        
+        let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        alert.addAction(cancel)
+        
+        present(alert, animated: true, completion: nil)
+    
+        
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -213,4 +238,54 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
         
         return attributedCaptionString
     }
+}
+
+extension NewsfeedViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    // https://hackernoon.com/swift-access-ios-camera-and-photo-library-dc1dbe0cdd76
+    func camera() {
+        if UIImagePickerController.isSourceTypeAvailable(.camera){
+            let myPickerController = UIImagePickerController()
+            myPickerController.delegate = self;
+            myPickerController.sourceType = .camera
+            present(myPickerController, animated: true, completion: nil)
+        }
+    }
+    
+    func photoLibrary() {
+        if UIImagePickerController.isSourceTypeAvailable(.photoLibrary){
+            let myPickerController = UIImagePickerController()
+            myPickerController.delegate = self;
+            myPickerController.sourceType = .photoLibrary
+            present(myPickerController, animated: true, completion: nil)
+        }
+    }
+    
+    // https://stackoverflow.com/questions/28255789/getting-url-of-uiimage-selected-from-uiimagepickercontroller
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        //print(info[UIImagePickerController.InfoKey.imageURL]!)
+        
+        if let imgURL = (info[UIImagePickerController.InfoKey.imageURL] as? URL) {
+            print("img url: ",imgURL)
+        }
+        
+//        if let imgUrl = info[UIImagePickerController.InfoKey.imageURL] as? URL{
+//            let imgName = imgUrl.lastPathComponent
+//            let documentDirectory = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first
+//            let localPath = documentDirectory?.appending(imgName)
+//
+//            let image = info[UIImagePickerController.InfoKey.originalImage] as! UIImage
+//            let data = image.pngData()! as NSData
+//            data.write(toFile: localPath!, atomically: true)
+//            //let imageData = NSData(contentsOfFile: localPath!)!
+//            let photoURL = URL.init(fileURLWithPath: localPath!)//NSURL(fileURLWithPath: localPath!)
+//            print("photo url: ", photoURL)
+//
+//        }
+        
+        dismiss(animated: true, completion: nil)
+        
+    }
+    
 }
