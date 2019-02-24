@@ -37,8 +37,6 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
         alert.addAction(cancel)
         
         present(alert, animated: true, completion: nil)
-    
-        
     }
     
     override func viewDidLoad() {
@@ -268,6 +266,13 @@ extension NewsfeedViewController: UIImagePickerControllerDelegate, UINavigationC
         
         if let imgURL = (info[UIImagePickerController.InfoKey.imageURL] as? URL) {
             print("img url: ",imgURL)
+            
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let postPhotoVC = storyboard.instantiateViewController(withIdentifier: "postPhotoViewController") as! PostPhotoViewController
+            // Pass photo to PostPhotoViewController
+            let photo = info[UIImagePickerController.InfoKey.originalImage] as! UIImage
+            postPhotoVC.photo = photo
+            self.navigationController?.pushViewController(postPhotoVC, animated: true)
         }
         
 //        if let imgUrl = info[UIImagePickerController.InfoKey.imageURL] as? URL{

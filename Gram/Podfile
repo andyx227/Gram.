@@ -15,4 +15,6 @@ target 'Gram' do
   pod 'Firebase/Firestore'
   pod 'Firebase/Storage'
   pod 'GoogleSignIn'
+  pod 'MultilineTextField'
+  pod 'IQKeyboardManagerSwift'
 end

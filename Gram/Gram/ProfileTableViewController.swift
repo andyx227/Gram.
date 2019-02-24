@@ -23,20 +23,20 @@ struct PhotoCard {
     var caption: String?
 }
 
-class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate {
+class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate, UITabBarControllerDelegate {
     var profile = [Api.profileInfo]()
     var photos = [PhotoCard]()
     var following: Bool = false  // Assume false always (this var only used when viewing another user's profile
     var firstTimeLoadingView = false  // Set to true when user clicks on a profile to view
     
+    override func viewWillAppear(_ animated: Bool) {
+        self.tableView.reloadData()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        /*profile = [ProfileInfo.init(profilePhoto: UIImage(named: "profile_photo")!,
-                                    fullname: "Andy Xue",
-                                    username: "@prestococo",
-                                    bio: "I mountain climb in my spare time!")
-        ]*/
+        self.tabBarController?.delegate = self
+        self.tabBarController?.selectedIndex = 2
         
         photos = [PhotoCard.init(profilePhoto: UIImage(named: "A")!,
                                  username: user!.username,
@@ -76,7 +76,6 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             }
             self.following = true
         }
-        //self.getNumFollowed(forUserId: sender.userID, displayInCell: sender)  // Update number of followers
         //self.tableView.reloadRows(at: [tappedIndexPath], with: .none)
         self.tableView.reloadData()
     }
@@ -84,6 +83,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
     func navigateToEditProfileViewController() {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let editProfileVC = storyboard.instantiateViewController(withIdentifier: "editProfileViewController") as! EditProfileViewController
+        editProfileVC.profileTableViewDelegate = self
         self.navigationController?.pushViewController(editProfileVC, animated: true)
     }
 
@@ -108,9 +108,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             // Set other profile information in its respective Labels
             cell.fullname.text = profile[indexPath.row].firstName + " " + profile[indexPath.row].lastName
             cell.username.text = "@" + profile[indexPath.row].username
-            //if let bio = profile[indexPath.row].bio {
-            cell.bio.text = "User will be allowed to edit their bio in future miletone."
-            //}
+            cell.bio.text = profile[indexPath.row].summary
             cell.userID = profile[indexPath.row].userID
             
             // Set number of followers and following if loading view for the first time
