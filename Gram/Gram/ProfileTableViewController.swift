@@ -21,6 +21,7 @@ struct PhotoCard {
     var date: String
     var photo: UIImage
     var caption: String?
+    var tags: [String]?
 }
 
 class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate, UITabBarControllerDelegate {
@@ -42,13 +43,15 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
                                  username: user!.username,
                                  date: "December 1, 2018",
                                  photo: UIImage(named:"mountain")!,
-                                 caption: "How do I get down from here?! #mountainclimbing"),
+                                 caption: "How do I get down from here?! #mountainclimbing",
+                                 tags: nil),
                   
                   PhotoCard.init(profilePhoto: UIImage(named: "A")!,
                                  username: user!.username,
                                  date: "January 12, 2019",
                                  photo: UIImage(named: "tower")!,
-                                 caption: "Paris is the best! #travel @mostrowski :)")
+                                 caption: "Paris is the best! #travel @mostrowski :)",
+                                 tags: nil)
         ]
     }
     

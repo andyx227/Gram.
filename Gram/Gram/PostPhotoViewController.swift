@@ -13,8 +13,9 @@ class PostPhotoViewController: UIViewController, UITextViewDelegate {
     
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var caption: MultilineTextField!
-    var photo: UIImage?
     @IBOutlet weak var photoHeightConstraint: NSLayoutConstraint!
+    var photo: UIImage?
+    var tags: [String]?
     
 
     override func viewDidLoad() {
@@ -92,6 +93,8 @@ class PostPhotoViewController: UIViewController, UITextViewDelegate {
         for token in tokenized_caption {
             if token.contains("#") {  // Hashtags should be in blue
                 attributedToken = NSAttributedString(string: token, attributes: hashtagAttributes)
+                if tags == nil { tags = [] }  // Initialize "tags" array if nil
+                tags!.append(token)  // Save tags (NOTE: each tag includes the # symbol!)
             } else if token.contains("@") {  // Tagged username should have bolded text
                 attributedToken = NSAttributedString(string: token, attributes: usernameAttributes)
             } else {
