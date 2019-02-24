@@ -93,8 +93,15 @@ struct Api {
                 dump(documents)
                 
                 var docData = documents[0].data().mapValues { String.init(describing: $0)}
-                let loadedProfile = Api.profileInfo.init(firstName: docData["firstName"] ?? "", lastName: docData["lastName"] ?? "", username: docData["username"] ?? "", email: docData["email"] ?? "", summary: docData["summary"] ?? "", userID: documents[0].documentID)
+                let loadedProfile = Api.profileInfo.init(firstName: docData["firstName"] ?? "", lastName: docData["lastName"] ?? "", username: docData["username"] ?? "", email: docData["email"] ?? "", summary: docData["summary"] ?? "", userID: documents[0].documentID, profilePhoto: nil)
                 user = loadedProfile
+                Api.getProfilePhoto(completion: { (url, err) in
+                    if err != nil {
+                        print("Error setting profile photo url: \(err ?? "null")")
+                    } else {
+                        user?.profilePhoto = url
+                    }
+                })
                 completion("success", nil)
             } else {
                 completion(nil, "Error on retrieving user data")
