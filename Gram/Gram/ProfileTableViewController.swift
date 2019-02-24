@@ -105,8 +105,10 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             
             // Set profile photo
             if profile[indexPath.row].userID != user?.userID {  // Viewing another user's profile
-                cell.profilePhoto.showAnimatedGradientSkeleton()
-                getProfilePhoto(cell)
+                if firstTimeLoadingView {
+                    cell.profilePhoto.showAnimatedGradientSkeleton()
+                    getProfilePhoto(cell)
+                }
             } else {
                 if let profilePhoto = ProfileDataCache.profilePhoto {  // Get profile photo from cache if possible
                     cell.profilePhoto.image = profilePhoto
