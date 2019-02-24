@@ -36,6 +36,13 @@ struct Api {
         var profilePhoto: String?
     }
     
+    struct photoURL {
+        var URL : String
+        var userID : String
+        var datePosted : String
+        var caption : String
+        var tags : [String]?
+    }
     static func checkUserExists(username: String, completion: @escaping ApiCompletionURL) {
         let userNameCheck = db.collection("users").whereField("username", isEqualTo: username)
         userNameCheck.getDocuments { (querySnapshot, err) in
@@ -179,10 +186,11 @@ struct Api {
             return
         }
         
-        var photoUrl : URL?
+        var photoURL : URL?
         
         DispatchQueue.global(qos: .userInitiated).async {
             // upload photo to storage
+            
             let storageRef = storage.reference()
             
             let profileRef = storageRef.child("images/photos/" + randomString(length:20))
@@ -200,7 +208,7 @@ struct Api {
                         return
                     }
                     
-                    photoUrl = downloadURL
+                    photoURL = downloadURL
                     group.leave()
                 }
             }
@@ -213,6 +221,7 @@ struct Api {
                     "UID" : user.userID,
                     "caption" : photo.caption ?? "null",
                     "datePosted" : Timestamp(date: Date()),
+                    "url" : photoURL ?? "",
                     "tags" : photo.tags!]) { err in
                         if let err = err {
                             print("Error creating photo document: \(err)")
@@ -220,7 +229,42 @@ struct Api {
                         }
                 }
                 
-                completion(photoUrl?.absoluteString, nil)
+                completion(photoURL?.absoluteString, nil)
+            }
+        }
+    }
+    
+    /**
+    Return the photos of the current logged in user in reverse chronological order
+    */
+    static func getProfilePhotos(completion: @escaping ApiCompletionPhotos) {
+        let docRef = db.collection("photos")
+        let query = docRef.whereField("UID", isEqualTo: user?.userID ?? "null").order(by: "datePosted", descending: true)
+        
+        query.getDocuments { (querySnapshot, error) in
+            if let documents = querySnapshot?.documents {
+                dump(documents)
+                var photos : [photoURL] = []
+                for document in documents {
+                    var docData = document.data().mapValues { String.init(describing: $0)}
+                    //unwrap into user object, potentially
+                    //if if fields empty
+                    var photo = photoURL(URL: docData["url"] ?? "",
+                                         userID: docData["UID"] ?? "",
+                                         datePosted: docData["datePosted"] ?? "",
+                                         caption: docData["caption"] ?? "",
+                                         tags: nil)
+                    // rmeove white space, first and last character, parentheses, and commas
+                    let tagString = String(docData["tags"]?.replacingOccurrences(of: " ", with: "").replacingOccurrences(of: " ", with: "").replacingOccurrences(of: "(", with: "").replacingOccurrences(of: ")", with: "").replacingOccurrences(of: ",", with: "").dropFirst().dropLast() ?? "")
+                    
+                    photo.tags = tagString.components(separatedBy: "\n")
+                    //append photo object to list of photos
+                    photos.append(photo)
+                }
+                
+                completion(photos, nil)
+            } else if error != nil{
+                completion(nil, "Error occurred retrieving profile photos: \(error.debugDescription)")
             }
         }
     }
@@ -458,4 +502,5 @@ struct Api {
     typealias ApiCompletionUserIDs = ((_ response: [String]?, _ error: String?) -> Void)
     typealias ApiCompletionURL = ((_ response: String?, _ error: String?) -> Void)
     typealias ApiCompletionInt = ((_ response: Int?, _ error: String?) -> Void)
+    typealias ApiCompletionPhotos = ((_ response: [photoURL]?, _ error: String?) -> Void)
 }
