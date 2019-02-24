@@ -37,8 +37,6 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
         alert.addAction(cancel)
         
         present(alert, animated: true, completion: nil)
-    
-        
     }
     
     override func viewDidLoad() {
@@ -57,13 +55,15 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                                  username: user!.username,
                                  date: "December 1, 2018",
                                  photo: UIImage(named:"mountain")!,
-                                 caption: "How do I get down from here?! #mountainclimbing"),
+                                 caption: "How do I get down from here?! #mountainclimbing",
+                                 tags: nil),
                   
                   PhotoCard.init(profilePhoto: UIImage(named: "A")!,
                                  username: user!.username,
                                  date: "January 12, 2019",
                                  photo: UIImage(named: "tower")!,
-                                 caption: "Paris is the best! #travel @mostrowski :)")
+                                 caption: "Paris is the best! #travel @mostrowski :)",
+                                 tags: nil)
         ]
     }
     
@@ -268,6 +268,13 @@ extension NewsfeedViewController: UIImagePickerControllerDelegate, UINavigationC
         
         if let imgURL = (info[UIImagePickerController.InfoKey.imageURL] as? URL) {
             print("img url: ",imgURL)
+            
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let postPhotoVC = storyboard.instantiateViewController(withIdentifier: "postPhotoViewController") as! PostPhotoViewController
+            // Pass photo to PostPhotoViewController
+            let photo = info[UIImagePickerController.InfoKey.originalImage] as! UIImage
+            postPhotoVC.photo = photo
+            self.navigationController?.pushViewController(postPhotoVC, animated: true)
         }
         
 //        if let imgUrl = info[UIImagePickerController.InfoKey.imageURL] as? URL{

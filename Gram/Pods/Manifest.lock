@@ -122,13 +122,16 @@ PODS:
     - nanopb (~> 0.3)
   - gRPC-Core/Interface (1.17.0)
   - GTMSessionFetcher/Core (1.2.1)
+  - IQKeyboardManagerSwift (6.2.0)
   - leveldb-library (1.20)
+  - MultilineTextField (0.2.3)
   - nanopb (0.3.901):
     - nanopb/decode (= 0.3.901)
     - nanopb/encode (= 0.3.901)
   - nanopb/decode (0.3.901)
   - nanopb/encode (0.3.901)
   - Protobuf (3.6.1)
+  - SkeletonView (1.4.1)
   - TextFieldEffects (1.5.1)
 
 DEPENDENCIES:
@@ -140,6 +143,9 @@ DEPENDENCIES:
   - Firebase/Firestore
   - Firebase/Storage
   - GoogleSignIn
+  - IQKeyboardManagerSwift
+  - MultilineTextField
+  - SkeletonView
   - TextFieldEffects
 
 SPEC REPOS:
@@ -162,9 +168,12 @@ SPEC REPOS:
     - "gRPC-C++"
     - gRPC-Core
     - GTMSessionFetcher
+    - IQKeyboardManagerSwift
     - leveldb-library
+    - MultilineTextField
     - nanopb
     - Protobuf
+    - SkeletonView
     - TextFieldEffects
 
 SPEC CHECKSUMS:
@@ -186,11 +195,14 @@ SPEC CHECKSUMS:
   "gRPC-C++": e76441995900ac90e9bd98644ab4733f12521edf
   gRPC-Core: 4028031ed2c5267cca0d846c876d8046b1ecb9b6
   GTMSessionFetcher: 32aeca0aa144acea523e1c8e053089dec2cb98ca
+  IQKeyboardManagerSwift: b07ccf9d8cafe993dcd6cb794eb4ba34611a0c4e
   leveldb-library: 08cba283675b7ed2d99629a4bc5fd052cd2bb6a5
+  MultilineTextField: 10965d9c3e05a182181bd7971eb009c7607001ae
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
   Protobuf: 1eb9700044745f00181c136ef21b8ff3ad5a0fd5
+  SkeletonView: 60d6ce7edb0cb4c7758db33c74add50392b3c475
   TextFieldEffects: 7d372f58aeaf9acd9626bbf962680aef926b085d
 
-PODFILE CHECKSUM: 5875f16603c8e21c31062491de9b73bc2137238b
+PODFILE CHECKSUM: 5e245ef4e8bc04f81a35cbe9a7ce96a9875eeeae
 
 COCOAPODS: 1.5.3
