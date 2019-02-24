@@ -17,4 +17,5 @@ target 'Gram' do
   pod 'GoogleSignIn'
   pod 'MultilineTextField'
   pod 'IQKeyboardManagerSwift'
+  pod 'SkeletonView'
 end

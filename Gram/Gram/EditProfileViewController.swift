@@ -8,8 +8,9 @@
 
 import UIKit
 import TextFieldEffects
+import SkeletonView
 
-class EditProfileViewController: UIViewController {
+class EditProfileViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     @IBOutlet weak var textFirstName: HoshiTextField!
     @IBOutlet weak var textLastName: HoshiTextField!
     @IBOutlet weak var textUsername: HoshiTextField!
@@ -17,6 +18,20 @@ class EditProfileViewController: UIViewController {
     @IBOutlet weak var profilePhoto: UIImageView!
     var currentlySelectedTextField: UITextField?
     var profileTableViewDelegate: ProfileTableViewController?
+    
+    override func viewWillAppear(_ animated: Bool) {
+        if profilePhoto.isSkeletonActive {
+            if let photo = ProfileDataCache.profilePhoto {
+                profilePhoto.image = photo
+            } else {
+                let firstLetterOfFirstName = String(user!.firstName.first!)
+                profilePhoto.image = UIImage(named: firstLetterOfFirstName)
+            }
+            
+            profilePhoto.hideSkeleton()
+            profilePhoto.stopSkeletonAnimation()
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,10 +42,14 @@ class EditProfileViewController: UIViewController {
         textUsername.text = user?.username
         textBio.text = user?.summary
         
-        // TODO: Retrieve user profile photo through Api.user object
         // Set profile photo to be round
-        let firstLetterOfFirstName = String(user!.firstName.first!)
-        profilePhoto.image = UIImage(named: firstLetterOfFirstName)
+        if let photo = ProfileDataCache.profilePhoto {
+            profilePhoto.image = photo
+        } else {
+            let firstLetterOfFirstName = String(user!.firstName.first!)
+            profilePhoto.image = UIImage(named: firstLetterOfFirstName)
+        }
+        
         profilePhoto.layer.cornerRadius = profilePhoto.frame.height / 2
         profilePhoto.clipsToBounds = true
     }
@@ -51,8 +70,8 @@ class EditProfileViewController: UIViewController {
         }
         
         // Update user with newly updated fields
-        user?.firstName = firstName
-        user?.lastName = lastName
+        user?.firstName = firstName.capitalizingFirstLetter()
+        user?.lastName = lastName.capitalizingFirstLetter()
         user?.username = username
         user?.summary = bio
         
@@ -69,8 +88,39 @@ class EditProfileViewController: UIViewController {
     }
     
     @IBAction func btnChangePhoto(_ sender: Any) {
-        // TODO: Implement logic for choosing profile photo
-        print("Warning — 'Change Photo' button in EditProfileViewController not yet implemented.")
+        if UIImagePickerController.isSourceTypeAvailable(.photoLibrary){
+            let myPickerController = UIImagePickerController()
+            myPickerController.delegate = self;
+            myPickerController.sourceType = .photoLibrary
+            present(myPickerController, animated: true, completion: nil)
+        }
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        if let imgURL = (info[UIImagePickerController.InfoKey.imageURL] as? URL) {
+            print("img url: ", imgURL)
+            Api.uploadProfilePhoto(path: imgURL) { (response, error) in
+                if let _ = error {
+                    self.presentAlertPopup(withTitle: "An error has occurred",
+                                           withMessage: "Could not successfully update your profile photo. Please try again.")
+                    return
+                }
+            }
+           
+            ProfileDataCache.profilePhoto = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
+            profilePhoto.showAnimatedGradientSkeleton()
+            self.dismiss(animated: true, completion: nil)
+        }
+    }
+}
+
+extension String {
+    func capitalizingFirstLetter() -> String {
+        return prefix(1).capitalized + dropFirst()
+    }
+    
+    mutating func capitalizeFirstLetter() {
+        self = self.capitalizingFirstLetter()
     }
 }
 

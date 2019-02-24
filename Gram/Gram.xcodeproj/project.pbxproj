@@ -26,6 +26,7 @@
 		A1A221072212B2E300A9A2EC /* AuthenticationListeners.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A221062212B2E300A9A2EC /* AuthenticationListeners.swift */; };
 		A1D621AA221F4AD000E7B68B /* EditProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D621A9221F4AD000E7B68B /* EditProfileViewController.swift */; };
 		A1D621AD22210B1F00E7B68B /* PostPhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D621AC22210B1F00E7B68B /* PostPhotoViewController.swift */; };
+		A1D621AF22222C7D00E7B68B /* ProfileDataCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D621AE22222C7D00E7B68B /* ProfileDataCache.swift */; };
 		A1DE5B1D22113C2800CF49DE /* PickUsernameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1DE5B1C22113C2800CF49DE /* PickUsernameViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -53,6 +54,7 @@
 		A1A221062212B2E300A9A2EC /* AuthenticationListeners.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationListeners.swift; sourceTree = "<group>"; };
 		A1D621A9221F4AD000E7B68B /* EditProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileViewController.swift; sourceTree = "<group>"; };
 		A1D621AC22210B1F00E7B68B /* PostPhotoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostPhotoViewController.swift; sourceTree = "<group>"; };
+		A1D621AE22222C7D00E7B68B /* ProfileDataCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileDataCache.swift; sourceTree = "<group>"; };
 		A1DE5B1C22113C2800CF49DE /* PickUsernameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickUsernameViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -107,6 +109,7 @@
 				A1A221062212B2E300A9A2EC /* AuthenticationListeners.swift */,
 				A1D621A9221F4AD000E7B68B /* EditProfileViewController.swift */,
 				A1D621AC22210B1F00E7B68B /* PostPhotoViewController.swift */,
+				A1D621AE22222C7D00E7B68B /* ProfileDataCache.swift */,
 			);
 			path = Gram;
 			sourceTree = "<group>";
@@ -270,6 +273,7 @@
 				"${BUILT_PRODUCTS_DIR}/IQKeyboardManagerSwift/IQKeyboardManagerSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/MultilineTextField/MultilineTextField.framework",
 				"${BUILT_PRODUCTS_DIR}/Protobuf/Protobuf.framework",
+				"${BUILT_PRODUCTS_DIR}/SkeletonView/SkeletonView.framework",
 				"${BUILT_PRODUCTS_DIR}/TextFieldEffects/TextFieldEffects.framework",
 				"${BUILT_PRODUCTS_DIR}/gRPC-C++/grpcpp.framework",
 				"${BUILT_PRODUCTS_DIR}/gRPC-Core/grpc.framework",
@@ -288,6 +292,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/IQKeyboardManagerSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MultilineTextField.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SkeletonView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TextFieldEffects.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/grpcpp.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/grpc.framework",
@@ -306,6 +311,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1D621AF22222C7D00E7B68B /* ProfileDataCache.swift in Sources */,
 				A12AC1F6220EB0B2000036E3 /* ProfileTableViewController.swift in Sources */,
 				5D73C433220B7EA900E75875 /* Api.swift in Sources */,
 				A11274DA21FD48AA00DA05D5 /* LoginViewController.swift in Sources */,

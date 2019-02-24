@@ -36,8 +36,6 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.tabBarController?.delegate = self
-        self.tabBarController?.selectedIndex = 2
         
         photos = [PhotoCard.init(profilePhoto: UIImage(named: "A")!,
                                  username: user!.username,
@@ -104,8 +102,20 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             // Set "Edit Profile" button style
             cell.changeFollowStatus.layer.cornerRadius = 10
             cell.changeFollowStatus.layer.borderColor = UIColor.black.cgColor
-            // Set profile photo to be round
-            cell.profilePhoto.image = UIImage(named: firstLetterOfFirstName)
+            
+            // Set profile photo
+            if profile[indexPath.row].userID != user?.userID {  // Viewing another user's profile
+                cell.profilePhoto.showAnimatedGradientSkeleton()
+                getProfilePhoto(cell)
+            } else {
+                if let profilePhoto = ProfileDataCache.profilePhoto {  // Get profile photo from cache if possible
+                    cell.profilePhoto.image = profilePhoto
+                } else {  // Otherwise, make an api call to retreive profile photo from Firebase
+                    cell.profilePhoto.showAnimatedGradientSkeleton()
+                    getProfilePhoto(cell)
+                }
+            }
+            
             cell.profilePhoto.layer.cornerRadius = cell.profilePhoto.frame.height / 2
             cell.profilePhoto.clipsToBounds = true
             // Set other profile information in its respective Labels
@@ -150,8 +160,14 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             // Remove later!
             let username = profile.first!.username
             
+            // Set profile photo
+            if let photo = ProfileDataCache.profilePhoto {
+                cell.profilePhoto.image = photo
+            } else {
+                cell.profilePhoto.image = UIImage(named: firstLetterOfFirstName)
+            }
+            
             // Set profile photo to be round
-            cell.profilePhoto.image = UIImage(named: firstLetterOfFirstName)
             cell.profilePhoto.layer.cornerRadius = cell.profilePhoto.frame.height / 2
             cell.profilePhoto.clipsToBounds = true
             
@@ -228,6 +244,42 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
                 self.fadeInAnimation(cell.numFollowing, duration: 0.8)
                 return
             }
+        }
+    }
+    
+    // TODO: Api.profileInfo should contain url for user profile photo.
+    // Function can only use logged-in user's profile photo, even when
+    // viewing another user's profile!
+    private func getProfilePhoto(_ cell: ProfileInfoCell) {
+        let firstLetterOfFirstName = String(profile.first!.firstName.first!)
+        
+        Api.getProfilePhoto { (photoUrl, error) in
+            if let _ = error {  // Show default profile photo if error
+                cell.profilePhoto.image = UIImage(named: firstLetterOfFirstName)
+            }
+            if let photoUrl = photoUrl {
+                if photoUrl == "" {  // No URL for profile photo, so use default profile photo
+                    cell.profilePhoto.image = UIImage(named: firstLetterOfFirstName)
+                    cell.profilePhoto.hideSkeleton()
+                    cell.profilePhoto.stopSkeletonAnimation()
+                    return
+                }
+                
+                do {
+                    let url = URL(string: photoUrl)
+                    let data = try Data(contentsOf: url!)
+                    ProfileDataCache.profilePhoto = UIImage(data: data)  // Save image in cache
+                    cell.profilePhoto.image = ProfileDataCache.profilePhoto
+                } catch {  // Show default profile photo if error
+                    cell.profilePhoto.image = UIImage(named: firstLetterOfFirstName)
+                }
+                cell.profilePhoto.hideSkeleton()
+                cell.profilePhoto.stopSkeletonAnimation()
+            }
+            
+            // Set profile photo to be round
+            cell.profilePhoto.layer.cornerRadius = cell.profilePhoto.frame.height / 2
+            cell.profilePhoto.clipsToBounds = true
         }
     }
 }

@@ -467,6 +467,9 @@
                                                         <constraint firstAttribute="height" constant="130" id="6ad-9o-vEw"/>
                                                         <constraint firstAttribute="width" constant="130" id="xce-iT-uWT"/>
                                                     </constraints>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                    </userDefinedRuntimeAttributes>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&lt;fullname&gt;" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="chQ-Jd-NSf">
                                                     <rect key="frame" x="0.0" y="154" width="343" height="23.5"/>
@@ -736,6 +739,9 @@
                                         <constraint firstItem="Vun-Yw-oMB" firstAttribute="top" secondItem="HtV-Ly-oFS" secondAttribute="bottom" constant="8" id="oSC-bM-UgK"/>
                                     </constraints>
                                 </tableViewCellContentView>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                </userDefinedRuntimeAttributes>
                                 <connections>
                                     <outlet property="caption" destination="RQZ-eC-VvE" id="gd5-OR-ssg"/>
                                     <outlet property="date" destination="G1K-h3-uvp" id="Zcn-cR-B17"/>
@@ -916,6 +922,9 @@
                                     <constraint firstAttribute="width" constant="130" id="MWd-Ay-Pvp"/>
                                     <constraint firstAttribute="height" constant="130" id="YFK-1I-gUv"/>
                                 </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                </userDefinedRuntimeAttributes>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

@@ -131,6 +131,7 @@ PODS:
   - nanopb/decode (0.3.901)
   - nanopb/encode (0.3.901)
   - Protobuf (3.6.1)
+  - SkeletonView (1.4.1)
   - TextFieldEffects (1.5.1)
 
 DEPENDENCIES:
@@ -144,6 +145,7 @@ DEPENDENCIES:
   - GoogleSignIn
   - IQKeyboardManagerSwift
   - MultilineTextField
+  - SkeletonView
   - TextFieldEffects
 
 SPEC REPOS:
@@ -171,6 +173,7 @@ SPEC REPOS:
     - MultilineTextField
     - nanopb
     - Protobuf
+    - SkeletonView
     - TextFieldEffects
 
 SPEC CHECKSUMS:
@@ -197,8 +200,9 @@ SPEC CHECKSUMS:
   MultilineTextField: 10965d9c3e05a182181bd7971eb009c7607001ae
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
   Protobuf: 1eb9700044745f00181c136ef21b8ff3ad5a0fd5
+  SkeletonView: 60d6ce7edb0cb4c7758db33c74add50392b3c475
   TextFieldEffects: 7d372f58aeaf9acd9626bbf962680aef926b085d
 
-PODFILE CHECKSUM: 1a1bfee6402505f6e5faaac360cc07653e4a86aa
+PODFILE CHECKSUM: 5e245ef4e8bc04f81a35cbe9a7ce96a9875eeeae
 
 COCOAPODS: 1.5.3
