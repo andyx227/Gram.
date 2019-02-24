@@ -216,17 +216,24 @@ extension UIViewController {
         self.navigationController?.pushViewController(tabBarController, animated: true)
     }
     
-    func changeStatusBarColor(forView viewController: UIViewController) {
-        if viewController is NewsfeedViewController {
-            // Change status bar color to RGB value -> 247, 245, 233
-            let statusBar: UIView = UIApplication.shared.value(forKey: "statusBar") as! UIView
-            if statusBar.responds(to:#selector(setter: UIView.backgroundColor)) {
-                statusBar.backgroundColor = UIColor(red: 247/255, green: 245/255, blue: 233/255, alpha: 1)
+    func changeStatusBarColor(forView viewController: UIViewController?) {
+        if let viewController = viewController {
+            if viewController is NewsfeedViewController {
+                // Change status bar color to RGB value -> 247, 245, 233
+                let statusBar: UIView = UIApplication.shared.value(forKey: "statusBar") as! UIView
+                if statusBar.responds(to:#selector(setter: UIView.backgroundColor)) {
+                    statusBar.backgroundColor = UIColor(red: 247/255, green: 245/255, blue: 233/255, alpha: 1)
+                }
+            } else if viewController is ProfileTableViewController {
+                let statusBar: UIView = UIApplication.shared.value(forKey: "statusBar") as! UIView
+                if statusBar.responds(to:#selector(setter: UIView.backgroundColor)) {
+                    statusBar.backgroundColor = UIColor.white
+                }
             }
-        } else if viewController is ProfileTableViewController {
+        } else {  // Use clear background by default
             let statusBar: UIView = UIApplication.shared.value(forKey: "statusBar") as! UIView
             if statusBar.responds(to:#selector(setter: UIView.backgroundColor)) {
-                statusBar.backgroundColor = UIColor.white
+                statusBar.backgroundColor = UIColor.clear
             }
         }
     }

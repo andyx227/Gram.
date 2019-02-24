@@ -19,6 +19,10 @@ class PostPhotoViewController: UIViewController, UITextViewDelegate {
     var tags: [String]?
     
 
+    override func viewWillAppear(_ animated: Bool) {
+        changeStatusBarColor(forView: self)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         hideKeyboard()

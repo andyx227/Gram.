@@ -18,27 +18,6 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
     var photos = [PhotoCard]()
     var imageURL: URL?
     
-    // create a popup that allows user to select image from either camera or photo library
-    @IBAction func addPhotoPressed(_ sender: UIButton) {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        let camera = UIAlertAction(title: "Camera", style: .default) { (action) in
-            //print("Get photo from camera")
-            self.camera()
-        }
-        alert.addAction(camera)
-        
-        let photoLibrary = UIAlertAction(title: "Photo Library", style: .default) { (action) in
-            //print("Get photo from photo library")
-            self.photoLibrary()
-        }
-        alert.addAction(photoLibrary)
-        
-        let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        alert.addAction(cancel)
-        
-        present(alert, animated: true, completion: nil)
-    }
     
     override func viewWillAppear(_ animated: Bool) {
         changeStatusBarColor(forView: self)
@@ -78,6 +57,17 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                                  caption: "Paris is the best! #travel @mostrowski :)",
                                  tags: nil)
         ]*/
+    }
+    
+    // Allow user to choose photo from album to post
+    @IBAction func btnPost(_ sender: UIButton) {
+        self.photoLibrary()
+        changeStatusBarColor(forView: nil)
+    }
+    
+    // Allow user to take a picture using camera, then post
+    @IBAction func btnCamera(_ sender: Any) {
+        self.camera()
     }
     
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
