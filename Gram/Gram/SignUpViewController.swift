@@ -113,7 +113,8 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
                                                                    username: theUsername,
                                                                    email: email,
                                                                    summary: "",
-                                                                   userID: "")
+                                                                   userID: "",
+                                                                   profilePhoto: nil)
                                 user = profile
                                 
                                 Api.signupUser(completion: { (response, error) in

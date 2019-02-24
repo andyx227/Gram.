@@ -33,6 +33,7 @@ struct Api {
         var userID : String
         var following : Bool
         var summary : String
+        var profilePhoto: String?
     }
     
     static func checkUserExists(username: String, completion: @escaping ApiCompletionURL) {
@@ -335,7 +336,7 @@ struct Api {
                     var docData = document.data().mapValues { String.init(describing: $0)}
                     //unwrap into user object, potentially
                     //if if fields empty
-                    let currUser = userInfo(firstName: docData["firstName"] ?? "", lastName: docData["lastName"] ?? "", userName: docData["username"] ?? "", userID: document.documentID, following: false, summary : docData["summary"] ?? "")
+                    let currUser = userInfo(firstName: docData["firstName"] ?? "", lastName: docData["lastName"] ?? "", userName: docData["username"] ?? "", userID: document.documentID, following: false, summary : docData["summary"] ?? "", profilePhoto : docData["profilePhoto"])
                     //append user object to list of
                     //users that satisfy search requirement
                     users.append(currUser)

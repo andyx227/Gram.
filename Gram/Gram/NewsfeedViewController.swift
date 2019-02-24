@@ -206,7 +206,8 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                                                  username: people[indexPath.row].userName,
                                                  email: "",
                                                  summary: people[indexPath.row].summary,  // TODO: userInfo should include a summary field too, using empty string for now
-                                                 userID: people[indexPath.row].userID)
+                                                 userID: people[indexPath.row].userID,
+                                                 profilePhoto: people[indexPath.row].profilePhoto)
         ]
 
         let profileTab = self.tabBarController?.viewControllers![2] as! ProfileTableViewController
