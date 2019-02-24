@@ -278,10 +278,6 @@ struct Api {
     }
     
     static func getFollowerPhotos(completion: @escaping ApiCompletionPhotos) {
-        guard let user = user else {
-            print("Global user not set")
-            return
-        }
         
         findFollowers { (users, error) in
             if error != nil {
