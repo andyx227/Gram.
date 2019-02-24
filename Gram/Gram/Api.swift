@@ -157,6 +157,71 @@ struct Api {
             }
         }
     }
+    
+    /**
+     Post a photo and return the url of the photo uploaded.
+     Returns empty url string on error
+    */
+    static func postPhoto(path: URL, photo: PhotoCard, completion: @escaping ApiCompletionURL) {
+        guard let user = user else {
+            completion(nil,"Global user not set")
+            return
+        }
+        
+        var photoUrl : URL?
+        
+        DispatchQueue.global(qos: .userInitiated).async {
+            // upload photo to storage
+            let storageRef = storage.reference()
+            
+            let profileRef = storageRef.child("images/photos/" + randomString(length:20))
+            let group = DispatchGroup()
+            
+            // Upload the file to the path
+            group.enter()
+            profileRef.putFile(from: path , metadata: nil) { metadata, error in
+                
+                // You can also access to download URL after upload.
+                profileRef.downloadURL { (url, error) in
+                    guard let downloadURL = url else {
+                        completion(nil, "An error has occurred obtaining profile photo url")
+                        print(error?.localizedDescription ?? "error")
+                        return
+                    }
+                    
+                    photoUrl = downloadURL
+                    group.leave()
+                }
+            }
+        
+            group.wait()
+            
+            DispatchQueue.main.async {
+                // create photo document
+                db.collection("photos").addDocument(data: [
+                    "UID" : user.userID,
+                    "caption" : photo.caption ?? "null",
+                    "datePosted" : Timestamp(date: Date()),
+                    "tags" : photo.tags]) { err in
+                        if let err = err {
+                            print("Error creating photo document: \(err)")
+                            completion(nil, err as? String);
+                        }
+                }
+                
+                completion(photoUrl?.absoluteString, nil)
+            }
+        }
+    }
+    
+    /**
+     used to generate a unique string for an image
+    */
+    static func randomString(length: Int) -> String {
+        let letters = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ"  // No lower case 'L' or upper case "I" because it's ambiguous
+        return String((0...length-1).map{ _ in letters.randomElement()! })
+    }
+    
     /**
      takes userID as arguement, defaults to current user
      returns dictionary of number of users followed and following the specified user
