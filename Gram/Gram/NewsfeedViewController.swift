@@ -13,6 +13,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
     @IBOutlet weak var searchBarPeople: UISearchBar!
     @IBOutlet weak var newsfeedTableView: UITableView!
     @IBOutlet weak var searchPeopleTableView: UITableView!
+    @IBOutlet weak var viewNoPhotos: UIView!
     var people = [Api.userInfo]()
     var photos = [PhotoCard]()
     var imageURL: URL?
@@ -39,6 +40,18 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
         present(alert, animated: true, completion: nil)
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        changeStatusBarColor(forView: self)
+        
+        if photos.count == 0 {
+            self.newsfeedTableView.isHidden = true
+            self.viewNoPhotos.isHidden = false
+        } else {
+            self.newsfeedTableView.isHidden = false
+            self.viewNoPhotos.isHidden = true
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.hideKeyboard()
@@ -51,7 +64,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
         self.tabBarController?.delegate = self
         self.tabBarController?.selectedIndex = 0
         
-        photos = [PhotoCard.init(profilePhoto: UIImage(named: "A")!,
+        /*photos = [PhotoCard.init(profilePhoto: UIImage(named: "A")!,
                                  username: user!.username,
                                  date: "December 1, 2018",
                                  photo: UIImage(named:"mountain")!,
@@ -64,7 +77,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                                  photo: UIImage(named: "tower")!,
                                  caption: "Paris is the best! #travel @mostrowski :)",
                                  tags: nil)
-        ]
+        ]*/
     }
     
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
@@ -87,9 +100,17 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchText.isEmpty {  // If user is not searching anything...
             self.searchPeopleTableView.isHidden = true  // Hide People Search TableView
-            self.newsfeedTableView.isHidden = false  // Show Newsfeed
+            
+            if photos.count == 0 {
+                self.viewNoPhotos.isHidden = false
+                self.newsfeedTableView.isHidden = true  // Hide Newsfeed
+            } else {
+                self.viewNoPhotos.isHidden = true
+                self.newsfeedTableView.isHidden = false  // Show Newsfeed
+            }
             return
         }
+        
         
         Api.searchUsers(name: searchText) { (peopleList, error) in
             if let _ = error {
@@ -101,6 +122,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
             if let peopleList = peopleList {
                 self.people = peopleList
                 self.newsfeedTableView.isHidden = true  // Hide newsfeed TableView in order to show the People Search TableView
+                self.viewNoPhotos.isHidden = true
                 self.searchPeopleTableView.isHidden = false
                 self.searchPeopleTableView.reloadData()
             } else {
@@ -125,8 +147,15 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
             }
             return people.count
         } else if tableView == self.newsfeedTableView {
-            self.searchPeopleTableView.isHidden = true
-            self.newsfeedTableView.isHidden = false
+            if photos.count > 0 {
+                self.searchPeopleTableView.isHidden = true
+                self.newsfeedTableView.isHidden = false
+                self.viewNoPhotos.isHidden = true
+            } else {
+                self.searchPeopleTableView.isHidden = true
+                self.newsfeedTableView.isHidden = true
+                self.viewNoPhotos.isHidden = false
+            }
             return photos.count
         } else {  // Should NEVER reach this case!
             return 0

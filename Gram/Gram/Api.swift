@@ -202,7 +202,7 @@ struct Api {
                     "UID" : user.userID,
                     "caption" : photo.caption ?? "null",
                     "datePosted" : Timestamp(date: Date()),
-                    "tags" : photo.tags]) { err in
+                    "tags" : photo.tags!]) { err in
                         if let err = err {
                             print("Error creating photo document: \(err)")
                             completion(nil, err as? String);
