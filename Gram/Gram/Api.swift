@@ -23,6 +23,7 @@ struct Api {
         var email : String
         var summary : String
         var userID : String
+        var profilePhoto: String?
     }
     
     struct userInfo {
@@ -105,7 +106,7 @@ struct Api {
      Given a path to an image stored locally, upload the image to the logged in user and set the profile photo field as the url of the photo uploaded
     */
     static func uploadProfilePhoto(path: URL, completion: @escaping ApiCompletion){
-        guard let user = user else {
+        guard var user = user else {
             completion(nil, "User has not been set")
             return
         }
@@ -122,6 +123,8 @@ struct Api {
                     print(error?.localizedDescription ?? "error")
                     return
                 }
+                
+                user.profilePhoto = url?.absoluteString
                 
                 db.collection("users").document(user.userID).setData(["profilePhoto": downloadURL.absoluteString], merge:true, completion: { (error) in
                     if let _ = error {
