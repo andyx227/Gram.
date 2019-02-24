@@ -15,6 +15,7 @@ class PostPhotoViewController: UIViewController, UITextViewDelegate {
     @IBOutlet weak var caption: MultilineTextField!
     @IBOutlet weak var photoHeightConstraint: NSLayoutConstraint!
     var photo: UIImage?
+    var photoUrl: URL?
     var tags: [String]?
     
 
@@ -54,7 +55,37 @@ class PostPhotoViewController: UIViewController, UITextViewDelegate {
     }
     
     @IBAction func btnPost(_ sender: Any) {
-        print("Warning — 'Post' button not yet implemented.")
+        guard let imgUrl = photoUrl else {
+            presentAlertPopup(withTitle: "Something went wrong!", withMessage: "Could not upload your photo. Please try again.")
+            return
+        }
+        guard let photoToPost = photo else {
+            presentAlertPopup(withTitle: "Something went wrong!", withMessage: "Could not upload your photo. Please try again.")
+            return
+        }
+        guard let photoCaption = caption else {
+            presentAlertPopup(withTitle: "Something went wrong!", withMessage: "Could not upload your photo. Please try again.")
+            return
+        }
+        
+        let tags = extractTags(caption.text)  // Get tags from the photo caption
+        
+        // Construct Photo Card object
+        let photoCard = PhotoCard.init(profilePhoto: UIImage(named: "A")!,  // Won't be using profilePhoto so this won't matter
+                                       username: user!.username,
+                                       date: "null",  // Don't need to pass in date, Firebase will take care of that
+                                       photo: photoToPost,
+                                       caption: photoCaption.text,
+                                       tags: tags)
+        
+        Api.postPhoto(path: imgUrl, photo: photoCard) { (url, error) in
+            if let _ = error {
+                self.presentAlertPopup(withTitle: "Something went wrong!", withMessage: "Could not upload your photo. Please try again.")
+                return
+            }
+        }
+        
+        self.navigationController?.popViewController(animated: true)
     }
     
     /**** Helper Functions Below ****/
@@ -71,7 +102,6 @@ class PostPhotoViewController: UIViewController, UITextViewDelegate {
         }
     }
     
-    /****** Helper Functions *****/
     private func formatCaption(_ caption: String) -> NSAttributedString {
         let usernameAttributes: [NSAttributedString.Key: Any] = [
             NSAttributedString.Key.font: UIFont(name: "HelveticaNeue-Bold", size: 13)!
@@ -105,6 +135,22 @@ class PostPhotoViewController: UIViewController, UITextViewDelegate {
         }
         
         return attributedCaptionString
+    }
+    
+    private func extractTags(_ caption: String) -> [String] {
+        var tags = [String]()
+        // Tokenize photo caption, delimited by whitespace
+        let tokenized_caption = caption.components(separatedBy: " ")
+
+        for token in tokenized_caption {
+            if token.contains("#") {  // Hashtags should be in blue
+                var tag = token
+                tag.remove(at: token.startIndex)  // Remove hashtag symbol at beginning of tag word
+                tags.append(tag)
+            }
+        }
+        
+        return tags
     }
 
 }

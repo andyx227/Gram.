@@ -274,6 +274,7 @@ extension NewsfeedViewController: UIImagePickerControllerDelegate, UINavigationC
             // Pass photo to PostPhotoViewController
             let photo = info[UIImagePickerController.InfoKey.originalImage] as! UIImage
             postPhotoVC.photo = photo
+            postPhotoVC.photoUrl = imgURL
             self.navigationController?.pushViewController(postPhotoVC, animated: true)
         }
         
