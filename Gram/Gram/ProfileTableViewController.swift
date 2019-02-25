@@ -311,10 +311,15 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
                         continue
                     }
                     guard let photoToDisplay = photoToDisplayInPhotoCard else { continue }  // If cannot load photo, skip this PhotoCard
+                    
+                    var date = photo.datePosted
+                    if let rangeToRemove = date.range(of: " at") {  // Remove the time part of date (Only want [MM DD, YYYY] part)
+                        date.removeSubrange(rangeToRemove.lowerBound ..< date.endIndex)
+                    }
                     // Construct PhotoCard object
                     self.photos.append(PhotoCard.init(profilePhoto: ProfileDataCache.profilePhoto!,
                                                       username: user!.username,
-                                                      date: photo.datePosted,
+                                                      date: date,
                                                       photo: photoToDisplay,
                                                       caption: photo.caption,
                                                       tags: photo.tags))
