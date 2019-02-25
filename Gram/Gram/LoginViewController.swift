@@ -30,21 +30,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
         // Google sign in
         GIDSignIn.sharedInstance()?.signInSilently()
         GIDSignIn.sharedInstance().uiDelegate = self
-
-        // Listen for keyboard events
-        NotificationCenter.default.addObserver(self, selector: #selector(shiftScreenUpForKeyboard(notification:)),
-                                               name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(shiftScreenUpForKeyboard(notification:)),
-                                               name: UIResponder.keyboardWillHideNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(shiftScreenUpForKeyboard(notification:)),
-                                               name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
-    }
-
-    deinit {
-        // Stop listening for keyboard hide/show events
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
     }
 
     @IBAction func loginPress(_ sender: Any) {
@@ -175,19 +160,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
         self.view.insertSubview(backgroundImageView, at: 0)
 
         return backgroundImageView
-    }
-
-    @objc private func shiftScreenUpForKeyboard(notification: Notification) {
-        guard let keyboardRect = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else {return}
-
-        if  notification.name == UIResponder.keyboardWillShowNotification ||
-            notification.name == UIResponder.keyboardWillChangeFrameNotification {
-            // Shift the screen up by the height of the keyboard
-            view.frame.origin.y = -keyboardRect.height + 30
-        } else {
-            // Keyboard is dismissed so return screen back to original height
-            view.frame.origin.y = 0
-        }
     }
 }
 

@@ -20,7 +20,6 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var btnSignUp: UIButton!
     @IBOutlet weak var errorLabel: UILabel!
     @IBOutlet weak var loadingIndicator: UIActivityIndicatorView!
-    var currentlySelectedTextField: UITextField?
     
     override func viewWillAppear(_ animated: Bool) {
         let _ = setBackgroundImage("background_signup")
@@ -40,22 +39,8 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
         
         self.enableSignUp()
         errorLabel.isHidden = true  // Hide error message Label
-        
-        // Listen for keyboard events
-        NotificationCenter.default.addObserver(self, selector: #selector(shiftScreenUpForKeyboard(notification:)),
-                                               name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(shiftScreenUpForKeyboard(notification:)),
-                                               name: UIResponder.keyboardWillHideNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(shiftScreenUpForKeyboard(notification:)),
-                                               name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
     }
     
-    deinit {
-        // Stop listening for keyboard hide/show events
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
-    }
     
     @IBAction func signUpButtonPressed(_ sender: UIButton) {
         self.disableSignUp()
@@ -148,11 +133,7 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
     @IBAction func cancelSignUp(_ sender: Any) {  // When user presses "Cancel", go back to login screen
         navigationController?.popViewController(animated: true)
     }
-    
-    func textFieldDidBeginEditing(_ textField: UITextField) {
-        currentlySelectedTextField = textField
-        
-    }
+
     
     /**************** Helper Functions Below *****************/
     
@@ -183,25 +164,5 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
         self.view.insertSubview(backgroundImageView, at: 0)
         
         return backgroundImageView
-    }
-    
-    @objc private func shiftScreenUpForKeyboard(notification: Notification) {
-        guard let keyboardRect = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else {return}
-        
-        if  notification.name == UIResponder.keyboardWillShowNotification ||
-            notification.name == UIResponder.keyboardWillChangeFrameNotification {
-
-            if let currentlySelectedTextField = currentlySelectedTextField {
-                if  currentlySelectedTextField == textUsername ||
-                    currentlySelectedTextField == textPassword ||
-                    currentlySelectedTextField == textConfirmPassword {
-                    // Shift the screen up by the height of the keyboard
-                    view.frame.origin.y = -keyboardRect.height
-                }
-            }
-        } else {
-            // Keyboard is dismissed so return screen back to original height
-            view.frame.origin.y = 0
-        }
     }
 }

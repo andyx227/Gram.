@@ -27,14 +27,6 @@ class PostPhotoViewController: UIViewController, UITextViewDelegate {
         super.viewDidLoad()
         hideKeyboard()
         
-        // Listen for keyboard events
-        NotificationCenter.default.addObserver(self, selector: #selector(shiftScreenUpForKeyboard(notification:)),
-                                               name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(shiftScreenUpForKeyboard(notification:)),
-                                               name: UIResponder.keyboardWillHideNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(shiftScreenUpForKeyboard(notification:)),
-                                               name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
-        
         // Load photo into ImageView
         if let photo = photo {
             // Scale photos before displaying them in UIImageView
@@ -44,14 +36,6 @@ class PostPhotoViewController: UIViewController, UITextViewDelegate {
         }
         
         caption.delegate = self
-    }
-    
-    
-    deinit {
-        // Stop listening for keyboard hide/show events
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
     }
     
     @IBAction func btnBack(_ sender: Any) {
@@ -102,19 +86,7 @@ class PostPhotoViewController: UIViewController, UITextViewDelegate {
     }
     
     /**** Helper Functions Below ****/
-    @objc private func shiftScreenUpForKeyboard(notification: Notification) {
-        guard let keyboardRect = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else {return}
-        
-        if  notification.name == UIResponder.keyboardWillShowNotification ||
-            notification.name == UIResponder.keyboardWillChangeFrameNotification {
-            // Shift the screen up by the height of the keyboard
-            view.frame.origin.y = -keyboardRect.height + 30
-        } else {
-            // Keyboard is dismissed so return screen back to original height
-            view.frame.origin.y = 0
-        }
-    }
-    
+
     private func formatCaption(_ caption: String) -> NSAttributedString {
         let usernameAttributes: [NSAttributedString.Key: Any] = [
             NSAttributedString.Key.font: UIFont(name: "HelveticaNeue-Bold", size: 13)!

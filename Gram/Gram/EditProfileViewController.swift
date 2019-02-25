@@ -16,7 +16,6 @@ class EditProfileViewController: UIViewController, UIImagePickerControllerDelega
     @IBOutlet weak var textUsername: HoshiTextField!
     @IBOutlet weak var textBio: HoshiTextField!
     @IBOutlet weak var profilePhoto: UIImageView!
-    var currentlySelectedTextField: UITextField?
     var profileTableViewDelegate: ProfileTableViewController?
     
     override func viewWillAppear(_ animated: Bool) {
