@@ -58,6 +58,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                                  caption: "Paris is the best! #travel @mostrowski :)",
                                  tags: nil)
         ]*/
+        getProfilePhoto()
     }
     
     // Allow user to choose photo from album to post
@@ -262,6 +263,30 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
         }
         
         return attributedCaptionString
+    }
+    
+    private func getProfilePhoto() {
+        let firstLetterOfFirstName = String(user!.firstName.first!)
+        
+        Api.getProfilePhoto { (photoUrl, error) in
+            if let _ = error {  // Show default profile photo if error
+                ProfileDataCache.profilePhoto = UIImage(named: firstLetterOfFirstName)
+            }
+            if let photoUrl = photoUrl {
+                if photoUrl == "" {  // No URL for profile photo, so use default profile photo
+                    ProfileDataCache.profilePhoto = UIImage(named: firstLetterOfFirstName)
+                    return
+                }
+                
+                do {
+                    let url = URL(string: photoUrl)
+                    let data = try Data(contentsOf: url!)
+                    ProfileDataCache.profilePhoto = UIImage(data: data)  // Save image in cache
+                } catch {  // Show default profile photo if error
+                    ProfileDataCache.profilePhoto = UIImage(named: firstLetterOfFirstName)
+                }
+            }
+        }
     }
 }
 

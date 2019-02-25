@@ -31,6 +31,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
     var photos = [PhotoCard]()
     var following: Bool = false  // Assume false always (this var only used when viewing another user's profile)
     var firstTimeLoadingView = false  // Set to true when user clicks on a profile to view
+    var showLoadingCell = true
     
     override func viewWillAppear(_ animated: Bool) {
         // If user posted a new photo, reload table view
@@ -91,7 +92,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if photos.count == 0 {
+        if photos.count == 0 && showLoadingCell {
             return profile.count + 1  // Plus 1 to load the "Loading Cell"
         } else {
             return profile.count + photos.count
@@ -108,22 +109,9 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             // Set "Edit Profile" button style
             cell.changeFollowStatus.layer.cornerRadius = 10
             cell.changeFollowStatus.layer.borderColor = UIColor.black.cgColor
-            
-            // Set profile photo
-            if profile[indexPath.row].userID != user?.userID {  // Viewing another user's profile
-                if firstTimeLoadingView {
-                    cell.profilePhoto.showAnimatedGradientSkeleton()
-                    getProfilePhoto(cell)
-                }
-            } else {
-                if let profilePhoto = ProfileDataCache.profilePhoto {  // Get profile photo from cache if possible
-                    cell.profilePhoto.image = profilePhoto
-                } else {  // Otherwise, make an api call to retreive profile photo from Firebase
-                    cell.profilePhoto.showAnimatedGradientSkeleton()
-                    getProfilePhoto(cell)
-                }
-            }
-            
+
+            // Set profile photo and make it round
+            cell.profilePhoto.image = ProfileDataCache.profilePhoto!
             cell.profilePhoto.layer.cornerRadius = cell.profilePhoto.frame.height / 2
             cell.profilePhoto.clipsToBounds = true
             // Set other profile information in its respective Labels
@@ -161,7 +149,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             }
             
             return cell
-        } else if photos.count == 0 {  // Cell to display loading icon
+        } else if photos.count == 0 && showLoadingCell {  // Cell to display loading icon
             let cell = tableView.dequeueReusableCell(withIdentifier: "loadingCell", for: indexPath) as! LoadingCell
             cell.loadingIndicator.startAnimating()
             return cell
@@ -258,43 +246,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
         }
     }
     
-    // TODO: Api.profileInfo should contain url for user profile photo.
-    // Function can only use logged-in user's profile photo, even when
-    // viewing another user's profile!
-    private func getProfilePhoto(_ cell: ProfileInfoCell) {
-        let firstLetterOfFirstName = String(profile.first!.firstName.first!)
-        
-        Api.getProfilePhoto { (photoUrl, error) in
-            if let _ = error {  // Show default profile photo if error
-                cell.profilePhoto.image = UIImage(named: firstLetterOfFirstName)
-            }
-            if let photoUrl = photoUrl {
-                if photoUrl == "" {  // No URL for profile photo, so use default profile photo
-                    cell.profilePhoto.image = UIImage(named: firstLetterOfFirstName)
-                    cell.profilePhoto.hideSkeleton()
-                    cell.profilePhoto.stopSkeletonAnimation()
-                    return
-                }
-                
-                do {
-                    let url = URL(string: photoUrl)
-                    let data = try Data(contentsOf: url!)
-                    ProfileDataCache.profilePhoto = UIImage(data: data)  // Save image in cache
-                    cell.profilePhoto.image = ProfileDataCache.profilePhoto
-                } catch {  // Show default profile photo if error
-                    cell.profilePhoto.image = UIImage(named: firstLetterOfFirstName)
-                }
-                cell.profilePhoto.hideSkeleton()
-                cell.profilePhoto.stopSkeletonAnimation()
-            }
-            
-            // Set profile photo to be round
-            cell.profilePhoto.layer.cornerRadius = cell.profilePhoto.frame.height / 2
-            cell.profilePhoto.clipsToBounds = true
-        }
-    }
-    
-    func getUserPhotos() {
+    private func getUserPhotos() {
         self.photos.removeAll()  // Load photos from clean slate
         self.tableView.reloadData()
         Api.getProfilePhotos(completion: { (photoList, error) in
@@ -302,8 +254,6 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
                 return
             }
             if let photoList = photoList {
-                while (ProfileDataCache.profilePhoto == nil) { continue }  // Busy wait until profile photo has been loaded
-                
                 for photo in photoList {
                     var photoToDisplayInPhotoCard: UIImage?
                     do {  // Attempt to extract the photo from the given photo url
@@ -327,6 +277,9 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
                                                       photo: photoToDisplay,
                                                       caption: photo.caption,
                                                       tags: photo.tags))
+                }
+                if photoList.count == 0 {
+                    self.showLoadingCell = false  // No photos so don't try loading any photos when reloading table view
                 }
                 self.tableView.reloadData()
                 self.tableView.finishInfiniteScroll()
