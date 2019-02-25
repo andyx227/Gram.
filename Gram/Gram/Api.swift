@@ -221,7 +221,7 @@ struct Api {
                     "UID" : user.userID,
                     "caption" : photo.caption ?? "null",
                     "datePosted" : Timestamp(date: Date()),
-                    "url" : photoURL ?? "",
+                    "url" : photoURL?.absoluteString ?? "",
                     "tags" : photo.tags!]) { err in
                         if let err = err {
                             print("Error creating photo document: \(err)")
@@ -273,8 +273,58 @@ struct Api {
      used to generate a unique string for an image
     */
     static func randomString(length: Int) -> String {
-        let letters = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ"  // No lower case 'L' or upper case "I" because it's ambiguous
+        let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"  // No lower case 'L' or upper case "I" because it's ambiguous
         return String((0...length-1).map{ _ in letters.randomElement()! })
+    }
+    
+    static func getFollowerPhotos(completion: @escaping ApiCompletionPhotos) {
+        
+        findFollowers { (users, error) in
+            if error != nil {
+                print("An error occurred finding followers")
+                completion(nil, "An error occurred getting follower photos \(error ?? "nil")")
+            }
+            
+            let docRef = db.collection("photos").order(by: "datePosted", descending: true)
+            docRef.getDocuments(completion: { (querySnapshot, error) in
+                if error != nil {
+                    print("An error occurred retrieving all photos: \(error?.localizedDescription ?? "")")
+                    completion(nil, "An error occurred retrieving all photos: \(error?.localizedDescription ?? "")")
+                }
+                
+                var photos : [photoURL] = []
+                if let documents = querySnapshot?.documents {
+                    for document in documents {
+                        var docData = document.data().mapValues { String.init(describing: $0)}
+                        if users?.contains(docData["UID"] ?? "") ?? false {
+                            let photo = photoURL(URL: docData["url"] ?? "", userID: docData["UID"] ?? "", datePosted: docData["datePosted"] ?? "", caption: docData["caption"] ?? "", tags: extractTags(text: docData["tags"] ?? ""))
+                            photos.append(photo)
+                        }
+                        
+                    }
+                    
+                    completion(photos, nil)
+                } else {
+                    print("error type:")
+                    dump(error!)
+                    completion(nil, "Collection does not exist")
+                }
+                
+            })
+            
+        }
+    }
+    
+    static func extractTags(text: String) -> [String]{
+        let tagString = String(text.replacingOccurrences(of: " ", with: "")
+                                   .replacingOccurrences(of: " ", with: "")
+                                   .replacingOccurrences(of: "(", with: "")
+                                   .replacingOccurrences(of: ")", with: "")
+                                   .replacingOccurrences(of: ",", with: "")
+                                   .dropFirst().dropLast())
+        let tags = tagString.components(separatedBy: "\n")
+        
+        return tags
     }
     
     /**
@@ -374,7 +424,6 @@ struct Api {
         
         query.getDocuments { (querySnapshot, error) in
             if let documents = querySnapshot?.documents {
-                dump(documents)
                 var users : [userInfo] = []
                 for document in documents {
                     var docData = document.data().mapValues { String.init(describing: $0)}
