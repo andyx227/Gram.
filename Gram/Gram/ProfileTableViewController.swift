@@ -32,13 +32,23 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
     var following: Bool = false  // Assume false always (this var only used when viewing another user's profile)
     var firstTimeLoadingView = false  // Set to true when user clicks on a profile to view
     var showLoadingCell = true
+    var profilePhotoOfDifferentUser: UIImage?
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        profilePhotoOfDifferentUser = nil  // Reset
+    }
     
     override func viewWillAppear(_ animated: Bool) {
+        changeStatusBarColor(forView: self)
+        
         // If user posted a new photo, reload table view
-        if ProfileDataCache.newPost {
-            photos = ProfileDataCache.loadedPhotos!  // New post should be savied in "loadedPhotos" array already
+        if ProfileDataCache.newPost || !ProfileDataCache.clean {
+            photos = ProfileDataCache.loadedPhotos  // New post should be savied in "loadedPhotos" array already
             self.tableView.reloadData()
             ProfileDataCache.newPost = false // Reset to false
+            ProfileDataCache.clean = true  // Mark cache as clean
+        } else if profile[0].userID != user!.userID {
+            self.tableView.reloadData()
         }
     }
     
@@ -111,7 +121,16 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             cell.changeFollowStatus.layer.borderColor = UIColor.black.cgColor
 
             // Set profile photo and make it round
-            cell.profilePhoto.image = ProfileDataCache.profilePhoto!
+            if profile[indexPath.row].userID == user!.userID {  // Grab logged-in user's profile photo from cache
+                cell.profilePhoto.image = ProfileDataCache.profilePhoto!
+            } else {  // Grab a different user's profile photo
+                if profilePhotoOfDifferentUser == nil {
+                    getProfilePhotoOfDifferentUser(cell, indexPath, firstLetterOfFirstName)
+                } else {
+                    cell.profilePhoto.image = profilePhotoOfDifferentUser
+                }
+            }
+            
             cell.profilePhoto.layer.cornerRadius = cell.profilePhoto.frame.height / 2
             cell.profilePhoto.clipsToBounds = true
             // Set other profile information in its respective Labels
@@ -287,6 +306,37 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
                 ProfileDataCache.loadedPhotos = self.photos
             }
         })
+    }
+    
+    /**
+     * Retrieves the profile photo of a different user (i.e. not the logged-in user)
+     * via the provided URL in the Api.profileInfo object. It does this in a background
+     * queue, and then sets @profilePhotoOfDifferentUser to the loaded profile photo.
+     *
+     * On error, it will use the default profile photo (First letter of user's first name).
+     */
+    private func getProfilePhotoOfDifferentUser(_ cell: ProfileInfoCell, _ indexPath: IndexPath, _ firstLetterOfFirstName: String) {
+        cell.profilePhoto.showAnimatedGradientSkeleton()
+        
+        DispatchQueue.global(qos: .userInitiated).async {
+            if let profilePhotoURL = self.profile[indexPath.row].profilePhoto {
+                if profilePhotoURL == "" {
+                    self.profilePhotoOfDifferentUser = UIImage(named: firstLetterOfFirstName)
+                } else {
+                    do {
+                        let url = URL(string: profilePhotoURL)
+                        let data = try Data(contentsOf: url!)
+                        self.profilePhotoOfDifferentUser = UIImage(data: data)
+                    } catch {
+                        self.profilePhotoOfDifferentUser = UIImage(named: firstLetterOfFirstName)
+                    }
+                }
+            }
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+                cell.profilePhoto.hideSkeleton()
+            }
+        }
     }
 }
 

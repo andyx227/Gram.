@@ -221,7 +221,7 @@
                                 <rect key="frame" x="0.0" y="20" width="375" height="64"/>
                                 <subviews>
                                     <searchBar contentMode="redraw" searchBarStyle="minimal" placeholder="Search People" translatesAutoresizingMaskIntoConstraints="NO" id="mvz-xl-Eum">
-                                        <rect key="frame" x="48" y="4" width="279" height="56"/>
+                                        <rect key="frame" x="48" y="4" width="284" height="56"/>
                                         <color key="backgroundColor" red="0.96862745100000003" green="0.96078431369999995" blue="0.91372549020000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" smartDashesType="no"/>
                                         <scopeButtonTitles>
@@ -241,10 +241,10 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" alpha="0.65000000000000002" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="h82-Nq-YeP">
-                                        <rect key="frame" x="327" y="14" width="40" height="40"/>
+                                        <rect key="frame" x="332" y="15" width="35" height="35"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="40" id="7g8-Li-fkb"/>
-                                            <constraint firstAttribute="width" constant="40" id="vZH-hd-B9Z"/>
+                                            <constraint firstAttribute="height" constant="35" id="7g8-Li-fkb"/>
+                                            <constraint firstAttribute="width" constant="35" id="vZH-hd-B9Z"/>
                                         </constraints>
                                         <state key="normal" image="icon_post"/>
                                         <connections>
@@ -259,9 +259,9 @@
                                     <constraint firstAttribute="bottom" secondItem="Hoe-6g-IbY" secondAttribute="bottom" constant="12" id="CjI-Jn-i78"/>
                                     <constraint firstItem="Hoe-6g-IbY" firstAttribute="leading" secondItem="Z4z-qK-gRl" secondAttribute="leading" constant="8" id="DhB-ka-CnD"/>
                                     <constraint firstAttribute="bottom" secondItem="mvz-xl-Eum" secondAttribute="bottom" constant="4" id="NNw-57-Bgi"/>
-                                    <constraint firstItem="h82-Nq-YeP" firstAttribute="top" secondItem="Z4z-qK-gRl" secondAttribute="top" constant="14" id="Uab-kU-ghv"/>
+                                    <constraint firstItem="h82-Nq-YeP" firstAttribute="top" secondItem="Z4z-qK-gRl" secondAttribute="top" constant="15" id="Uab-kU-ghv"/>
                                     <constraint firstItem="mvz-xl-Eum" firstAttribute="leading" secondItem="Hoe-6g-IbY" secondAttribute="trailing" id="XrM-Xk-8qZ"/>
-                                    <constraint firstAttribute="trailing" secondItem="mvz-xl-Eum" secondAttribute="trailing" constant="48" id="gti-Qr-EBS"/>
+                                    <constraint firstAttribute="trailing" secondItem="mvz-xl-Eum" secondAttribute="trailing" constant="43" id="gti-Qr-EBS"/>
                                     <constraint firstAttribute="trailing" secondItem="h82-Nq-YeP" secondAttribute="trailing" constant="8" id="yFI-32-QRH"/>
                                 </constraints>
                             </view>

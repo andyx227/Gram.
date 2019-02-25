@@ -220,9 +220,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
         profileTab.profile = selectedUser
         profileTab.following = people[indexPath.row].following
         profileTab.firstTimeLoadingView = true
-        profileTab.tableView.reloadData()
         self.tabBarController?.selectedViewController = profileTab
-        changeStatusBarColor(forView: profileTab)
         tableView.deselectRow(at: indexPath, animated: true)  // Deselect the row
     }
     

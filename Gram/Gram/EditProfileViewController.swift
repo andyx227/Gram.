@@ -108,6 +108,7 @@ class EditProfileViewController: UIViewController, UIImagePickerControllerDelega
             }
            
             ProfileDataCache.profilePhoto = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
+            ProfileDataCache.clean = false  // Mark cache as dirty since we just updated profile photo
             profilePhoto.showAnimatedGradientSkeleton()
             self.dismiss(animated: true, completion: nil)
         }

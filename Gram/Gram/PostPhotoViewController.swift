@@ -87,10 +87,8 @@ class PostPhotoViewController: UIViewController, UITextViewDelegate {
                                        caption: photoCaption.text,
                                        tags: tags)
         
-        if ProfileDataCache.loadedPhotos == nil {  // Initialize array in cache if necessary
-            ProfileDataCache.loadedPhotos = [PhotoCard]()
-        }
-        ProfileDataCache.loadedPhotos!.insert(photoCard, at: 0)  // Prepend PhotoCard to array saved in cache
+      
+        ProfileDataCache.loadedPhotos.insert(photoCard, at: 0)  // Prepend PhotoCard to array saved in cache
         ProfileDataCache.newPost = true
         
         Api.postPhoto(path: imgUrl, photo: photoCard) { (url, error) in
