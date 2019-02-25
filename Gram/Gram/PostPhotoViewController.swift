@@ -74,13 +74,21 @@ class PostPhotoViewController: UIViewController, UITextViewDelegate {
         
         let tags = extractTags(caption.text)  // Get tags from the photo caption
         
-        // Construct Photo Card object
+        // Format the date (want something like [Jan 2, 2019])
+        let date = Date()
+        let format = DateFormatter()
+        format.dateFormat = "MMM dd, yyyy"
+        let formattedDate = format.string(from: date)
+
         let photoCard = PhotoCard.init(profilePhoto: UIImage(named: "A")!,  // Won't be using profilePhoto so this won't matter
                                        username: user!.username,
-                                       date: "null",  // Don't need to pass in date, Firebase will take care of that
+                                       date: formattedDate,  // Don't need to pass in date, Firebase will take care of that
                                        photo: photoToPost,
                                        caption: photoCaption.text,
                                        tags: tags)
+        
+        ProfileDataCache.loadedPhotos?.insert(photoCard, at: 0)  // Prepend PhotoCard to array saved in cache
+        ProfileDataCache.newPost = true
         
         Api.postPhoto(path: imgUrl, photo: photoCard) { (url, error) in
             if let _ = error {

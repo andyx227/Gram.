@@ -32,20 +32,24 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
     var following: Bool = false  // Assume false always (this var only used when viewing another user's profile)
     var firstTimeLoadingView = false  // Set to true when user clicks on a profile to view
     
+    override func viewWillAppear(_ animated: Bool) {
+        // If user posted a new photo, reload table view
+        if ProfileDataCache.newPost {
+            photos = ProfileDataCache.loadedPhotos!  // New post should be savied in "loadedPhotos" array already
+            self.tableView.reloadData()
+            ProfileDataCache.newPost = false // Reset to false
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         tableView.setShouldShowInfiniteScrollHandler { _ -> Bool in
-            if ProfileDataCache.clean {
-                return false  // Do not retrieve photos if the cache is clean!
-            } else {
-                return true
-            }
+            return false  // Assume that all photos will be loaded on first load!
         }
         
         tableView.addInfiniteScroll { (tableView) in
-            self.getUserPhotos()
+            self.getUserPhotos()  // NOTE: This block of code will actually never run because setShouldShowInfiniteScrollHandler returns false always!
         }
         
         getUserPhotos()
@@ -328,7 +332,6 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
                 self.tableView.finishInfiniteScroll()
                 // Save photos in cache
                 ProfileDataCache.loadedPhotos = self.photos
-                ProfileDataCache.clean = true
             }
         })
     }
