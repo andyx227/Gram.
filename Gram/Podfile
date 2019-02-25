@@ -18,4 +18,6 @@ target 'Gram' do
   pod 'MultilineTextField'
   pod 'IQKeyboardManagerSwift'
   pod 'SkeletonView'
+  pod 'UIScrollView-InfiniteScroll', '~> 1.1.0'
+  pod 'NVActivityIndicatorView'
 end

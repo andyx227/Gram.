@@ -634,6 +634,9 @@
                                         <constraint firstAttribute="bottomMargin" secondItem="0fL-Jk-MDV" secondAttribute="bottom" constant="14" id="tXp-8d-ZbM"/>
                                     </constraints>
                                 </tableViewCellContentView>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                </userDefinedRuntimeAttributes>
                                 <connections>
                                     <outlet property="bio" destination="78j-qS-PCu" id="cJv-os-hnh"/>
                                     <outlet property="changeFollowStatus" destination="adL-Ro-1bh" id="OPZ-RF-hmk"/>

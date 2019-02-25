@@ -130,9 +130,13 @@ PODS:
     - nanopb/encode (= 0.3.901)
   - nanopb/decode (0.3.901)
   - nanopb/encode (0.3.901)
+  - NVActivityIndicatorView (4.6.1):
+    - NVActivityIndicatorView/Presenter (= 4.6.1)
+  - NVActivityIndicatorView/Presenter (4.6.1)
   - Protobuf (3.6.1)
   - SkeletonView (1.4.1)
   - TextFieldEffects (1.5.1)
+  - UIScrollView-InfiniteScroll (1.1.0)
 
 DEPENDENCIES:
   - DynamicBlurView
@@ -145,8 +149,10 @@ DEPENDENCIES:
   - GoogleSignIn
   - IQKeyboardManagerSwift
   - MultilineTextField
+  - NVActivityIndicatorView
   - SkeletonView
   - TextFieldEffects
+  - UIScrollView-InfiniteScroll (~> 1.1.0)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -172,9 +178,11 @@ SPEC REPOS:
     - leveldb-library
     - MultilineTextField
     - nanopb
+    - NVActivityIndicatorView
     - Protobuf
     - SkeletonView
     - TextFieldEffects
+    - UIScrollView-InfiniteScroll
 
 SPEC CHECKSUMS:
   BoringSSL-GRPC: 2a230d9cd93e7ce39916044f645cebb31f37dde6
@@ -199,10 +207,12 @@ SPEC CHECKSUMS:
   leveldb-library: 08cba283675b7ed2d99629a4bc5fd052cd2bb6a5
   MultilineTextField: 10965d9c3e05a182181bd7971eb009c7607001ae
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
+  NVActivityIndicatorView: 4ca19fccc84595a78957336a086d00a49be6ce61
   Protobuf: 1eb9700044745f00181c136ef21b8ff3ad5a0fd5
   SkeletonView: 60d6ce7edb0cb4c7758db33c74add50392b3c475
   TextFieldEffects: 7d372f58aeaf9acd9626bbf962680aef926b085d
+  UIScrollView-InfiniteScroll: 3ef456bcbe759c19f510a383cff96e6647c98c98
 
-PODFILE CHECKSUM: 5e245ef4e8bc04f81a35cbe9a7ce96a9875eeeae
+PODFILE CHECKSUM: 0f5f28c5287fe8e84bc46b6138d084dbd848e2a0
 
 COCOAPODS: 1.5.3
