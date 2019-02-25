@@ -17,6 +17,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
     var people = [Api.userInfo]()
     var photos = [PhotoCard]()
     var imageURL: URL?
+    var previouslySelectedTabIndex = 0
     
     
     override func viewWillAppear(_ animated: Bool) {
@@ -77,13 +78,17 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
             newsfeedVC.searchBarPeople.text = ""
             newsfeedVC.searchPeopleTableView.isHidden = true
             newsfeedVC.newsfeedTableView.isHidden = false
+            previouslySelectedTabIndex = 0
             
         } else if viewController is ProfileTableViewController {
             let profileVC = viewController as! ProfileTableViewController
             changeStatusBarColor(forView: profileVC)
             profileVC.profile = [user!]
             profileVC.firstTimeLoadingView = true
-            profileVC.tableView.reloadData()
+            if previouslySelectedTabIndex != 2 {
+                profileVC.tableView.reloadData()  // Only reload table if we are coming to profile tab from another tab
+            }
+            previouslySelectedTabIndex = 2
         }
     }
     
@@ -284,8 +289,6 @@ extension NewsfeedViewController: UIImagePickerControllerDelegate, UINavigationC
     // https://stackoverflow.com/questions/28255789/getting-url-of-uiimage-selected-from-uiimagepickercontroller
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        //print(info[UIImagePickerController.InfoKey.imageURL]!)
-        
         if let imgURL = (info[UIImagePickerController.InfoKey.imageURL] as? URL) {
             print("img url: ",imgURL)
             
@@ -297,23 +300,6 @@ extension NewsfeedViewController: UIImagePickerControllerDelegate, UINavigationC
             postPhotoVC.photoUrl = imgURL
             self.navigationController?.pushViewController(postPhotoVC, animated: true)
         }
-        
-//        if let imgUrl = info[UIImagePickerController.InfoKey.imageURL] as? URL{
-//            let imgName = imgUrl.lastPathComponent
-//            let documentDirectory = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first
-//            let localPath = documentDirectory?.appending(imgName)
-//
-//            let image = info[UIImagePickerController.InfoKey.originalImage] as! UIImage
-//            let data = image.pngData()! as NSData
-//            data.write(toFile: localPath!, atomically: true)
-//            //let imageData = NSData(contentsOfFile: localPath!)!
-//            let photoURL = URL.init(fileURLWithPath: localPath!)//NSURL(fileURLWithPath: localPath!)
-//            print("photo url: ", photoURL)
-//
-//        }
-        
         dismiss(animated: true, completion: nil)
-        
     }
-    
 }

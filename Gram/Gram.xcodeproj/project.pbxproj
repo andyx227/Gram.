@@ -16,6 +16,7 @@
 		A12AC1FA220EC880000036E3 /* PhotoCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A12AC1F9220EC880000036E3 /* PhotoCardCell.swift */; };
 		A12AC1FC220FA3A1000036E3 /* NewsfeedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A12AC1FB220FA3A1000036E3 /* NewsfeedViewController.swift */; };
 		A12AC1FE221018B2000036E3 /* PeopleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A12AC1FD221018B2000036E3 /* PeopleCell.swift */; };
+		A1617C0122237F6700B7C9EB /* LoadingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1617C0022237F6700B7C9EB /* LoadingCell.swift */; };
 		A16A3E8B21FE5F2300E13C81 /* SignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16A3E8A21FE5F2300E13C81 /* SignUpViewController.swift */; };
 		A17D05C121FA53C300205E1D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17D05C021FA53C300205E1D /* AppDelegate.swift */; };
 		A17D05C321FA53C300205E1D /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17D05C221FA53C300205E1D /* FirstViewController.swift */; };
@@ -42,6 +43,7 @@
 		A12AC1F9220EC880000036E3 /* PhotoCardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCardCell.swift; sourceTree = "<group>"; };
 		A12AC1FB220FA3A1000036E3 /* NewsfeedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsfeedViewController.swift; sourceTree = "<group>"; };
 		A12AC1FD221018B2000036E3 /* PeopleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleCell.swift; sourceTree = "<group>"; };
+		A1617C0022237F6700B7C9EB /* LoadingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingCell.swift; sourceTree = "<group>"; };
 		A16A3E8A21FE5F2300E13C81 /* SignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewController.swift; sourceTree = "<group>"; };
 		A17D05BD21FA53C300205E1D /* Gram.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Gram.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A17D05C021FA53C300205E1D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -120,6 +122,7 @@
 				A12AC1F7220EB20B000036E3 /* ProfileInfoCell.swift */,
 				A12AC1F9220EC880000036E3 /* PhotoCardCell.swift */,
 				A12AC1FD221018B2000036E3 /* PeopleCell.swift */,
+				A1617C0022237F6700B7C9EB /* LoadingCell.swift */,
 			);
 			path = "Custom Cells";
 			sourceTree = "<group>";
@@ -326,6 +329,7 @@
 				A1A221072212B2E300A9A2EC /* AuthenticationListeners.swift in Sources */,
 				A17D05C121FA53C300205E1D /* AppDelegate.swift in Sources */,
 				A12AC1FA220EC880000036E3 /* PhotoCardCell.swift in Sources */,
+				A1617C0122237F6700B7C9EB /* LoadingCell.swift in Sources */,
 				A17D05C321FA53C300205E1D /* FirstViewController.swift in Sources */,
 				A12AC1FE221018B2000036E3 /* PeopleCell.swift in Sources */,
 				A1DE5B1D22113C2800CF49DE /* PickUsernameViewController.swift in Sources */,

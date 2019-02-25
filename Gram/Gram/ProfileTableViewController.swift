@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import UIScrollView_InfiniteScroll
+import NVActivityIndicatorView
 
 struct ProfileInfo {
     var profilePhoto: UIImage
@@ -25,32 +27,28 @@ struct PhotoCard {
 }
 
 class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate, UITabBarControllerDelegate {
-    var profile = [Api.profileInfo]()
+    var profile: [Api.profileInfo] = [user!]
     var photos = [PhotoCard]()
-    var following: Bool = false  // Assume false always (this var only used when viewing another user's profile
+    var following: Bool = false  // Assume false always (this var only used when viewing another user's profile)
     var firstTimeLoadingView = false  // Set to true when user clicks on a profile to view
     
-    override func viewWillAppear(_ animated: Bool) {
-        self.tableView.reloadData()
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        photos = [PhotoCard.init(profilePhoto: UIImage(named: "A")!,
-                                 username: user!.username,
-                                 date: "December 1, 2018",
-                                 photo: UIImage(named:"mountain")!,
-                                 caption: "How do I get down from here?! #mountainclimbing",
-                                 tags: nil),
-                  
-                  PhotoCard.init(profilePhoto: UIImage(named: "A")!,
-                                 username: user!.username,
-                                 date: "January 12, 2019",
-                                 photo: UIImage(named: "tower")!,
-                                 caption: "Paris is the best! #travel @mostrowski :)",
-                                 tags: nil)
-        ]
+        tableView.setShouldShowInfiniteScrollHandler { _ -> Bool in
+            if ProfileDataCache.clean {
+                return false  // Do not retrieve photos if the cache is clean!
+            } else {
+                return true
+            }
+        }
+        
+        tableView.addInfiniteScroll { (tableView) in
+            self.getUserPhotos()
+        }
+        
+        getUserPhotos()
     }
     
     func didChangeFollowStatus(_ sender: ProfileInfoCell) {
@@ -89,7 +87,11 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return profile.count + photos.count
+        if photos.count == 0 {
+            return profile.count + 1  // Plus 1 to load the "Loading Cell"
+        } else {
+            return profile.count + photos.count
+        }
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -155,12 +157,12 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             }
             
             return cell
+        } else if photos.count == 0 {  // Cell to display loading icon
+            let cell = tableView.dequeueReusableCell(withIdentifier: "loadingCell", for: indexPath) as! LoadingCell
+            cell.loadingIndicator.startAnimating()
+            return cell
         } else {  // The remaining cells are the "PhotoCard" cells
             let cell = tableView.dequeueReusableCell(withIdentifier: "photoCardCell", for: indexPath) as! PhotoCardCell
-            
-            // TODO: Temporarily using the method below to retrieve username
-            // Remove later!
-            let username = profile.first!.username
             
             // Set profile photo
             if let photo = ProfileDataCache.profilePhoto {
@@ -173,6 +175,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             cell.profilePhoto.layer.cornerRadius = cell.profilePhoto.frame.height / 2
             cell.profilePhoto.clipsToBounds = true
             
+            let username = photos[indexPath.row - 1].username
             cell.username.text = username
             cell.date.text = photos[indexPath.row - 1].date
             
@@ -193,6 +196,8 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
     
     /****** Helper Functions *****/
     private func formatCaption(_ caption: String, user username: String) -> NSAttributedString {
+        if caption.isEmpty {return NSAttributedString(string: "")}
+        
         let usernameAttributes: [NSAttributedString.Key: Any] = [
             NSAttributedString.Key.font: UIFont(name: "HelveticaNeue-Bold", size: 13)!
         ]
@@ -283,6 +288,44 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             cell.profilePhoto.layer.cornerRadius = cell.profilePhoto.frame.height / 2
             cell.profilePhoto.clipsToBounds = true
         }
+    }
+    
+    func getUserPhotos() {
+        self.photos.removeAll()  // Load photos from clean slate
+        self.tableView.reloadData()
+        Api.getProfilePhotos(completion: { (photoList, error) in
+            if let _ = error {
+                return
+            }
+            if let photoList = photoList {
+                while (ProfileDataCache.profilePhoto == nil) { continue }  // Busy wait until profile photo has been loaded
+                
+                for photo in photoList {
+                    var photoToDisplayInPhotoCard: UIImage?
+                    do {  // Attempt to extract the photo from the given photo url
+                        let url = URL(string: photo.URL)
+                        guard let photoURL = url else { continue }  // If cannot load url, skip this PhotoCard
+                        let data = try Data(contentsOf: photoURL)
+                        photoToDisplayInPhotoCard = UIImage(data: data)
+                    } catch {  // If error, try loading another photo card (skip this one)
+                        continue
+                    }
+                    guard let photoToDisplay = photoToDisplayInPhotoCard else { continue }  // If cannot load photo, skip this PhotoCard
+                    // Construct PhotoCard object
+                    self.photos.append(PhotoCard.init(profilePhoto: ProfileDataCache.profilePhoto!,
+                                                      username: user!.username,
+                                                      date: photo.datePosted,
+                                                      photo: photoToDisplay,
+                                                      caption: photo.caption,
+                                                      tags: photo.tags))
+                }
+                self.tableView.reloadData()
+                self.tableView.finishInfiniteScroll()
+                // Save photos in cache
+                ProfileDataCache.loadedPhotos = self.photos
+                ProfileDataCache.clean = true
+            }
+        })
     }
 }
 
