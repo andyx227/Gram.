@@ -247,18 +247,21 @@ struct Api {
                 var photos : [photoURL] = []
                 for document in documents {
                     var docData = document.data().mapValues { String.init(describing: $0)}
-                    //unwrap into user object, potentially
-                    //if if fields empty
                     var photo = photoURL(URL: docData["url"] ?? "",
                                          userID: docData["UID"] ?? "",
                                          datePosted: docData["datePosted"] ?? "",
                                          caption: docData["caption"] ?? "",
-                                         tags: nil)
-                    // rmeove white space, first and last character, parentheses, and commas
-                    let tagString = String(docData["tags"]?.replacingOccurrences(of: " ", with: "").replacingOccurrences(of: " ", with: "").replacingOccurrences(of: "(", with: "").replacingOccurrences(of: ")", with: "").replacingOccurrences(of: ",", with: "").dropFirst().dropLast() ?? "")
+                                         tags: extractTags(text: docData["tags"] ?? ""))
                     
-                    photo.tags = tagString.components(separatedBy: "\n")
-                    //append photo object to list of photos
+                    let start = photo.datePosted.index(photo.datePosted.startIndex, offsetBy: 22)
+                    let end = photo.datePosted.index(photo.datePosted.endIndex, offsetBy: -23)
+                    let range = start..<end
+                    let sec = Double(String(photo.datePosted[range])) //get sec from substring
+                    let interval = TimeInterval(exactly: sec ?? 0)// time interval of sec in seconds
+                    let date = Date(timeIntervalSince1970: interval!) // get time from 1970
+                    let dateString = DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .medium) //make date nice and localized
+                    photo.datePosted = dateString
+                    
                     photos.append(photo)
                 }
                 
@@ -297,10 +300,23 @@ struct Api {
                     for document in documents {
                         var docData = document.data().mapValues { String.init(describing: $0)}
                         if users?.contains(docData["UID"] ?? "") ?? false {
-                            let photo = photoURL(URL: docData["url"] ?? "", userID: docData["UID"] ?? "", datePosted: docData["datePosted"] ?? "", caption: docData["caption"] ?? "", tags: extractTags(text: docData["tags"] ?? ""))
+                            var photo = photoURL(URL: docData["url"] ?? "",
+                                                 userID: docData["UID"] ?? "",
+                                                 datePosted: docData["datePosted"] ?? "",
+                                                 caption: docData["caption"] ?? "",
+                                                 tags: extractTags(text: docData["tags"] ?? ""))
+                            
+                            let start = photo.datePosted.index(photo.datePosted.startIndex, offsetBy: 22)
+                            let end = photo.datePosted.index(photo.datePosted.endIndex, offsetBy: -23)
+                            let range = start..<end
+                            let sec = Double(String(photo.datePosted[range])) //get sec from substring
+                            let interval = TimeInterval(exactly: sec ?? 0)// time interval of sec in seconds
+                            let date = Date(timeIntervalSince1970: interval!) // get time from 1970
+                            let dateString = DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .medium) //make date nice and localized
+                            photo.datePosted = dateString
+                            
                             photos.append(photo)
                         }
-                        
                     }
                     
                     completion(photos, nil)
