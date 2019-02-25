@@ -41,7 +41,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
     override func viewWillAppear(_ animated: Bool) {
         changeStatusBarColor(forView: self)
         
-        // If user posted a new photo, reload table view
+        // If user posted a new photo or if cache is dirty, reload table view
         if ProfileDataCache.newPost || !ProfileDataCache.clean {
             photos = ProfileDataCache.loadedPhotos  // New post should be savied in "loadedPhotos" array already
             self.tableView.reloadData()
@@ -49,6 +49,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             ProfileDataCache.clean = true  // Mark cache as clean
         } else if profile[0].userID != user!.userID {
             self.tableView.reloadData()
+            self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)  // Auto scroll to top when viewing a different profile
         }
     }
     
@@ -267,6 +268,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
     
     private func getUserPhotos() {
         self.photos.removeAll()  // Load photos from clean slate
+        self.showLoadingCell = true
         self.tableView.reloadData()
         Api.getProfilePhotos(completion: { (photoList, error) in
             if let _ = error {

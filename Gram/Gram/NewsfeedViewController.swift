@@ -18,18 +18,11 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
     var photos = [PhotoCard]()
     var imageURL: URL?
     var previouslySelectedTabIndex = 0
+    var showLoadingCell = true
     
     
     override func viewWillAppear(_ animated: Bool) {
         changeStatusBarColor(forView: self)
-        
-        if photos.count == 0 {
-            self.newsfeedTableView.isHidden = true
-            self.viewNoPhotos.isHidden = false
-        } else {
-            self.newsfeedTableView.isHidden = false
-            self.viewNoPhotos.isHidden = true
-        }
     }
     
     override func viewDidLoad() {
@@ -44,21 +37,18 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
         self.tabBarController?.delegate = self
         self.tabBarController?.selectedIndex = 0
         
-        /*photos = [PhotoCard.init(profilePhoto: UIImage(named: "A")!,
-                                 username: user!.username,
-                                 date: "December 1, 2018",
-                                 photo: UIImage(named:"mountain")!,
-                                 caption: "How do I get down from here?! #mountainclimbing",
-                                 tags: nil),
-                  
-                  PhotoCard.init(profilePhoto: UIImage(named: "A")!,
-                                 username: user!.username,
-                                 date: "January 12, 2019",
-                                 photo: UIImage(named: "tower")!,
-                                 caption: "Paris is the best! #travel @mostrowski :)",
-                                 tags: nil)
-        ]*/
         getProfilePhoto()
+        
+        newsfeedTableView.setShouldShowInfiniteScrollHandler { _ -> Bool in
+            return false  // Assume that all photos will be loaded on first load!
+        }
+        
+        newsfeedTableView.addInfiniteScroll { (tableView) in
+            self.getNewsfeedPhotos()  // NOTE: This block of code will actually never run because setShouldShowInfiniteScrollHandler returns false always!
+        }
+
+        newsfeedTableView.reloadData()  // Display the "Loading Cell" (shows the loading indicator)
+        getNewsfeedPhotos()
     }
     
     // Allow user to choose photo from album to post
@@ -79,6 +69,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
             newsfeedVC.searchBarPeople.text = ""
             newsfeedVC.searchPeopleTableView.isHidden = true
             newsfeedVC.newsfeedTableView.isHidden = false
+            newsfeedTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)  // Auto scroll to top of NewsfeedTableView
             previouslySelectedTabIndex = 0
             
         } else if viewController is ProfileTableViewController {
@@ -89,6 +80,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
             if previouslySelectedTabIndex != 2 {
                 profileVC.tableView.reloadData()  // Only reload table if we are coming to profile tab from another tab
             }
+            profileVC.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)  // Auto scroll to top of ProfileTableView
             previouslySelectedTabIndex = 2
         }
     }
@@ -143,6 +135,9 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
             }
             return people.count
         } else if tableView == self.newsfeedTableView {
+            if showLoadingCell {
+                return 1
+            }
             if photos.count > 0 {
                 self.searchPeopleTableView.isHidden = true
                 self.newsfeedTableView.isHidden = false
@@ -172,32 +167,37 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
             
             return cell
         } else if tableView == self.newsfeedTableView {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "photoCardCell", for: indexPath) as! PhotoCardCell
-            // TODO: Temporarily using the method below to retrieve username
-            // Remove later!
-            let username = user!.username
-            
-            // Set profile photo to be round
-            let firstLetterOfFirstName = String(user!.firstName.first!)
-            cell.profilePhoto.image = UIImage(named: firstLetterOfFirstName)
-            cell.profilePhoto.layer.cornerRadius = cell.profilePhoto.frame.height / 2
-            cell.profilePhoto.clipsToBounds = true
-            
-            cell.username.text = username
-            cell.date.text = photos[indexPath.row].date
-            
-            // Scale photos before displaying them in UIImageView
-            let photo = photos[indexPath.row].photo
-            let ratio = photo.getCropRatio()
-            cell.photoHeightConstraint.constant = UIScreen.main.bounds.width / ratio
-            cell.photo.image = photos[indexPath.row].photo
-            
-            // Format caption before displaying
-            if let caption = photos[indexPath.row].caption {
-                cell.caption.attributedText = self.formatCaption(caption, user: username)
+            if photos.count == 0 && showLoadingCell {
+                let cell = tableView.dequeueReusableCell(withIdentifier: "loadingCell", for: indexPath) as! LoadingCell
+                cell.loadingIndicator.startAnimating()
+                return cell
+            } else {
+                let cell = tableView.dequeueReusableCell(withIdentifier: "photoCardCell", for: indexPath) as! PhotoCardCell
+                // TODO: Temporarily using the method below to retrieve username
+                // Remove later!
+                let username = user!.username
+                
+                // Set profile photo to be round
+                let firstLetterOfFirstName = String(user!.firstName.first!)
+                cell.profilePhoto.image = UIImage(named: firstLetterOfFirstName)
+                cell.profilePhoto.layer.cornerRadius = cell.profilePhoto.frame.height / 2
+                cell.profilePhoto.clipsToBounds = true
+                
+                cell.username.text = username
+                cell.date.text = photos[indexPath.row].date
+                
+                // Scale photos before displaying them in UIImageView
+                let photo = photos[indexPath.row].photo
+                let ratio = photo.getCropRatio()
+                cell.photoHeightConstraint.constant = UIScreen.main.bounds.width / ratio
+                cell.photo.image = photos[indexPath.row].photo
+                
+                // Format caption before displaying
+                if let caption = photos[indexPath.row].caption {
+                    cell.caption.attributedText = self.formatCaption(caption, user: username)
+                }
+                return cell
             }
-            
-            return cell
         } else {  // This case should never be reached!
             let cell = tableView.dequeueReusableCell(withIdentifier: "ShouldNeverDequeueCellHere!")
             return cell!
@@ -283,6 +283,49 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                 } catch {  // Show default profile photo if error
                     ProfileDataCache.profilePhoto = UIImage(named: firstLetterOfFirstName)
                 }
+            }
+        }
+    }
+    
+    private func getNewsfeedPhotos() {
+        self.photos.removeAll()  // Start loading photos from clean slate
+        self.showLoadingCell = true
+        self.newsfeedTableView.reloadData()
+        
+        Api.getFollowerPhotos { (photoList, error) in
+            if let _ = error {
+                self.showLoadingCell = false
+            }
+            if let photoList = photoList {
+                for photo in photoList {
+                    var photoToDisplayInPhotoCard: UIImage?
+                    do {  // Attempt to extract the photo from the given photo url
+                        let url = URL(string: photo.URL)
+                        guard let photoURL = url else { continue }  // If cannot load url, skip this PhotoCard
+                        let data = try Data(contentsOf: photoURL)
+                        photoToDisplayInPhotoCard = UIImage(data: data)
+                    } catch {  // If error, try loading another photo card (skip this one)
+                        continue
+                    }
+                    guard let photoToDisplay = photoToDisplayInPhotoCard else { continue }  // If cannot load photo, skip this PhotoCard
+                    
+                    var date = photo.datePosted
+                    if let rangeToRemove = date.range(of: " at") {  // Remove the time part of date (Only want [MM DD, YYYY] part)
+                        date.removeSubrange(rangeToRemove.lowerBound ..< date.endIndex)
+                    }
+                    // Construct PhotoCard object
+                    self.photos.append(PhotoCard.init(profilePhoto: ProfileDataCache.profilePhoto!,
+                                                      username: "null",
+                                                      date: date,
+                                                      photo: photoToDisplay,
+                                                      caption: photo.caption,
+                                                      tags: photo.tags))
+                }
+                if photoList.count == 0 {
+                    self.showLoadingCell = false  // No photos so don't try loading any photos when reloading table view
+                }
+                self.newsfeedTableView.reloadData()
+                self.newsfeedTableView.finishInfiniteScroll()
             }
         }
     }

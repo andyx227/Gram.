@@ -75,6 +75,9 @@ class EditProfileViewController: UIViewController, UIImagePickerControllerDelega
         user?.username = username
         user?.summary = bio
         
+        profileTableViewDelegate?.profile = [user!]  // ProfileTableView should get the most recent profile update
+        profileTableViewDelegate?.tableView.reloadData()  // Refresh the TableView
+        
         Api.updateUser { (response, error) in
             if let _ = error {
                 self.presentAlertPopup(withTitle: "Something went wrong!",
