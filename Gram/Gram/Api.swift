@@ -39,6 +39,7 @@ struct Api {
     struct photoURL {
         var URL : String
         var userID : String
+        var profilePhoto: String
         var datePosted : String
         var caption : String
         var tags : [String]?
@@ -221,6 +222,7 @@ struct Api {
                     "UID" : user.userID,
                     "caption" : photo.caption ?? "null",
                     "datePosted" : Timestamp(date: Date()),
+                    "profilePhoto" : user.profilePhoto ?? "",
                     "url" : photoURL?.absoluteString ?? "",
                     "tags" : photo.tags!]) { err in
                         if let err = err {
@@ -249,6 +251,7 @@ struct Api {
                     var docData = document.data().mapValues { String.init(describing: $0)}
                     var photo = photoURL(URL: docData["url"] ?? "",
                                          userID: docData["UID"] ?? "",
+                                         profilePhoto: docData["profilePhoto"] ?? "",
                                          datePosted: docData["datePosted"] ?? "",
                                          caption: docData["caption"] ?? "",
                                          tags: extractTags(text: docData["tags"] ?? ""))
@@ -314,6 +317,7 @@ struct Api {
                         if users?.contains(docData["UID"] ?? "") ?? false {
                             var photo = photoURL(URL: docData["url"] ?? "",
                                                  userID: docData["UID"] ?? "",
+                                                 profilePhoto: docData["profilePhoto"] ?? "",
                                                  datePosted: docData["datePosted"] ?? "",
                                                  caption: docData["caption"] ?? "",
                                                  tags: extractTags(text: docData["tags"] ?? ""))
