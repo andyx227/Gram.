@@ -188,7 +188,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                 let cell = tableView.dequeueReusableCell(withIdentifier: "photoCardCell", for: indexPath) as! PhotoCardCell
                 // TODO: Temporarily using the method below to retrieve username
                 // Remove later!
-                let username = user!.username
+                let username = photos[indexPath.row].username
                 
                 // Set profile photo to be round
                 let firstLetterOfFirstName = String(user!.firstName.first!)
@@ -301,9 +301,8 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     private func getNewsfeedPhotos(_ firstTimeLoad: Bool) {
-        self.photos.removeAll()  // Start loading photos from clean slate
-        
         if firstTimeLoad {
+            self.photos.removeAll()  // Start loading photos from clean slate
             self.showLoadingCell = true
             self.newsfeedTableView.reloadData()
         }
@@ -313,6 +312,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                 self.showLoadingCell = false
             }
             if let photoList = photoList {
+                self.photos.removeAll()  // Start loading photos from clean slate
                 for photo in photoList {
                     var photoToDisplayInPhotoCard: UIImage?
                     do {  // Attempt to extract the photo from the given photo url
@@ -337,9 +337,8 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                                                       caption: photo.caption,
                                                       tags: photo.tags))
                 }
-                if photoList.count == 0 {
-                    self.showLoadingCell = false  // No photos so don't try loading any photos when reloading table view
-                }
+                
+                self.showLoadingCell = false
                 self.newsfeedTableView.reloadData()
                 self.newsfeedTableView.finishInfiniteScroll()
                 
