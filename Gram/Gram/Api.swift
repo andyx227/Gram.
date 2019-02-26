@@ -39,7 +39,6 @@ struct Api {
     struct photoURL {
         var URL : String
         var userID : String
-        var profilePhoto: String
         var datePosted : String
         var caption : String
         var tags : [String]?
@@ -174,6 +173,20 @@ struct Api {
         }
     }
     
+    static func getPreofilePhotoWithUID(userID: String, completion: @escaping ApiCompletionURL) {
+        let docRef = db.collection("users").document(userID)
+        
+        docRef.getDocument { (document, error) in
+            if error !=  nil {
+                print("Error retrieving profile photo for user: \(userID)")
+                completion(nil, "Error retrieving profile photo for user: \(userID)")
+            } else {
+                let docData = document?.data()?.mapValues { String.init(describing: $0)}
+                completion((docData?["profilePhoto"] ?? ""), nil)
+            }
+        }
+    }
+    
     /**
      Post a photo and return the url of the photo uploaded.
      Returns empty url string on error
@@ -219,7 +232,6 @@ struct Api {
                     "UID" : user.userID,
                     "caption" : photo.caption ?? "null",
                     "datePosted" : Timestamp(date: Date()),
-                    "profilePhoto" : user.profilePhoto ?? "",
                     "url" : photoURL?.absoluteString ?? "",
                     "tags" : photo.tags!]) { err in
                         if let err = err {
@@ -248,7 +260,6 @@ struct Api {
                     var docData = document.data().mapValues { String.init(describing: $0)}
                     var photo = photoURL(URL: docData["url"] ?? "",
                                          userID: docData["UID"] ?? "",
-                                         profilePhoto: docData["profilePhoto"] ?? "",
                                          datePosted: docData["datePosted"] ?? "",
                                          caption: docData["caption"] ?? "",
                                          tags: extractTags(text: docData["tags"] ?? ""))
@@ -314,7 +325,6 @@ struct Api {
                         if users?.contains(docData["UID"] ?? "") ?? false {
                             var photo = photoURL(URL: docData["url"] ?? "",
                                                  userID: docData["UID"] ?? "",
-                                                 profilePhoto: docData["profilePhoto"] ?? "",
                                                  datePosted: docData["datePosted"] ?? "",
                                                  caption: docData["caption"] ?? "",
                                                  tags: extractTags(text: docData["tags"] ?? ""))
