@@ -48,7 +48,10 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             ProfileDataCache.newPost = false // Reset to false
             ProfileDataCache.clean = true  // Mark cache as clean
         } else if profile[0].userID != user!.userID {
+            self.photos.removeAll()
+            showLoadingCell = true
             self.tableView.reloadData()
+            getUserPhotos()
             self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)  // Auto scroll to top when viewing a different profile
         }
     }
@@ -270,7 +273,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
         self.photos.removeAll()  // Load photos from clean slate
         self.showLoadingCell = true
         self.tableView.reloadData()
-        Api.getProfilePhotos(completion: { (photoList, error) in
+        Api.getProfilePhotos(userID: profile.first!.userID, completion: { (photoList, error) in
             if let _ = error {
                 return
             }
