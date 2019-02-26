@@ -12,6 +12,7 @@ import UIKit
 protocol ProfileInfoCellDelegate {
     func navigateToEditProfileViewController()
     func didChangeFollowStatus(_ sender: ProfileInfoCell)
+    func logout()
 }
 
 class ProfileInfoCell: UITableViewCell {
@@ -21,6 +22,7 @@ class ProfileInfoCell: UITableViewCell {
     @IBOutlet weak var username: UILabel!
     @IBOutlet weak var bio: UILabel!
     @IBOutlet weak var changeFollowStatus: UIButton!
+    @IBOutlet weak var logout: UIButton!
     @IBOutlet weak var followingIcon: UIImageView!
     @IBOutlet weak var numFollowers: UILabel!
     @IBOutlet weak var numFollowing: UILabel!
@@ -42,5 +44,8 @@ class ProfileInfoCell: UITableViewCell {
         } else {  // Viewing another user's profile
             delegate?.didChangeFollowStatus(self)
         }
+    }
+    @IBAction func logout(_ sender: Any) {
+        delegate?.logout()
     }
 }

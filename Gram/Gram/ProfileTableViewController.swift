@@ -154,6 +154,8 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             cell.isFollowing = self.following
             
             if user?.userID != profile[indexPath.row].userID {  // Looking at another user's profile
+                cell.logout.isHidden = true  // Hide logout button when viewing another user's profile
+                
                 if self.following {
                     UIView.performWithoutAnimation {
                         cell.changeFollowStatus.setTitle("Unfollow", for: .normal)
@@ -168,6 +170,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
                     }
                 }
             } else {  // Looking at our own profile
+                cell.logout.isHidden = false  // Show logout button when viewing own profile
                 cell.changeFollowStatus.setTitle("Edit Profile", for: .normal)
                 cell.changeFollowStatus.titleLabel?.textAlignment = .center
                 cell.followingIcon.isHidden = true
@@ -346,22 +349,14 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
         }
     }
     
-    @IBAction func logoutPressed(sender: UIButton) {
+    func logout() {
         let firebaseAuth = Auth.auth()
         do {
             try firebaseAuth.signOut()
-            performSegue(withIdentifier: "logoutToSignIn", sender: nil)
+            self.navigationController?.popToRootViewController(animated: true)
         } catch let signOutError as NSError {
             print ("Error signing out: %@", signOutError)
         }
-
-        // Way 1:
-        // performSegue(withIdentifier: "logoutToSignIn", sender: nil)
-
-        // Way 2:
-        // self.dismiss(animated: true, completion: {});
-        // self.navigationController?.popViewController(animated: true);
-        
     }
 }
 

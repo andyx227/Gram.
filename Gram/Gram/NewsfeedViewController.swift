@@ -336,16 +336,17 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                     
                     // Get profile photo
                     let username = self.userIDToUsername![photo.userID] ?? "A"
+                    let firstLetterOfUsername = String(username.capitalized.first!)
                     let profilePhoto: UIImage?
                     if photo.profilePhoto == "" {
-                        profilePhoto = UIImage(named: username)
+                        profilePhoto = UIImage(named: firstLetterOfUsername)
                     } else {
                         do {
                             let url = URL(string: photo.profilePhoto)
                             let data = try Data(contentsOf: url!)
                             profilePhoto = UIImage(data: data)
                         } catch {
-                            profilePhoto = UIImage(named: username)
+                            profilePhoto = UIImage(named: firstLetterOfUsername)
                         }
                     }
                   

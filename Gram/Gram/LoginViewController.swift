@@ -19,6 +19,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
     var userEmail = ""
 
     override func viewWillAppear(_ animated: Bool) {
+        GIDSignIn.sharedInstance()?.signInSilently()
+        changeStatusBarColor(forView: self)
         let _ = setBackgroundImage("background_login")
     }
 
@@ -45,57 +47,11 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
     @IBAction func loginWithGoogle(_ sender: Any) {
         // In viewDidLoad(), user should have been signed-in silently. If that didn't work
         // for some reason, prompt the user to sign in via Google if they wish.
-        if Auth.auth().currentUser == nil { GIDSignIn.sharedInstance()?.signIn() }
+        if Auth.auth().currentUser == nil {
+            GIDSignIn.sharedInstance()?.signIn()
+        }
         
-        // Use if-let to prevent the create of multiple listeners!
-        if let _ = AuthenticationListeners.googleAuthenticationListener { return }
-        
-        AuthenticationListeners.googleAuthenticationListener = Auth.auth().addStateDidChangeListener({ (auth: Auth, user: User?) in
-            if let user = user {  // User has a Google account!
-                self.googleLoginButton.isEnabled = false  // Prevent user from pressing button multiple times!
-                self.googleLoginButton.alpha = 0.5
-                let alert = UIAlertController(title: nil, message: "Logging in...", preferredStyle: .alert)
-
-                let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
-                loadingIndicator.hidesWhenStopped = true
-                loadingIndicator.style = UIActivityIndicatorView.Style.gray
-                loadingIndicator.startAnimating()
-
-                alert.view.addSubview(loadingIndicator)
-                self.present(alert, animated: true, completion: nil)
-
-                Api.checkEmailExists(email: user.email!, completion: { (response, error) in
-                    if let _ = error {  // Email already exists, sign user in immediately
-                        Api.setUserWithEmail(email: user.email!, completion: { (response, error) in
-                            if let _ = error {
-                                print("Error — Api could not set up user via setUserWithEmail()")
-                                self.googleLoginButton.isEnabled = true  // Re-enable Google login button
-                                self.googleLoginButton.alpha = 1
-                                Auth.auth().removeStateDidChangeListener(AuthenticationListeners.googleAuthenticationListener!)
-                                return
-                            }
-                            if let _ = response {
-                                Auth.auth().removeStateDidChangeListener(AuthenticationListeners.googleAuthenticationListener!)
-                                self.transitionToNewsfeedView()
-                            }
-                        }) // Api.setUserWithEmail()
-                    }
-                    if let _ = response {  // Email doesn't exist, so bring user to PickUsernameViewController
-                        self.googleLoginButton.isEnabled = true
-                        self.googleLoginButton.alpha = 1
-                        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-                        let pickUsernameVC = storyboard.instantiateViewController(withIdentifier: "pickUsernameViewController") as! PickUsernameViewController
-                        self.navigationController?.pushViewController(pickUsernameVC, animated: true)
-                        Auth.auth().removeStateDidChangeListener(AuthenticationListeners.googleAuthenticationListener!)
-                    }
-                })  // Api.checkEmailExists()
-                self.dismiss(animated: true, completion: nil)
-            } else {  // There was an error signing in using Google...
-                print("Error — Google sign-in failed.")
-                self.googleLoginButton.isEnabled = true
-                self.googleLoginButton.alpha = 1
-            }
-        })
+        googleAuthentication()
     }
 
     private func authenticate(email: String, password: String) {
@@ -161,6 +117,76 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
 
         return backgroundImageView
     }
+    
+    /**
+     * Gets a Google authentication listener to retrieve currently logged-in user's
+     * info, and checks if against our database to see if that user already exists.
+     * When everything checks out, it will automatically transition to NewsfeedViewController.
+     * Otherwise, authentication has failed and function will return.
+     */
+    private func googleAuthentication() {
+        // Use if-let to prevent the create of multiple listeners!
+        if let _ = AuthenticationListeners.googleAuthenticationListener {
+            return
+        }
+        
+        AuthenticationListeners.googleAuthenticationListener = Auth.auth().addStateDidChangeListener({ (auth: Auth, user: User?) in
+            if let user = user {  // User has a Google account!
+                self.googleLoginButton.isEnabled = false  // Prevent user from pressing button multiple times!
+                self.googleLoginButton.alpha = 0.5
+                /*let alert = UIAlertController(title: nil, message: "Logging in...", preferredStyle: .alert)
+                 
+                 let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
+                 loadingIndicator.hidesWhenStopped = true
+                 loadingIndicator.style = UIActivityIndicatorView.Style.gray
+                 loadingIndicator.startAnimating()
+                 
+                 alert.view.addSubview(loadingIndicator) */
+                //self.present(alert, animated: true, completion: nil)
+                
+                Api.checkEmailExists(email: user.email!, completion: { (response, error) in
+                    if let _ = error {  // Email already exists, sign user in immediately
+                        Api.setUserWithEmail(email: user.email!, completion: { (response, error) in
+                            if let _ = error {
+                                print("Error — Api could not set up user via setUserWithEmail()")
+                                self.googleLoginButton.isEnabled = true  // Re-enable Google login button
+                                self.googleLoginButton.alpha = 0.75
+                                Auth.auth().removeStateDidChangeListener(AuthenticationListeners.googleAuthenticationListener!)
+                                AuthenticationListeners.googleAuthenticationListener = nil
+                                return
+                            }
+                            if let _ = response {
+                                Auth.auth().removeStateDidChangeListener(AuthenticationListeners.googleAuthenticationListener!)
+                                AuthenticationListeners.googleAuthenticationListener = nil
+                                self.googleLoginButton.isEnabled = true  // Re-enable Google login button
+                                self.googleLoginButton.alpha = 0.75
+                                self.transitionToNewsfeedView()
+                                return
+                            }
+                        }) // Api.setUserWithEmail()
+                        return
+                    }
+                    if let _ = response {  // Email doesn't exist, so bring user to PickUsernameViewController
+                        self.googleLoginButton.isEnabled = true
+                        self.googleLoginButton.alpha = 0.75
+                        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                        let pickUsernameVC = storyboard.instantiateViewController(withIdentifier: "pickUsernameViewController") as! PickUsernameViewController
+                        self.navigationController?.pushViewController(pickUsernameVC, animated: true)
+                        Auth.auth().removeStateDidChangeListener(AuthenticationListeners.googleAuthenticationListener!)
+                        AuthenticationListeners.googleAuthenticationListener = nil
+                        return
+                    }
+                })  // Api.checkEmailExists()
+                //self.dismiss(animated: true, completion: nil)
+            } else {  // There was an error signing in using Google...
+                print("Error — Google sign-in failed.")
+                Auth.auth().removeStateDidChangeListener(AuthenticationListeners.googleAuthenticationListener!)
+                AuthenticationListeners.googleAuthenticationListener = nil
+                self.googleLoginButton.isEnabled = true
+                self.googleLoginButton.alpha = 0.75
+            }
+        })
+    }
 }
 
 extension UIViewController {
@@ -201,11 +227,11 @@ extension UIViewController {
                 if statusBar.responds(to:#selector(setter: UIView.backgroundColor)) {
                     statusBar.backgroundColor = UIColor.white
                 }
-            }
-        } else {  // Use clear background by default
-            let statusBar: UIView = UIApplication.shared.value(forKey: "statusBar") as! UIView
-            if statusBar.responds(to:#selector(setter: UIView.backgroundColor)) {
-                statusBar.backgroundColor = UIColor.clear
+            } else {  // Use clear background by default
+                let statusBar: UIView = UIApplication.shared.value(forKey: "statusBar") as! UIView
+                if statusBar.responds(to:#selector(setter: UIView.backgroundColor)) {
+                    statusBar.backgroundColor = UIColor.clear
+                }
             }
         }
     }

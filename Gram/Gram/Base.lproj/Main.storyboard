@@ -577,18 +577,22 @@
                                                         <constraint firstAttribute="height" constant="20" id="9e8-Zf-WHy"/>
                                                     </constraints>
                                                 </imageView>
-                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PZV-zt-coE">
-                                                    <rect key="frame" x="288" y="0.0" width="48" height="30"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <state key="normal" title="Logout"/>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PZV-zt-coE">
+                                                    <rect key="frame" x="306" y="0.0" width="37" height="27"/>
+                                                    <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="12"/>
+                                                    <state key="normal" title="Logout">
+                                                        <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    </state>
                                                     <connections>
-                                                        <action selector="logoutPressedWithSender:" destination="QQv-hb-yZn" eventType="touchUpInside" id="uaw-gj-DMi"/>
+                                                        <action selector="logout:" destination="3b7-PQ-plm" eventType="touchUpInside" id="xAD-GE-yg4"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <constraints>
+                                                <constraint firstAttribute="trailing" secondItem="PZV-zt-coE" secondAttribute="trailing" id="4m2-xl-EXS"/>
                                                 <constraint firstItem="adL-Ro-1bh" firstAttribute="top" secondItem="sYp-mf-czZ" secondAttribute="bottom" constant="1.5" id="5YF-co-bXc"/>
+                                                <constraint firstItem="PZV-zt-coE" firstAttribute="leading" secondItem="9cS-7J-H6k" secondAttribute="trailing" constant="69.5" id="8gv-ey-lK4"/>
                                                 <constraint firstItem="9cS-7J-H6k" firstAttribute="centerX" secondItem="0fL-Jk-MDV" secondAttribute="centerX" id="9Ms-wb-SMN"/>
                                                 <constraint firstAttribute="trailing" secondItem="f0v-Ue-pRQ" secondAttribute="trailing" id="Bhb-k9-Tno"/>
                                                 <constraint firstItem="chQ-Jd-NSf" firstAttribute="top" secondItem="9cS-7J-H6k" secondAttribute="bottom" constant="16" id="Cpp-22-h0B"/>
@@ -598,6 +602,7 @@
                                                 <constraint firstAttribute="bottom" secondItem="adL-Ro-1bh" secondAttribute="bottom" id="PqH-qg-ln3"/>
                                                 <constraint firstAttribute="trailing" secondItem="78j-qS-PCu" secondAttribute="trailing" id="UN2-mG-bNt"/>
                                                 <constraint firstItem="78j-qS-PCu" firstAttribute="top" secondItem="f0v-Ue-pRQ" secondAttribute="bottom" constant="8" id="UhW-On-u9h"/>
+                                                <constraint firstItem="PZV-zt-coE" firstAttribute="top" secondItem="0fL-Jk-MDV" secondAttribute="top" id="VYK-98-yMX"/>
                                                 <constraint firstAttribute="trailing" secondItem="sYp-mf-czZ" secondAttribute="trailing" constant="27.5" id="blb-72-Nrz"/>
                                                 <constraint firstItem="chQ-Jd-NSf" firstAttribute="leading" secondItem="0fL-Jk-MDV" secondAttribute="leading" id="bql-xk-m4R"/>
                                                 <constraint firstItem="9cS-7J-H6k" firstAttribute="top" secondItem="0fL-Jk-MDV" secondAttribute="top" constant="8" id="pAT-YC-zYE"/>
@@ -625,6 +630,7 @@
                                     <outlet property="changeFollowStatus" destination="adL-Ro-1bh" id="OPZ-RF-hmk"/>
                                     <outlet property="followingIcon" destination="BsG-19-DN5" id="efB-h3-4Sd"/>
                                     <outlet property="fullname" destination="chQ-Jd-NSf" id="zAN-j1-MYB"/>
+                                    <outlet property="logout" destination="PZV-zt-coE" id="MOA-Qr-Nh8"/>
                                     <outlet property="numFollowers" destination="Unv-kM-BSt" id="Enc-1U-efN"/>
                                     <outlet property="numFollowing" destination="uIu-Ry-rKV" id="HPa-9j-3fk"/>
                                     <outlet property="profilePhoto" destination="9cS-7J-H6k" id="8rD-LS-e5f"/>
@@ -824,7 +830,6 @@
                     <tabBarItem key="tabBarItem" title="Profile" image="icon_profile" id="LrH-Yl-lbZ"/>
                     <connections>
                         <segue destination="art-24-v0n" kind="presentation" identifier="profileToEditProfileView" id="lIz-gV-h2M"/>
-                        <segue destination="FHm-UB-HZ5" kind="presentation" identifier="logoutToSignIn" id="6dE-c7-GOY"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3VB-ke-VFF" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1219,9 +1224,6 @@
                                                 <real key="value" value="1"/>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
-                                        <connections>
-                                            <action selector="loginPress:" destination="FHm-UB-HZ5" eventType="editingDidEnd" id="wSr-pM-I4d"/>
-                                        </connections>
                                     </textField>
                                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icon_password" translatesAutoresizingMaskIntoConstraints="NO" id="pZD-UT-5Rl">
                                         <rect key="frame" x="4" y="77" width="36" height="36"/>
@@ -1359,6 +1361,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
+                        <color key="backgroundColor" red="0.67239505052566528" green="0.59607976675033569" blue="0.57867783308029175" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="kDD-1a-0vQ" firstAttribute="trailing" secondItem="Wis-sB-YPd" secondAttribute="trailing" constant="20" id="7KL-27-pIE"/>
                             <constraint firstItem="Wis-sB-YPd" firstAttribute="top" secondItem="kDD-1a-0vQ" secondAttribute="top" constant="77" id="GDK-TH-1X4"/>
@@ -1727,7 +1730,6 @@
         <image name="icon_username" width="180" height="180"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="BWx-km-74Z"/>
-        <segue reference="6dE-c7-GOY"/>
+        <segue reference="N6e-Lm-z6O"/>
     </inferredMetricsTieBreakers>
 </document>
