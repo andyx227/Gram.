@@ -517,10 +517,14 @@ struct Api {
         }
     }
     
+    /**
+     Creates a like entry with for a post, expecting the post id and post type (a string) as argument
+     If a like between the user and post already exists, the like is deleted
+    */
     static func likePost(postID : String, postType : String, completion : @escaping ApiCompletion) {
         let userID = user!.userID
-        let docRef = db.collection("likes")
-        let query = docRef.whereField("postID", isEqualTo: postID).whereField("postType", isEqualTo: postType)
+        let docRef = db.collection("likes")				
+        let query = docRef.whereField("postID", isEqualTo: postID).whereField("postType", isEqualTo: postType).whereField("userID", isEqualTo: userID)
         query.getDocuments { (querySnapshot, error) in
             if let documents = querySnapshot?.documents {
                 if documents.count == 0 {
@@ -538,6 +542,26 @@ struct Api {
             }
         }
     }
+    
+    
+    
+    /**
+     Gets the total likes on a post, expecting the post id and post type (a string) as argument
+     */
+    static func likeCount(postID : String, postType : String, completion : @escaping ApiCompletionInt) {
+        let docRef = db.collection("likes")
+        let query = docRef.whereField("postID", isEqualTo: postID).whereField("postType", isEqualTo: postType)
+        query.getDocuments { (querySnapshot, error) in
+            if let documents = querySnapshot?.documents {
+                completion(documents.count, nil)
+            } else {
+                print("error type:")
+                dump(error!)
+                completion(nil, "Collection does not exist")
+            }
+        }
+    }
+    
     
     /**
      Updates the firestore user object with changable fields
@@ -583,3 +607,4 @@ struct Api {
     typealias ApiCompletionInt = ((_ response: Int?, _ error: String?) -> Void)
     typealias ApiCompletionPhotos = ((_ response: [photoURL]?, _ error: String?) -> Void)
 }
+
