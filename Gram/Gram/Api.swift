@@ -280,6 +280,14 @@ struct Api {
         return String((0...length-1).map{ _ in letters.randomElement()! })
     }
     
+    static func getUserName(userID: String, completion: @escaping ApiCompletionUserID) {
+        let docRef = db.collection("users").document(userID)
+        docRef.getDocument { (document, error) in
+            let docData = document?.data()?.mapValues { String.init(describing: $0)}
+            completion(docData?["username"] ?? "")
+        }
+    }
+    
     static func getFollowerPhotos(completion: @escaping ApiCompletionPhotos) {
         
         findFollowers { (users, error) in
@@ -564,6 +572,7 @@ struct Api {
     typealias ApiCompletion = ((_ response: [String: Any]?, _ error: String?) -> Void)
     typealias ApiCompletionList = ((_ response: [[String: Any]]?, _ error: String?) -> Void)
     typealias ApiCompletionUserList = ((_ response: [userInfo]?, _ error: String?) -> Void)
+    typealias ApiCompletionUserID = ((_ response: String) -> Void)
     typealias ApiCompletionUserIDs = ((_ response: [String]?, _ error: String?) -> Void)
     typealias ApiCompletionURL = ((_ response: String?, _ error: String?) -> Void)
     typealias ApiCompletionInt = ((_ response: Int?, _ error: String?) -> Void)
