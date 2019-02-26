@@ -533,7 +533,7 @@ struct Api {
     */
     static func likePost(postID : String, postType : String, completion : @escaping ApiCompletion) {
         let userID = user!.userID
-        let docRef = db.collection("likes")				
+        let docRef = db.collection("likes")
         let query = docRef.whereField("postID", isEqualTo: postID).whereField("postType", isEqualTo: postType).whereField("userID", isEqualTo: userID)
         query.getDocuments { (querySnapshot, error) in
             if let documents = querySnapshot?.documents {
@@ -564,6 +564,29 @@ struct Api {
         query.getDocuments { (querySnapshot, error) in
             if let documents = querySnapshot?.documents {
                 completion(documents.count, nil)
+            } else {
+                print("error type:")
+                dump(error!)
+                completion(nil, "Collection does not exist")
+            }
+        }
+    }
+    
+    /**
+     Gets whether or not user has liked a post
+    */
+    static func isLiked(postID : String, postType : String, completion : @escaping ApiCompletionBool) {
+        let userID = user!.userID
+        let docRef = db.collection("likes")
+        let query = docRef.whereField("postID", isEqualTo: postID).whereField("postType", isEqualTo: postType).whereField("userID", isEqualTo: userID)
+        query.getDocuments { (querySnapshot, error) in
+            if let documents = querySnapshot?.documents {
+                if documents.count == 0 {
+                    completion(false, nil)
+                } else {
+                    docRef.document(documents[0].documentID).delete()
+                    completion(true, nil)
+                }
             } else {
                 print("error type:")
                 dump(error!)
@@ -616,5 +639,6 @@ struct Api {
     typealias ApiCompletionURL = ((_ response: String?, _ error: String?) -> Void)
     typealias ApiCompletionInt = ((_ response: Int?, _ error: String?) -> Void)
     typealias ApiCompletionPhotos = ((_ response: [photoURL]?, _ error: String?) -> Void)
+    typealias ApiCompletionBool = ((_ response: Bool?, _ error: String?) -> Void)
 }
 
