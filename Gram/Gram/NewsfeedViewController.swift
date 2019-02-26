@@ -20,6 +20,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
     var previouslySelectedTabIndex = 0
     var showLoadingCell = true
     var pullToRefresh: PullToRefresh?
+    var userIDToUsername: [String: String]?
     
     var tableViewRefreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
@@ -61,7 +62,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
         }
 
         newsfeedTableView.reloadData()  // Display the "Loading Cell" (shows the loading indicator)
-        getNewsfeedPhotos(true)
+        getListOfFollowing()  // This funtion will in turn call getNewsfeedPhotos(), which will populate NewsfeedTableView
     }
     
     // Allow user to choose photo from album to post
@@ -82,7 +83,10 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
             newsfeedVC.searchBarPeople.text = ""
             newsfeedVC.searchPeopleTableView.isHidden = true
             newsfeedVC.newsfeedTableView.isHidden = false
-            newsfeedTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)  // Auto scroll to top of NewsfeedTableView
+            
+            if photos.count > 0 {  // If there are no cells, no need to auto-scroll to top
+                newsfeedTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)  // Auto scroll to top of NewsfeedTableView
+            }
             previouslySelectedTabIndex = 0
             
         } else if viewController is ProfileTableViewController {
@@ -191,8 +195,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                 let username = photos[indexPath.row].username
                 
                 // Set profile photo to be round
-                let firstLetterOfFirstName = String(user!.firstName.first!)
-                cell.profilePhoto.image = UIImage(named: firstLetterOfFirstName)
+                cell.profilePhoto.image = photos[indexPath.row].profilePhoto
                 cell.profilePhoto.layer.cornerRadius = cell.profilePhoto.frame.height / 2
                 cell.profilePhoto.clipsToBounds = true
                 
@@ -301,11 +304,11 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     private func getNewsfeedPhotos(_ firstTimeLoad: Bool) {
-        if firstTimeLoad {
+        /*if firstTimeLoad {
             self.photos.removeAll()  // Start loading photos from clean slate
             self.showLoadingCell = true
             self.newsfeedTableView.reloadData()
-        }
+        }*/
         
         Api.getFollowerPhotos { (photoList, error) in
             if let _ = error {
@@ -313,6 +316,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
             }
             if let photoList = photoList {
                 self.photos.removeAll()  // Start loading photos from clean slate
+                
                 for photo in photoList {
                     var photoToDisplayInPhotoCard: UIImage?
                     do {  // Attempt to extract the photo from the given photo url
@@ -329,9 +333,25 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                     if let rangeToRemove = date.range(of: " at") {  // Remove the time part of date (Only want [MM DD, YYYY] part)
                         date.removeSubrange(rangeToRemove.lowerBound ..< date.endIndex)
                     }
+                    
+                    // Get profile photo
+                    let username = self.userIDToUsername![photo.userID] ?? "A"
+                    let profilePhoto: UIImage?
+                    if photo.profilePhoto == "" {
+                        profilePhoto = UIImage(named: username)
+                    } else {
+                        do {
+                            let url = URL(string: photo.profilePhoto)
+                            let data = try Data(contentsOf: url!)
+                            profilePhoto = UIImage(data: data)
+                        } catch {
+                            profilePhoto = UIImage(named: username)
+                        }
+                    }
+                  
                     // Construct PhotoCard object
-                    self.photos.append(PhotoCard.init(profilePhoto: ProfileDataCache.profilePhoto!,
-                                                      username: "null",
+                    self.photos.append(PhotoCard.init(profilePhoto: profilePhoto!,
+                                                      username: self.userIDToUsername![photo.userID] ?? "",
                                                       date: date,
                                                       photo: photoToDisplay,
                                                       caption: photo.caption,
@@ -361,6 +381,33 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
         if let pullToRefresh = pullToRefresh {
             pullToRefresh.startAnimation()
             getNewsfeedPhotos(false)
+        }
+    }
+    
+    private func getListOfFollowing() {
+        if userIDToUsername == nil { userIDToUsername = [String: String]() }
+        
+        Api.findFollowers { (followingList, error) in
+            if let _ = error {
+                print("Error — Error when retrieving list of userIDs that the logged-in user is following.")
+            }
+            if let followingList = followingList {
+                let listLength = followingList.count
+                var usernamesFetched = 0
+                
+                DispatchQueue.global(qos: .userInitiated).async {
+                    while usernamesFetched < listLength { continue }  // Busy wait in background thread until all usernames have been fetched
+                    self.getNewsfeedPhotos(true)
+                }
+                
+               
+                for userID in followingList {
+                    Api.getUserName(userID: userID, completion: { (username) in
+                        self.userIDToUsername![userID] = username
+                        usernamesFetched = usernamesFetched + 1
+                    })
+                }
+            }
         }
     }
 }
