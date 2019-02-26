@@ -237,9 +237,9 @@ struct Api {
     /**
     Return the photos of the current logged in user in reverse chronological order
     */
-    static func getProfilePhotos(completion: @escaping ApiCompletionPhotos) {
+    static func getProfilePhotos(userID: String, completion: @escaping ApiCompletionPhotos) {
         let docRef = db.collection("photos")
-        let query = docRef.whereField("UID", isEqualTo: user?.userID ?? "null").order(by: "datePosted", descending: true)
+        let query = docRef.whereField("UID", isEqualTo: userID).order(by: "datePosted", descending: true)
         
         query.getDocuments { (querySnapshot, error) in
             if let documents = querySnapshot?.documents {
