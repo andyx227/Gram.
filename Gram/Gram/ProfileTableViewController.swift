@@ -9,6 +9,8 @@
 import UIKit
 import UIScrollView_InfiniteScroll
 import NVActivityIndicatorView
+import FirebaseAuth
+import GoogleSignIn
 
 struct ProfileInfo {
     var profilePhoto: UIImage
@@ -342,6 +344,24 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
                 cell.profilePhoto.hideSkeleton()
             }
         }
+    }
+    
+    @IBAction func logoutPressed(sender: UIButton) {
+        let firebaseAuth = Auth.auth()
+        do {
+            try firebaseAuth.signOut()
+            performSegue(withIdentifier: "logoutToSignIn", sender: nil)
+        } catch let signOutError as NSError {
+            print ("Error signing out: %@", signOutError)
+        }
+
+        // Way 1:
+        // performSegue(withIdentifier: "logoutToSignIn", sender: nil)
+
+        // Way 2:
+        // self.dismiss(animated: true, completion: {});
+        // self.navigationController?.popViewController(animated: true);
+        
     }
 }
 

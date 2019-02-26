@@ -577,6 +577,14 @@
                                                         <constraint firstAttribute="height" constant="20" id="9e8-Zf-WHy"/>
                                                     </constraints>
                                                 </imageView>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PZV-zt-coE">
+                                                    <rect key="frame" x="288" y="0.0" width="48" height="30"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <state key="normal" title="Logout"/>
+                                                    <connections>
+                                                        <action selector="logoutPressedWithSender:" destination="QQv-hb-yZn" eventType="touchUpInside" id="uaw-gj-DMi"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <constraints>
@@ -816,6 +824,7 @@
                     <tabBarItem key="tabBarItem" title="Profile" image="icon_profile" id="LrH-Yl-lbZ"/>
                     <connections>
                         <segue destination="art-24-v0n" kind="presentation" identifier="profileToEditProfileView" id="lIz-gV-h2M"/>
+                        <segue destination="FHm-UB-HZ5" kind="presentation" identifier="logoutToSignIn" id="6dE-c7-GOY"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3VB-ke-VFF" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1719,5 +1728,6 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="BWx-km-74Z"/>
+        <segue reference="6dE-c7-GOY"/>
     </inferredMetricsTieBreakers>
 </document>
