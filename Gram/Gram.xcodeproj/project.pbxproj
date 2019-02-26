@@ -25,6 +25,8 @@
 		A17D05CA21FA53C400205E1D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A17D05C921FA53C400205E1D /* Assets.xcassets */; };
 		A17D05CD21FA53C400205E1D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A17D05CB21FA53C400205E1D /* LaunchScreen.storyboard */; };
 		A1A221072212B2E300A9A2EC /* AuthenticationListeners.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A221062212B2E300A9A2EC /* AuthenticationListeners.swift */; };
+		A1A9A3E82224B622000ACF84 /* PullToRefreshView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A1A9A3E72224B622000ACF84 /* PullToRefreshView.xib */; };
+		A1A9A3EA2224B72F000ACF84 /* PullToRefresh.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A9A3E92224B72F000ACF84 /* PullToRefresh.swift */; };
 		A1D621AA221F4AD000E7B68B /* EditProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D621A9221F4AD000E7B68B /* EditProfileViewController.swift */; };
 		A1D621AD22210B1F00E7B68B /* PostPhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D621AC22210B1F00E7B68B /* PostPhotoViewController.swift */; };
 		A1D621AF22222C7D00E7B68B /* ProfileDataCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D621AE22222C7D00E7B68B /* ProfileDataCache.swift */; };
@@ -54,6 +56,8 @@
 		A17D05CC21FA53C400205E1D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A17D05CE21FA53C400205E1D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A1A221062212B2E300A9A2EC /* AuthenticationListeners.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationListeners.swift; sourceTree = "<group>"; };
+		A1A9A3E72224B622000ACF84 /* PullToRefreshView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PullToRefreshView.xib; sourceTree = "<group>"; };
+		A1A9A3E92224B72F000ACF84 /* PullToRefresh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullToRefresh.swift; sourceTree = "<group>"; };
 		A1D621A9221F4AD000E7B68B /* EditProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileViewController.swift; sourceTree = "<group>"; };
 		A1D621AC22210B1F00E7B68B /* PostPhotoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostPhotoViewController.swift; sourceTree = "<group>"; };
 		A1D621AE22222C7D00E7B68B /* ProfileDataCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileDataCache.swift; sourceTree = "<group>"; };
@@ -107,11 +111,13 @@
 				5D73C432220B7EA900E75875 /* Api.swift */,
 				A12AC1F5220EB0B2000036E3 /* ProfileTableViewController.swift */,
 				A12AC1FB220FA3A1000036E3 /* NewsfeedViewController.swift */,
+				A1A9A3E72224B622000ACF84 /* PullToRefreshView.xib */,
 				A1DE5B1C22113C2800CF49DE /* PickUsernameViewController.swift */,
 				A1A221062212B2E300A9A2EC /* AuthenticationListeners.swift */,
 				A1D621A9221F4AD000E7B68B /* EditProfileViewController.swift */,
 				A1D621AC22210B1F00E7B68B /* PostPhotoViewController.swift */,
 				A1D621AE22222C7D00E7B68B /* ProfileDataCache.swift */,
+				A1A9A3E92224B72F000ACF84 /* PullToRefresh.swift */,
 			);
 			path = Gram;
 			sourceTree = "<group>";
@@ -208,6 +214,7 @@
 				A17D05CD21FA53C400205E1D /* LaunchScreen.storyboard in Resources */,
 				A11274E021FD76BE00DA05D5 /* GoogleService-Info.plist in Resources */,
 				A17D05CA21FA53C400205E1D /* Assets.xcassets in Resources */,
+				A1A9A3E82224B622000ACF84 /* PullToRefreshView.xib in Resources */,
 				A17D05C821FA53C300205E1D /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -331,6 +338,7 @@
 				A12AC1FA220EC880000036E3 /* PhotoCardCell.swift in Sources */,
 				A1617C0122237F6700B7C9EB /* LoadingCell.swift in Sources */,
 				A17D05C321FA53C300205E1D /* FirstViewController.swift in Sources */,
+				A1A9A3EA2224B72F000ACF84 /* PullToRefresh.swift in Sources */,
 				A12AC1FE221018B2000036E3 /* PeopleCell.swift in Sources */,
 				A1DE5B1D22113C2800CF49DE /* PickUsernameViewController.swift in Sources */,
 				A1D621AD22210B1F00E7B68B /* PostPhotoViewController.swift in Sources */,

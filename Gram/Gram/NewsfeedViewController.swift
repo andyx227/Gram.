@@ -19,6 +19,15 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
     var imageURL: URL?
     var previouslySelectedTabIndex = 0
     var showLoadingCell = true
+    var pullToRefresh: PullToRefresh?
+    
+    var tableViewRefreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.backgroundColor = .white
+        refreshControl.tintColor = .clear
+        refreshControl.addTarget(self, action: #selector(refreshNewsfeed), for: .valueChanged)
+        return refreshControl
+    }()
     
     
     override func viewWillAppear(_ animated: Bool) {
@@ -39,16 +48,20 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
         
         getProfilePhoto()
         
+        // Set up RefreshControl for NewsfeedTableView
+        newsfeedTableView.refreshControl = tableViewRefreshControl
+        getRefereshView()
+        
         newsfeedTableView.setShouldShowInfiniteScrollHandler { _ -> Bool in
             return false  // Assume that all photos will be loaded on first load!
         }
         
         newsfeedTableView.addInfiniteScroll { (tableView) in
-            self.getNewsfeedPhotos()  // NOTE: This block of code will actually never run because setShouldShowInfiniteScrollHandler returns false always!
+            self.getNewsfeedPhotos(false)  // NOTE: This block of code will actually never run because setShouldShowInfiniteScrollHandler returns false always!
         }
 
         newsfeedTableView.reloadData()  // Display the "Loading Cell" (shows the loading indicator)
-        getNewsfeedPhotos()
+        getNewsfeedPhotos(true)
     }
     
     // Allow user to choose photo from album to post
@@ -287,10 +300,13 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
         }
     }
     
-    private func getNewsfeedPhotos() {
+    private func getNewsfeedPhotos(_ firstTimeLoad: Bool) {
         self.photos.removeAll()  // Start loading photos from clean slate
-        self.showLoadingCell = true
-        self.newsfeedTableView.reloadData()
+        
+        if firstTimeLoad {
+            self.showLoadingCell = true
+            self.newsfeedTableView.reloadData()
+        }
         
         Api.getFollowerPhotos { (photoList, error) in
             if let _ = error {
@@ -326,7 +342,26 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                 }
                 self.newsfeedTableView.reloadData()
                 self.newsfeedTableView.finishInfiniteScroll()
+                
+                if !firstTimeLoad {
+                    self.tableViewRefreshControl.endRefreshing()
+                }
             }
+        }
+    }
+    
+    func getRefereshView() {
+        if let objOfRefreshView = Bundle.main.loadNibNamed("PullToRefreshView", owner: self, options: nil)?.first as? PullToRefresh {
+            pullToRefresh = objOfRefreshView
+            pullToRefresh!.frame = tableViewRefreshControl.frame
+            tableViewRefreshControl.addSubview(pullToRefresh!)
+        }
+    }
+    
+    @objc func refreshNewsfeed() {
+        if let pullToRefresh = pullToRefresh {
+            pullToRefresh.startAnimation()
+            getNewsfeedPhotos(false)
         }
     }
 }
