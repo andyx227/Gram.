@@ -283,7 +283,11 @@ struct Api {
     static func getUserName(userID: String, completion: @escaping ApiCompletionUserID) {
         let docRef = db.collection("users").document(userID)
         docRef.getDocument { (document, error) in
-            let docData = document?.data()?.mapValues { String.init(describing: $0)}
+            guard let document = document else {
+                return
+            }
+            
+            let docData = document.data()?.mapValues { String.init(describing: $0)}
             completion(docData?["username"] ?? "")
         }
     }
