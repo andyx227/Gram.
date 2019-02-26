@@ -128,7 +128,7 @@ struct Api {
         }
         let storageRef = storage.reference()
 
-        let profileRef = storageRef.child("images/profilePhotos/" + user.username)
+        let profileRef = storageRef.child("images/profilePhotos/" + user.userID)
         // Upload the file to the path
         profileRef.putFile(from: path , metadata: nil) { metadata, error in
             
@@ -162,15 +162,12 @@ struct Api {
             return
         }
         
-        let docRef = db.collection("users")
-        let query = docRef.whereField("username", isEqualTo: user.username)
+        let docRef = db.collection("users").document(user.userID)
         
-        query.getDocuments { (querySnapshot, error) in
-            if let documents = querySnapshot?.documents {
-                dump(documents)
-                
-                var docData = documents[0].data().mapValues { String.init(describing: $0)}
-                completion((docData["profilePhoto"] ?? ""), nil)
+        docRef.getDocument { (document, error) in
+            if document != nil {
+                let docData = document?.data()?.mapValues { String.init(describing: $0)}
+                completion((docData?["profilePhoto"] ?? ""), nil)
             } else {
                 completion(nil, "Error retrieving for profile photo")
             }
