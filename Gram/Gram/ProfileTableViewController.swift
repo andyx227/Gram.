@@ -277,7 +277,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
         self.tableView.reloadData()
         Api.getProfilePhotos(userID: profile.first!.userID, completion: { (photoList, error) in
             if let _ = error {
-                return
+                self.showLoadingCell = false
             }
             if let photoList = photoList {
                 for photo in photoList {
