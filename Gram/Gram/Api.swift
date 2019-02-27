@@ -39,7 +39,6 @@ struct Api {
     struct photoURL {
         var URL : String
         var userID : String
-        var profilePhoto: String
         var datePosted : String
         var caption : String
         var tags : [String]?
@@ -174,6 +173,20 @@ struct Api {
         }
     }
     
+    static func getProfilePhotoWithUID(userID: String, completion: @escaping ApiCompletionURL) {
+        let docRef = db.collection("users").document(userID)
+        
+        docRef.getDocument { (document, error) in
+            if error !=  nil {
+                print("Error retrieving profile photo for user: \(userID)")
+                completion(nil, "Error retrieving profile photo for user: \(userID)")
+            } else {
+                let docData = document?.data()?.mapValues { String.init(describing: $0)}
+                completion((docData?["profilePhoto"] ?? ""), nil)
+            }
+        }
+    }
+    
     /**
      Post a photo and return the url of the photo uploaded.
      Returns empty url string on error
@@ -219,7 +232,6 @@ struct Api {
                     "UID" : user.userID,
                     "caption" : photo.caption ?? "null",
                     "datePosted" : Timestamp(date: Date()),
-                    "profilePhoto" : user.profilePhoto ?? "",
                     "url" : photoURL?.absoluteString ?? "",
                     "tags" : photo.tags!]) { err in
                         if let err = err {
@@ -248,7 +260,6 @@ struct Api {
                     var docData = document.data().mapValues { String.init(describing: $0)}
                     var photo = photoURL(URL: docData["url"] ?? "",
                                          userID: docData["UID"] ?? "",
-                                         profilePhoto: docData["profilePhoto"] ?? "",
                                          datePosted: docData["datePosted"] ?? "",
                                          caption: docData["caption"] ?? "",
                                          tags: extractTags(text: docData["tags"] ?? ""))
@@ -314,7 +325,6 @@ struct Api {
                         if users?.contains(docData["UID"] ?? "") ?? false {
                             var photo = photoURL(URL: docData["url"] ?? "",
                                                  userID: docData["UID"] ?? "",
-                                                 profilePhoto: docData["profilePhoto"] ?? "",
                                                  datePosted: docData["datePosted"] ?? "",
                                                  caption: docData["caption"] ?? "",
                                                  tags: extractTags(text: docData["tags"] ?? ""))
@@ -517,10 +527,14 @@ struct Api {
         }
     }
     
+    /**
+     Creates a like entry with for a post, expecting the post id and post type (a string) as argument
+     If a like between the user and post already exists, the like is deleted
+    */
     static func likePost(postID : String, postType : String, completion : @escaping ApiCompletion) {
         let userID = user!.userID
         let docRef = db.collection("likes")
-        let query = docRef.whereField("postID", isEqualTo: postID).whereField("postType", isEqualTo: postType)
+        let query = docRef.whereField("postID", isEqualTo: postID).whereField("postType", isEqualTo: postType).whereField("userID", isEqualTo: userID)
         query.getDocuments { (querySnapshot, error) in
             if let documents = querySnapshot?.documents {
                 if documents.count == 0 {
@@ -538,6 +552,49 @@ struct Api {
             }
         }
     }
+    
+    
+    
+    /**
+     Gets the total likes on a post, expecting the post id and post type (a string) as argument
+     */
+    static func likeCount(postID : String, postType : String, completion : @escaping ApiCompletionInt) {
+        let docRef = db.collection("likes")
+        let query = docRef.whereField("postID", isEqualTo: postID).whereField("postType", isEqualTo: postType)
+        query.getDocuments { (querySnapshot, error) in
+            if let documents = querySnapshot?.documents {
+                completion(documents.count, nil)
+            } else {
+                print("error type:")
+                dump(error!)
+                completion(nil, "Collection does not exist")
+            }
+        }
+    }
+    
+    /**
+     Gets whether or not user has liked a post
+    */
+    static func isLiked(postID : String, postType : String, completion : @escaping ApiCompletionBool) {
+        let userID = user!.userID
+        let docRef = db.collection("likes")
+        let query = docRef.whereField("postID", isEqualTo: postID).whereField("postType", isEqualTo: postType).whereField("userID", isEqualTo: userID)
+        query.getDocuments { (querySnapshot, error) in
+            if let documents = querySnapshot?.documents {
+                if documents.count == 0 {
+                    completion(false, nil)
+                } else {
+                    docRef.document(documents[0].documentID).delete()
+                    completion(true, nil)
+                }
+            } else {
+                print("error type:")
+                dump(error!)
+                completion(nil, "Collection does not exist")
+            }
+        }
+    }
+    
     
     /**
      Updates the firestore user object with changable fields
@@ -582,4 +639,6 @@ struct Api {
     typealias ApiCompletionURL = ((_ response: String?, _ error: String?) -> Void)
     typealias ApiCompletionInt = ((_ response: Int?, _ error: String?) -> Void)
     typealias ApiCompletionPhotos = ((_ response: [photoURL]?, _ error: String?) -> Void)
+    typealias ApiCompletionBool = ((_ response: Bool?, _ error: String?) -> Void)
 }
+
