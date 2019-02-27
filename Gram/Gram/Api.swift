@@ -173,7 +173,7 @@ struct Api {
         }
     }
     
-    static func getPreofilePhotoWithUID(userID: String, completion: @escaping ApiCompletionURL) {
+    static func getProfilePhotoWithUID(userID: String, completion: @escaping ApiCompletionURL) {
         let docRef = db.collection("users").document(userID)
         
         docRef.getDocument { (document, error) in
