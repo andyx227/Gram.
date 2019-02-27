@@ -20,7 +20,6 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
     var previouslySelectedTabIndex = 0
     var showLoadingCell = true
     var pullToRefresh: PullToRefresh?
-    var userIDToUsername: [String: String]?
     
     var tableViewRefreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
@@ -46,8 +45,6 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
         searchBarPeople.autocapitalizationType = .none
         self.tabBarController?.delegate = self
         self.tabBarController?.selectedIndex = 0
-        
-        getProfilePhoto()
         
         // Set up RefreshControl for NewsfeedTableView
         newsfeedTableView.refreshControl = tableViewRefreshControl
@@ -86,17 +83,24 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
             
             if photos.count > 0 {  // If there are no cells, no need to auto-scroll to top
                 newsfeedTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)  // Auto scroll to top of NewsfeedTableView
+                viewNoPhotos.isHidden = true
+            } else {
+                viewNoPhotos.isHidden = false
             }
+            
             previouslySelectedTabIndex = 0
             
         } else if viewController is ProfileTableViewController {
-            let profileVC = viewController as! ProfileTableViewController
+            let profileVC = self.tabBarController?.viewControllers![2] as! ProfileTableViewController
             changeStatusBarColor(forView: profileVC)
             profileVC.profile = [user!]
             profileVC.firstTimeLoadingView = true
+            
             if previouslySelectedTabIndex != 2 {
+                profileVC.photos = ProfileDataCache.loadedPhotos
                 profileVC.tableView.reloadData()  // Only reload table if we are coming to profile tab from another tab
             }
+            
             profileVC.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)  // Auto scroll to top of ProfileTableView
             previouslySelectedTabIndex = 2
         }
@@ -108,7 +112,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
             
             if photos.count == 0 {
                 self.viewNoPhotos.isHidden = false
-                self.newsfeedTableView.isHidden = true  // Hide Newsfeed
+                self.newsfeedTableView.isHidden = false  // Show Newsfeed (allows users to pull down to refresh table)
             } else {
                 self.viewNoPhotos.isHidden = true
                 self.newsfeedTableView.isHidden = false  // Show Newsfeed
@@ -161,7 +165,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                 self.viewNoPhotos.isHidden = true
             } else {
                 self.searchPeopleTableView.isHidden = true
-                self.newsfeedTableView.isHidden = true
+                self.newsfeedTableView.isHidden = false  // Still show empty NewsfeedView because we want to allow users to refresh (pull-down-to-refresh)
                 self.viewNoPhotos.isHidden = false
             }
             return photos.count
@@ -190,15 +194,13 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                 return cell
             } else {
                 let cell = tableView.dequeueReusableCell(withIdentifier: "photoCardCell", for: indexPath) as! PhotoCardCell
-                // TODO: Temporarily using the method below to retrieve username
-                // Remove later!
-                let username = photos[indexPath.row].username
                 
                 // Set profile photo to be round
                 cell.profilePhoto.image = photos[indexPath.row].profilePhoto
                 cell.profilePhoto.layer.cornerRadius = cell.profilePhoto.frame.height / 2
                 cell.profilePhoto.clipsToBounds = true
                 
+                let username = photos[indexPath.row].username
                 cell.username.text = username
                 cell.date.text = photos[indexPath.row].date
                 
@@ -233,7 +235,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
         ]
 
         let profileTab = self.tabBarController?.viewControllers![2] as! ProfileTableViewController
-        profileTab.profile = selectedUser
+        ProfileTableViewController.profileInfo = selectedUser
         profileTab.following = people[indexPath.row].following
         profileTab.firstTimeLoadingView = true
         self.tabBarController?.selectedViewController = profileTab
@@ -279,37 +281,8 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
         return attributedCaptionString
     }
     
-    private func getProfilePhoto() {
-        let firstLetterOfFirstName = String(user!.firstName.first!)
-        
-        Api.getProfilePhoto { (photoUrl, error) in
-            if let _ = error {  // Show default profile photo if error
-                ProfileDataCache.profilePhoto = UIImage(named: firstLetterOfFirstName)
-            }
-            if let photoUrl = photoUrl {
-                if photoUrl == "" {  // No URL for profile photo, so use default profile photo
-                    ProfileDataCache.profilePhoto = UIImage(named: firstLetterOfFirstName)
-                    return
-                }
-                
-                do {
-                    let url = URL(string: photoUrl)
-                    let data = try Data(contentsOf: url!)
-                    ProfileDataCache.profilePhoto = UIImage(data: data)  // Save image in cache
-                } catch {  // Show default profile photo if error
-                    ProfileDataCache.profilePhoto = UIImage(named: firstLetterOfFirstName)
-                }
-            }
-        }
-    }
     
     private func getNewsfeedPhotos(_ firstTimeLoad: Bool) {
-        /*if firstTimeLoad {
-            self.photos.removeAll()  // Start loading photos from clean slate
-            self.showLoadingCell = true
-            self.newsfeedTableView.reloadData()
-        }*/
-        
         Api.getFollowerPhotos { (photoList, error) in
             if let _ = error {
                 self.showLoadingCell = false
@@ -319,6 +292,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                 
                 for photo in photoList {
                     var photoToDisplayInPhotoCard: UIImage?
+                    
                     do {  // Attempt to extract the photo from the given photo url
                         let url = URL(string: photo.URL)
                         guard let photoURL = url else { continue }  // If cannot load url, skip this PhotoCard
@@ -327,16 +301,18 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                     } catch {  // If error, try loading another photo card (skip this one)
                         continue
                     }
+                    
                     guard let photoToDisplay = photoToDisplayInPhotoCard else { continue }  // If cannot load photo, skip this PhotoCard
                     
+                    // Format upload date for this photo
                     var date = photo.datePosted
                     if let rangeToRemove = date.range(of: " at") {  // Remove the time part of date (Only want [MM DD, YYYY] part)
                         date.removeSubrange(rangeToRemove.lowerBound ..< date.endIndex)
                     }
                     
                     // Get profile photo
-                    let username = self.userIDToUsername![photo.userID] ?? "A"
-                    let firstLetterOfUsername = String(username.capitalized.first!)
+                    let username = ProfileDataCache.userIDToUsername![photo.userID] ?? "A"
+                    let firstLetterOfUsername = String(username[username.startIndex]).capitalized
                     let profilePhoto: UIImage?
                     if photo.profilePhoto == "" {
                         profilePhoto = UIImage(named: firstLetterOfUsername)
@@ -352,7 +328,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                   
                     // Construct PhotoCard object
                     self.photos.append(PhotoCard.init(profilePhoto: profilePhoto!,
-                                                      username: self.userIDToUsername![photo.userID] ?? "",
+                                                      username: ProfileDataCache.userIDToUsername![photo.userID] ?? "",
                                                       date: date,
                                                       photo: photoToDisplay,
                                                       caption: photo.caption,
@@ -386,7 +362,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     private func getListOfFollowing() {
-        if userIDToUsername == nil { userIDToUsername = [String: String]() }
+        if ProfileDataCache.userIDToUsername == nil { ProfileDataCache.userIDToUsername = [String: String]() }  // Initialize
         
         Api.findFollowers { (followingList, error) in
             if let _ = error {
@@ -404,7 +380,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                
                 for userID in followingList {
                     Api.getUserName(userID: userID, completion: { (username) in
-                        self.userIDToUsername![userID] = username
+                        ProfileDataCache.userIDToUsername![userID] = username
                         usernamesFetched = usernamesFetched + 1
                     })
                 }

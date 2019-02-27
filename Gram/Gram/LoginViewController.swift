@@ -83,6 +83,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
                                                                handler: { _ in NSLog("Login failed alert occured.")}))
                             return
                         }
+                        self.getProfilePhoto()
                         self.dismiss(animated: true, completion: nil)
                         self.transitionToNewsfeedView()
                     })
@@ -156,6 +157,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
                                 return
                             }
                             if let _ = response {
+                                self.getProfilePhoto()
                                 Auth.auth().removeStateDidChangeListener(AuthenticationListeners.googleAuthenticationListener!)
                                 AuthenticationListeners.googleAuthenticationListener = nil
                                 self.googleLoginButton.isEnabled = true  // Re-enable Google login button
@@ -167,6 +169,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
                         return
                     }
                     if let _ = response {  // Email doesn't exist, so bring user to PickUsernameViewController
+                        self.getProfilePhoto()
                         self.googleLoginButton.isEnabled = true
                         self.googleLoginButton.alpha = 0.75
                         let storyboard = UIStoryboard(name: "Main", bundle: nil)
@@ -186,6 +189,30 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
                 self.googleLoginButton.alpha = 0.75
             }
         })
+    }
+    
+    private func getProfilePhoto() {
+        let firstLetterOfFirstName = String(user!.firstName.first!)
+        
+        Api.getProfilePhoto { (photoUrl, error) in
+            if let _ = error {  // Show default profile photo if error
+                ProfileDataCache.profilePhoto = UIImage(named: firstLetterOfFirstName)
+            }
+            if let photoUrl = photoUrl {
+                if photoUrl == "" {  // No URL for profile photo, so use default profile photo
+                    ProfileDataCache.profilePhoto = UIImage(named: firstLetterOfFirstName)
+                    return
+                }
+                
+                do {
+                    let url = URL(string: photoUrl)
+                    let data = try Data(contentsOf: url!)
+                    ProfileDataCache.profilePhoto = UIImage(data: data)  // Save image in cache
+                } catch {  // Show default profile photo if error
+                    ProfileDataCache.profilePhoto = UIImage(named: firstLetterOfFirstName)
+                }
+            }
+        }
     }
 }
 

@@ -104,6 +104,7 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
                                 
                                 Api.signupUser(completion: { (response, error) in
                                     if error == nil {
+                                        ProfileDataCache.profilePhoto = UIImage(named: String(firstname.capitalized.first!))
                                         self.transitionToNewsfeedView()
                                     }
                                     else {
