@@ -401,6 +401,13 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
         do {
             try firebaseAuth.signOut()
             user = nil
+            ProfileTableViewController.profileInfo = nil
+            ProfileDataCache.loadedPhotos.removeAll()
+            ProfileDataCache.userIDToProfilePhoto = nil
+            ProfileDataCache.userIDToUsername = nil
+            ProfileDataCache.profilePhoto = nil
+            ProfileDataCache.clean = false
+            ProfileDataCache.newPost = false
             self.navigationController?.popToRootViewController(animated: true)
         } catch let signOutError as NSError {
             print ("Error signing out: %@", signOutError)

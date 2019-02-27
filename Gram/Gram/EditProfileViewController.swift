@@ -74,7 +74,8 @@ class EditProfileViewController: UIViewController, UIImagePickerControllerDelega
         user?.username = username
         user?.summary = bio
         
-        profileTableViewDelegate?.profile = [user!]  // ProfileTableView should get the most recent profile update
+        ProfileTableViewController.profileInfo = [user!]
+        //profileTableViewDelegate?.profile = [user!]  // ProfileTableView should get the most recent profile update
         profileTableViewDelegate?.tableView.reloadData()  // Refresh the TableView
         
         Api.updateUser { (response, error) in
@@ -83,7 +84,8 @@ class EditProfileViewController: UIViewController, UIImagePickerControllerDelega
                                        withMessage: "We could not update your profile at this time. Please try again later.")
             }
             if let _ = response {
-                self.profileTableViewDelegate?.profile = [user!]
+                //self.profileTableViewDelegate?.profile = [user!]
+                ProfileTableViewController.profileInfo = [user!]
                 self.navigationController?.popViewController(animated: true)
             }
         }

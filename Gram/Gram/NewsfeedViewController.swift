@@ -96,10 +96,10 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
             profileVC.profile = [user!]
             profileVC.firstTimeLoadingView = true
             
-            if previouslySelectedTabIndex != 2 {
+            //if previouslySelectedTabIndex != 2 {
                 profileVC.photos = ProfileDataCache.loadedPhotos
                 profileVC.tableView.reloadData()  // Only reload table if we are coming to profile tab from another tab
-            }
+            //}
             
             profileVC.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)  // Auto scroll to top of ProfileTableView
             previouslySelectedTabIndex = 2
@@ -310,25 +310,14 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                         date.removeSubrange(rangeToRemove.lowerBound ..< date.endIndex)
                     }
                     
-                    // Get profile photo
                     let username = ProfileDataCache.userIDToUsername![photo.userID] ?? "A"
-                    let firstLetterOfUsername = String(username[username.startIndex]).capitalized
-                    let profilePhoto: UIImage?
-                    if photo.profilePhoto == "" {
-                        profilePhoto = UIImage(named: firstLetterOfUsername)
-                    } else {
-                        do {
-                            let url = URL(string: photo.profilePhoto)
-                            let data = try Data(contentsOf: url!)
-                            profilePhoto = UIImage(data: data)
-                        } catch {
-                            profilePhoto = UIImage(named: firstLetterOfUsername)
-                        }
-                    }
-                  
+                    
+                    // Get profile photo
+                    let profilePhoto = ProfileDataCache.userIDToProfilePhoto![photo.userID] ?? UIImage(named: "A")!
+                    
                     // Construct PhotoCard object
-                    self.photos.append(PhotoCard.init(profilePhoto: profilePhoto!,
-                                                      username: ProfileDataCache.userIDToUsername![photo.userID] ?? "",
+                    self.photos.append(PhotoCard.init(profilePhoto: profilePhoto,
+                                                      username: username,
                                                       date: date,
                                                       photo: photoToDisplay,
                                                       caption: photo.caption,
@@ -363,6 +352,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
     
     private func getListOfFollowing() {
         if ProfileDataCache.userIDToUsername == nil { ProfileDataCache.userIDToUsername = [String: String]() }  // Initialize
+        if ProfileDataCache.userIDToProfilePhoto == nil { ProfileDataCache.userIDToProfilePhoto = [String: UIImage]() }  // Initialize
         
         Api.findFollowers { (followingList, error) in
             if let _ = error {
@@ -371,9 +361,10 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
             if let followingList = followingList {
                 let listLength = followingList.count
                 var usernamesFetched = 0
+                var profilePhotosFetched = 0
                 
                 DispatchQueue.global(qos: .userInitiated).async {
-                    while usernamesFetched < listLength { continue }  // Busy wait in background thread until all usernames have been fetched
+                    while usernamesFetched + profilePhotosFetched < 2 * listLength { continue }  // Busy wait in background thread until all usernames & profile photos have been fetched
                     self.getNewsfeedPhotos(true)
                 }
                 
@@ -382,6 +373,30 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                     Api.getUserName(userID: userID, completion: { (username) in
                         ProfileDataCache.userIDToUsername![userID] = username
                         usernamesFetched = usernamesFetched + 1
+                        
+                        Api.getProfilePhotoWithUID(userID: userID, completion: { (url, error) in
+                            if let _ = error {
+                                print("Error — Error when retrieving profile photo url for userID: \(userID)")
+                                ProfileDataCache.userIDToProfilePhoto![userID] = UIImage(named: String(username.capitalized.first!))
+                                profilePhotosFetched = profilePhotosFetched + 1
+                            }
+                            if let url = url {
+                                if url == "" {
+                                    ProfileDataCache.userIDToProfilePhoto![userID] = UIImage(named: String(username.capitalized.first!))
+                                    profilePhotosFetched = profilePhotosFetched + 1
+                                } else {
+                                    do {
+                                        let url = URL(string: url)
+                                        let data = try Data(contentsOf: url!)
+                                        ProfileDataCache.userIDToProfilePhoto![userID] = UIImage(data: data)
+                                        profilePhotosFetched = profilePhotosFetched + 1
+                                    } catch {
+                                        ProfileDataCache.userIDToProfilePhoto![userID] = UIImage(named: String(username.capitalized.first!))
+                                        profilePhotosFetched = profilePhotosFetched + 1
+                                    }
+                                }
+                            }
+                        })
                     })
                 }
             }
