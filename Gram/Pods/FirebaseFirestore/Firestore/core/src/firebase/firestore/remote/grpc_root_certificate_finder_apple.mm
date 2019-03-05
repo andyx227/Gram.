@@ -70,7 +70,6 @@ NSString* FindPathToCertificatesFile() {
       }
     }
   }
-
   return nil;
 }
 
