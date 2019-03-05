@@ -8,6 +8,11 @@
 
 import Foundation
 import UIKit
+import ActiveLabel
+
+protocol photoCardCellDelegate {
+    func likePressed(_ sender: PhotoCardCell)
+}
 
 class PhotoCardCell: UITableViewCell {
     
@@ -16,5 +21,12 @@ class PhotoCardCell: UITableViewCell {
     @IBOutlet weak var date: UILabel!
     @IBOutlet weak var photo: UIImageView!
     @IBOutlet weak var photoHeightConstraint: NSLayoutConstraint!
-    @IBOutlet weak var caption: UILabel!
+    @IBOutlet weak var caption: ActiveLabel!
+    @IBOutlet weak var btnLike: UIButton!
+    
+    var delegate: photoCardCellDelegate?
+   
+    @IBAction func likePhoto(_ sender: Any) {  // Or "unlike" if user already liked
+        delegate?.likePressed(self)
+    }
 }

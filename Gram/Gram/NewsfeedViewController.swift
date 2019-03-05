@@ -8,7 +8,7 @@
 
 import UIKit
 
-class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, UITabBarControllerDelegate {
+class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, UITabBarControllerDelegate, photoCardCellDelegate {
    
     @IBOutlet weak var searchBarPeople: UISearchBar!
     @IBOutlet weak var newsfeedTableView: UITableView!
@@ -71,6 +71,15 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
     // Allow user to take a picture using camera, then post
     @IBAction func btnCamera(_ sender: Any) {
         self.camera()
+    }
+    
+    func likePressed(_ sender: PhotoCardCell) {
+        // Toggle between "like" and "unlike" icons when pressed
+        if sender.btnLike.imageView!.image == UIImage(named: "icon_heart_empty") {
+            sender.btnLike.setImage(UIImage(named: "icon_heart_filled"), for: .normal)
+        } else {
+            sender.btnLike.setImage(UIImage(named: "icon_heart_empty"), for: .normal)
+        }
     }
     
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
@@ -194,6 +203,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                 return cell
             } else {
                 let cell = tableView.dequeueReusableCell(withIdentifier: "photoCardCell", for: indexPath) as! PhotoCardCell
+                cell.delegate = self
                 
                 // Set profile photo to be round
                 cell.profilePhoto.image = photos[indexPath.row].profilePhoto
@@ -212,7 +222,16 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                 
                 // Format caption before displaying
                 if let caption = photos[indexPath.row].caption {
-                    cell.caption.attributedText = self.formatCaption(caption, user: username)
+                    cell.caption.enabledTypes = [.hashtag, .mention]
+                    cell.caption.attributedText = NSAttributedString(string: "@\(username) " + caption)
+                    // TODO: taps on hashtags (#) and mentions (@)
+                    cell.caption.handleHashtagTap { hashtag in
+                        print("Note — Pressed hashtag: \(hashtag)")
+                    }
+                    cell.caption.handleMentionTap{ mention in
+                        print("Note — Pressed mention: \(mention)")
+                    }
+                    
                 }
                 return cell
             }
