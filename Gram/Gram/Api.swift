@@ -42,6 +42,9 @@ struct Api {
         var datePosted : String
         var caption : String
         var tags : [String]?
+        var liked : Bool
+        var likeCount : Int
+        var photoID : String
     }
     static func checkUserExists(username: String, completion: @escaping ApiCompletionURL) {
         let userNameCheck = db.collection("users").whereField("username", isEqualTo: username)
@@ -262,7 +265,10 @@ struct Api {
                                          userID: docData["UID"] ?? "",
                                          datePosted: docData["datePosted"] ?? "",
                                          caption: docData["caption"] ?? "",
-                                         tags: extractTags(text: docData["tags"] ?? ""))
+                                         tags: extractTags(text: docData["tags"] ?? ""),
+                                         liked: false,
+                                         likeCount: 0,
+                                         photoID: document.documentID)
                     
                     let start = photo.datePosted.index(photo.datePosted.startIndex, offsetBy: 22)
                     let end = photo.datePosted.index(photo.datePosted.endIndex, offsetBy: -23)
@@ -327,7 +333,10 @@ struct Api {
                                                  userID: docData["UID"] ?? "",
                                                  datePosted: docData["datePosted"] ?? "",
                                                  caption: docData["caption"] ?? "",
-                                                 tags: extractTags(text: docData["tags"] ?? ""))
+                                                 tags: extractTags(text: docData["tags"] ?? ""),
+                                                 liked: false,
+                                                 likeCount: 0,
+                                                 photoID: document.documentID)
                             
                             let start = photo.datePosted.index(photo.datePosted.startIndex, offsetBy: 22)
                             let end = photo.datePosted.index(photo.datePosted.endIndex, offsetBy: -23)
@@ -342,7 +351,7 @@ struct Api {
                         }
                     }
                     
-                    completion(photos, nil)
+                    likeInfo(photos: photos, completion: completion)
                 } else {
                     print("error type:")
                     dump(error!)
@@ -524,6 +533,39 @@ struct Api {
                 completion(nil, "Collection does not exist")
             }
             
+        }
+    }
+    
+    static func likeInfo(photos: [photoURL], completion : @escaping ApiCompletionPhotos) {
+        let group = DispatchGroup()
+        var photos = photos
+        // Upload the file to the path
+        DispatchQueue.global(qos: .userInitiated).async {
+            for i in 0 ..< photos.count {
+                group.enter()
+                likeCount(postID: photos[i].photoID, postType: "photo") { (likes, err) in
+                    if let likes = likes {
+                        photos[i].likeCount = likes
+                    }
+                    
+                    group.leave()
+                }
+                
+                group.enter()
+                isLiked(postID: photos[i].photoID, postType: "photo") { (liked, err) in
+                    if let liked = liked {
+                        photos[i].liked = liked
+                    }
+                    
+                    group.leave()
+                }
+            }
+            print("waiting for the group")
+            group.wait()
+            print("leaving for completion")
+            DispatchQueue.main.async {
+                completion(photos, nil)
+            }
         }
     }
     
