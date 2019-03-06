@@ -669,6 +669,53 @@ struct Api {
         }
     }
     
+    /**
+     Takes a string as arguement and returns photos that have a tag
+     that matches the input string
+     */
+    static func searchTags(tag: String, completion: @escaping ApiCompletionPhotos) {
+        
+        let docRef = db.collection("photos").order(by: "datePosted", descending: true).whereField("tags", arrayContains: tag)
+        docRef.getDocuments { (querySnapshot, error) in
+            if error != nil {
+                print("An error occurred retrieving all photos: \(error?.localizedDescription ?? "")")
+                completion(nil, "An error occurred retrieving all photos: \(error?.localizedDescription ?? "")")
+            }
+            
+            var photos : [photoURL] = []
+            if let documents = querySnapshot?.documents {
+                for document in documents {
+                    var docData = document.data().mapValues { String.init(describing: $0)}
+                    var photo = photoURL(URL: docData["url"] ?? "",
+                                         userID: docData["UID"] ?? "",
+                                         datePosted: docData["datePosted"] ?? "",
+                                         caption: docData["caption"] ?? "",
+                                         tags: extractTags(text: docData["tags"] ?? ""),
+                                         liked: false,
+                                         likeCount: 0,
+                                         photoID: document.documentID)
+                    
+                    let start = photo.datePosted.index(photo.datePosted.startIndex, offsetBy: 22)
+                    let end = photo.datePosted.index(photo.datePosted.endIndex, offsetBy: -23)
+                    let range = start..<end
+                    let sec = Double(String(photo.datePosted[range])) //get sec from substring
+                    let interval = TimeInterval(exactly: sec ?? 0)// time interval of sec in seconds
+                    let date = Date(timeIntervalSince1970: interval!) // get time from 1970
+                    let dateString = DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .medium) //make date nice and localized
+                    photo.datePosted = dateString
+                    
+                    photos.append(photo)
+                }
+                
+                likeInfo(photos: photos, completion: completion)
+            } else {
+                print("error type:")
+                dump(error!)
+                completion(nil, "Collection does not exist")
+            }
+        }
+    }
+    
     static func getUser(email : String, completion : @escaping ApiCompletion) {
         
     }
