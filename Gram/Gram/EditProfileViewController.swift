@@ -54,6 +54,8 @@ class EditProfileViewController: UIViewController, UIImagePickerControllerDelega
     }
     
     @IBAction func btnBack(_ sender: Any) {
+        ProfileTableViewController.profileInfo = [user!]
+        profileTableViewDelegate?.profileTableView.reloadData()  // Refresh the TableView
         self.navigationController?.popViewController(animated: true)
     }
     
@@ -75,8 +77,7 @@ class EditProfileViewController: UIViewController, UIImagePickerControllerDelega
         user?.summary = bio
         
         ProfileTableViewController.profileInfo = [user!]
-        //profileTableViewDelegate?.profile = [user!]  // ProfileTableView should get the most recent profile update
-        profileTableViewDelegate?.tableView.reloadData()  // Refresh the TableView
+        profileTableViewDelegate?.profileTableView.reloadData()  // Refresh the TableView
         
         Api.updateUser { (response, error) in
             if let _ = error {

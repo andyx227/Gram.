@@ -28,7 +28,7 @@ struct PhotoCard {
     var tags: [String]?
 }
 
-class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate, UITabBarControllerDelegate {
+class ProfileTableViewController: UIViewController, ProfileInfoCellDelegate, UITabBarControllerDelegate, UITableViewDataSource, UITableViewDelegate {
     static var profileInfo: [Api.profileInfo]?
     var profile = [Api.profileInfo]()
     var photos = [PhotoCard]()
@@ -36,6 +36,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
     var firstTimeLoadingView = false  // Set to true when user clicks on a profile to view
     var showLoadingCell = true
     var profilePhotoOfDifferentUser: UIImage?
+    @IBOutlet weak var profileTableView: UITableView!
     
     override func viewWillDisappear(_ animated: Bool) {
         profilePhotoOfDifferentUser = nil  // Reset
@@ -49,34 +50,36 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
         } else {
             profile = [user!]
         }
-        
-        // If user posted a new photo or if cache is dirty, reload table view
-        if ProfileDataCache.newPost || !ProfileDataCache.clean {
-            photos = ProfileDataCache.loadedPhotos  // New post should be savied in "loadedPhotos" array already
-            self.tableView.reloadData()
-            ProfileDataCache.newPost = false // Reset to false
-            ProfileDataCache.clean = true  // Mark cache as clean
-        }
-        else if profile.first!.userID != user!.userID {  // Viewing another user's profile
+
+        if profile.first!.userID != user!.userID {  // Viewing another user's profile
             self.photos.removeAll()
             showLoadingCell = true
-            self.tableView.reloadData()
-            self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)  // Auto scroll to top when viewing a different profile
+            profileTableView.reloadData()  // Reloading table will show loading cell
+            let firstLetterOfFirstName = String(profile.first!.firstName.first!)
+            getProfilePhotoOfDifferentUser(firstLetterOfFirstName: firstLetterOfFirstName)
+            self.profileTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)  // Auto scroll to top when viewing a different profile
         }
         else if profile.first!.userID == user!.userID {  // Viewing own profile
-            photos = ProfileDataCache.loadedPhotos  // Photos
-            self.tableView.reloadData()
+            if ProfileDataCache.loadedPhotos == nil {
+                ProfileDataCache.loadedPhotos = [PhotoCard]()  // Initialize
+                getUserPhotos()  // Fetch user's own photos for the first time from Firebase (will be saved in cache)
+            } else {
+                photos = ProfileDataCache.loadedPhotos!
+                profileTableView.reloadData()
+            }
         }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        profileTableView.delegate = self
+        profileTableView.dataSource = self
         
-        tableView.setShouldShowInfiniteScrollHandler { _ -> Bool in
+        profileTableView.setShouldShowInfiniteScrollHandler { _ -> Bool in
             return false  // Assume that all photos will be loaded on first load!
         }
         
-        tableView.addInfiniteScroll { (tableView) in
+        profileTableView.addInfiniteScroll { (tableView) in
             self.getUserPhotos()  // NOTE: This block of code will actually never run because setShouldShowInfiniteScrollHandler returns false always!
         }
         
@@ -85,12 +88,10 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
         } else {
             profile = [user!]
         }
-        
-        getUserPhotos()
     }
     
     func didChangeFollowStatus(_ sender: ProfileInfoCell) {
-        guard let _ = self.tableView.indexPath(for: sender) else { return }
+        //guard let _ = self.profileTableView.indexPath(for: sender) else { return }
         
         if sender.isFollowing {
             Api.followUser(followingID: sender.userID, following: true) { (response, error) in
@@ -116,7 +117,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             self.following = true
         }
         //self.tableView.reloadRows(at: [tappedIndexPath], with: .none)
-        self.tableView.reloadData()
+        self.profileTableView.reloadData()
     }
     
     func navigateToEditProfileViewController() {
@@ -126,7 +127,7 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
         self.navigationController?.pushViewController(editProfileVC, animated: true)
     }
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if photos.count == 0 && showLoadingCell {
             return profile.count + 1  // Plus 1 to load the "Loading Cell"
         } else {
@@ -134,11 +135,18 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
         }
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let firstLetterOfFirstName = String(profile.first!.firstName.first!)
         
         if indexPath.row == 0 {  // This cell displays the profile info
             let cell = tableView.dequeueReusableCell(withIdentifier: "profileInfoCell", for: indexPath) as! ProfileInfoCell
+
+            if showLoadingCell {  // If loading uploaded photos, also show "skeleton" for profile photo while it's being fetched from Firebase
+                DispatchQueue.main.async {
+                    cell.profilePhoto.showAnimatedGradientSkeleton()
+                    cell.profilePhoto.startAnimating()
+                }
+            }
 
             cell.delegate = self
             // Set button style
@@ -148,12 +156,12 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             // Set profile photo and make it round
             if profile[indexPath.row].userID == user!.userID {  // Grab logged-in user's profile photo from cache
                 cell.profilePhoto.image = ProfileDataCache.profilePhoto!
+                cell.profilePhoto.hideSkeleton()
+                cell.profilePhoto.stopSkeletonAnimation()
             } else {  // Grab a different user's profile photo
-                if profilePhotoOfDifferentUser == nil {
-                    getProfilePhotoOfDifferentUser(cell, indexPath, firstLetterOfFirstName)
-                } else {
-                    cell.profilePhoto.image = profilePhotoOfDifferentUser
-                }
+                cell.profilePhoto.image = profilePhotoOfDifferentUser
+                cell.profilePhoto.hideSkeleton()
+                cell.profilePhoto.stopSkeletonAnimation()
             }
             
             cell.profilePhoto.layer.cornerRadius = cell.profilePhoto.frame.height / 2
@@ -296,10 +304,8 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
         }
     }
     
-    private func getUserPhotos() {
+    func getUserPhotos() {
         self.photos.removeAll()  // Load photos from clean slate
-        //self.showLoadingCell = true
-        //self.tableView.reloadData()
         
         Api.getProfilePhotos(userID: profile.first!.userID, completion: { (photoList, error) in
             if let _ = error {
@@ -345,11 +351,9 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
                                                       tags: photo.tags))
                 }  // for-loop
                 
-                if photoList.count == 0 {
-                    self.showLoadingCell = false  // No photos so don't try loading any photos when reloading table view
-                }
-                self.tableView.reloadData()
-                self.tableView.finishInfiniteScroll()
+                self.showLoadingCell = false  // No photos so don't try loading any photos when reloading table view
+                self.profileTableView.reloadData()
+                self.profileTableView.finishInfiniteScroll()
                 
                 // Save photos in cache only for logged-in user
                 if self.profile.first!.userID == user!.userID {
@@ -366,12 +370,11 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
      *
      * On error, it will use the default profile photo (First letter of user's first name).
      */
-    private func getProfilePhotoOfDifferentUser(_ cell: ProfileInfoCell, _ indexPath: IndexPath, _ firstLetterOfFirstName: String) {
-        cell.profilePhoto.showAnimatedGradientSkeleton()
+    private func getProfilePhotoOfDifferentUser(firstLetterOfFirstName: String) {
         var execute = 0
         
         DispatchQueue.global(qos: .userInitiated).async {
-            if let profilePhotoURL = self.profile[indexPath.row].profilePhoto {
+            if let profilePhotoURL = self.profile.first!.profilePhoto {
                 if profilePhotoURL == "" {
                     self.profilePhotoOfDifferentUser = UIImage(named: firstLetterOfFirstName)
                 } else {
@@ -388,8 +391,6 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
             DispatchQueue.global(qos: .userInitiated).async {
                 while execute == 0 { continue }
                 DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                    cell.profilePhoto.hideSkeleton()
                     self.getUserPhotos()
                 }
             }
@@ -401,13 +402,16 @@ class ProfileTableViewController: UITableViewController, ProfileInfoCellDelegate
         do {
             try firebaseAuth.signOut()
             user = nil
+            
+            // Purge the cache
             ProfileTableViewController.profileInfo = nil
-            ProfileDataCache.loadedPhotos.removeAll()
+            ProfileDataCache.loadedPhotos?.removeAll()
             ProfileDataCache.userIDToProfilePhoto = nil
             ProfileDataCache.userIDToUsername = nil
             ProfileDataCache.profilePhoto = nil
             ProfileDataCache.clean = false
             ProfileDataCache.newPost = false
+            
             self.navigationController?.popToRootViewController(animated: true)
         } catch let signOutError as NSError {
             print ("Error signing out: %@", signOutError)
@@ -424,7 +428,7 @@ extension UIImage {
         if width >= height {
             ratio = CGFloat(width / height)
         } else {
-             ratio = CGFloat(height / width)
+            ratio = CGFloat(height / width)
         }
         
         return ratio

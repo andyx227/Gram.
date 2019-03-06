@@ -105,12 +105,15 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
             profileVC.profile = [user!]
             profileVC.firstTimeLoadingView = true
             
-            //if previouslySelectedTabIndex != 2 {
-                profileVC.photos = ProfileDataCache.loadedPhotos
-                profileVC.tableView.reloadData()  // Only reload table if we are coming to profile tab from another tab
-            //}
+            if ProfileDataCache.loadedPhotos == nil {
+                ProfileDataCache.loadedPhotos = [PhotoCard]()  // Initialize
+                profileVC.getUserPhotos()  // First time loading own profile, so fetch photos from Firebase (will be saved in cache)
+            } else {
+                profileVC.photos = ProfileDataCache.loadedPhotos!
+                profileVC.profileTableView.reloadData()  // Only reload table if we are coming to profile tab from another tab
+            }
             
-            profileVC.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)  // Auto scroll to top of ProfileTableView
+            profileVC.profileTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)  // Auto scroll to top of ProfileTableView
             previouslySelectedTabIndex = 2
         }
     }
