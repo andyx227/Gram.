@@ -74,11 +74,29 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func likePressed(_ sender: PhotoCardCell) {
+        guard let tappedIndexPath = self.newsfeedTableView.indexPath(for: sender) else { return }
         // Toggle between "like" and "unlike" icons when pressed
         if sender.btnLike.imageView!.image == UIImage(named: "icon_heart_empty") {
-            sender.btnLike.setImage(UIImage(named: "icon_heart_filled"), for: .normal)
+            photos[tappedIndexPath.row].liked = true
+            photos[tappedIndexPath.row].likeCount += 1
         } else {
-            sender.btnLike.setImage(UIImage(named: "icon_heart_empty"), for: .normal)
+            photos[tappedIndexPath.row].liked = false
+            photos[tappedIndexPath.row].likeCount -= 1
+        }
+        
+        Api.likePost(postID: sender.photoID, postType: "photo") { (response, error) in
+            if let _ = error {
+                print("Error — An error occurred when liking post with photoID: \(sender.photoID ?? "null")")
+            }
+            if let _ = response {
+                // Next few lines of code makes sure that when reloading, the table don't auto scroll to top
+                let lastScrollOffset = self.newsfeedTableView.contentOffset
+                self.newsfeedTableView.beginUpdates()
+                self.newsfeedTableView.reloadRows(at: [tappedIndexPath], with: .none)
+                self.newsfeedTableView.endUpdates()
+                self.newsfeedTableView.layer.removeAllAnimations()
+                self.newsfeedTableView.setContentOffset(lastScrollOffset, animated: false)
+            }
         }
     }
     
@@ -207,6 +225,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
             } else {
                 let cell = tableView.dequeueReusableCell(withIdentifier: "photoCardCell", for: indexPath) as! PhotoCardCell
                 cell.delegate = self
+                cell.photoID = photos[indexPath.row].photoID
                 
                 // Set profile photo to be round
                 cell.profilePhoto.image = photos[indexPath.row].profilePhoto
@@ -216,6 +235,24 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                 let username = photos[indexPath.row].username
                 cell.username.text = username
                 cell.date.text = photos[indexPath.row].date
+                
+                // Set up like button
+                if photos[indexPath.row].liked {
+                    cell.btnLike.setImage(UIImage(named: "icon_heart_filled"), for: .normal)
+                } else {
+                    cell.btnLike.setImage(UIImage(named: "icon_heart_empty"), for: .normal)
+                }
+                
+                // Set like count
+                let likeCount = photos[indexPath.row].likeCount
+                cell.likeCount = likeCount
+                
+                if likeCount == 0 {
+                    cell.lblNumLikes.isHidden = true  // Don't show "number of likes" label if photo has no likes
+                } else {
+                    cell.lblNumLikes.isHidden = false
+                    cell.lblNumLikes.text = likeCount > 1 ? "\(likeCount) likes" : "1 like"
+                }
                 
                 // Scale photos before displaying them in UIImageView
                 let photo = photos[indexPath.row].photo
@@ -332,6 +369,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                         date.removeSubrange(rangeToRemove.lowerBound ..< date.endIndex)
                     }
                     
+                    // Get username
                     let username = ProfileDataCache.userIDToUsername![photo.userID] ?? "A"
                     
                     // Get profile photo
@@ -343,7 +381,10 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                                                       date: date,
                                                       photo: photoToDisplay,
                                                       caption: photo.caption,
-                                                      tags: photo.tags))
+                                                      tags: photo.tags,
+                                                      liked: photo.liked,
+                                                      likeCount: photo.likeCount,
+                                                      photoID: photo.photoID))
                 }
                 
                 self.showLoadingCell = false

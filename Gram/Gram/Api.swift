@@ -690,7 +690,6 @@ struct Api {
                 if documents.count == 0 {
                     completion(false, nil)
                 } else {
-                    docRef.document(documents[0].documentID).delete()
                     completion(true, nil)
                 }
             } else {

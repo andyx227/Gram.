@@ -69,7 +69,10 @@ class PostPhotoViewController: UIViewController, UITextViewDelegate {
                                        date: formattedDate,  // Don't need to pass in date, Firebase will take care of that
                                        photo: photoToPost,
                                        caption: photoCaption.text,
-                                       tags: tags)
+                                       tags: tags,
+                                       liked: false,
+                                       likeCount: 0,
+                                       photoID: "null")  // TODO: must get photoID from Api call!
         
         if ProfileDataCache.loadedPhotos == nil {
             ProfileDataCache.loadedPhotos = [PhotoCard]()  // Initialize
