@@ -243,7 +243,7 @@ extension UIViewController {
     
     func changeStatusBarColor(forView viewController: UIViewController?) {
         if let viewController = viewController {
-            if viewController is NewsfeedViewController {
+            if viewController is NewsfeedViewController || viewController is CommunityViewController{
                 // Change status bar color to RGB value -> 247, 245, 233
                 let statusBar: UIView = UIApplication.shared.value(forKey: "statusBar") as! UIView
                 if statusBar.responds(to:#selector(setter: UIView.backgroundColor)) {

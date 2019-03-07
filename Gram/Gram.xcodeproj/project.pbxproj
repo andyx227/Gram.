@@ -20,7 +20,7 @@
 		A16A3E8B21FE5F2300E13C81 /* SignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16A3E8A21FE5F2300E13C81 /* SignUpViewController.swift */; };
 		A17D05C121FA53C300205E1D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17D05C021FA53C300205E1D /* AppDelegate.swift */; };
 		A17D05C321FA53C300205E1D /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17D05C221FA53C300205E1D /* FirstViewController.swift */; };
-		A17D05C521FA53C300205E1D /* SecondViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17D05C421FA53C300205E1D /* SecondViewController.swift */; };
+		A17D05C521FA53C300205E1D /* CommunityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17D05C421FA53C300205E1D /* CommunityViewController.swift */; };
 		A17D05C821FA53C300205E1D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A17D05C621FA53C300205E1D /* Main.storyboard */; };
 		A17D05CA21FA53C400205E1D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A17D05C921FA53C400205E1D /* Assets.xcassets */; };
 		A17D05CD21FA53C400205E1D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A17D05CB21FA53C400205E1D /* LaunchScreen.storyboard */; };
@@ -50,7 +50,7 @@
 		A17D05BD21FA53C300205E1D /* Gram.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Gram.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A17D05C021FA53C300205E1D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A17D05C221FA53C300205E1D /* FirstViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstViewController.swift; sourceTree = "<group>"; };
-		A17D05C421FA53C300205E1D /* SecondViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondViewController.swift; sourceTree = "<group>"; };
+		A17D05C421FA53C300205E1D /* CommunityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityViewController.swift; sourceTree = "<group>"; };
 		A17D05C721FA53C300205E1D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		A17D05C921FA53C400205E1D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A17D05CC21FA53C400205E1D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -100,7 +100,7 @@
 				A1DE5B1B22113BCB00CF49DE /* Custom Cells */,
 				A17D05C021FA53C300205E1D /* AppDelegate.swift */,
 				A17D05C221FA53C300205E1D /* FirstViewController.swift */,
-				A17D05C421FA53C300205E1D /* SecondViewController.swift */,
+				A17D05C421FA53C300205E1D /* CommunityViewController.swift */,
 				A17D05C621FA53C300205E1D /* Main.storyboard */,
 				A17D05C921FA53C400205E1D /* Assets.xcassets */,
 				A17D05CB21FA53C400205E1D /* LaunchScreen.storyboard */,
@@ -331,7 +331,7 @@
 				A12AC1F6220EB0B2000036E3 /* ProfileTableViewController.swift in Sources */,
 				5D73C433220B7EA900E75875 /* Api.swift in Sources */,
 				A11274DA21FD48AA00DA05D5 /* LoginViewController.swift in Sources */,
-				A17D05C521FA53C300205E1D /* SecondViewController.swift in Sources */,
+				A17D05C521FA53C300205E1D /* CommunityViewController.swift in Sources */,
 				A12AC1F8220EB20B000036E3 /* ProfileInfoCell.swift in Sources */,
 				A12AC1FC220FA3A1000036E3 /* NewsfeedViewController.swift in Sources */,
 				A1D621AA221F4AD000E7B68B /* EditProfileViewController.swift in Sources */,
