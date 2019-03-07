@@ -26,9 +26,13 @@ struct PhotoCard {
     var photo: UIImage
     var caption: String?
     var tags: [String]?
+    var liked: Bool
+    var likeCount: Int
+    var photoID: String
 }
 
-class ProfileTableViewController: UIViewController, ProfileInfoCellDelegate, UITabBarControllerDelegate, UITableViewDataSource, UITableViewDelegate {
+class ProfileTableViewController: UIViewController, ProfileInfoCellDelegate, UITabBarControllerDelegate,
+UITableViewDataSource, UITableViewDelegate, photoCardCellDelegate {
     static var profileInfo: [Api.profileInfo]?
     var profile = [Api.profileInfo]()
     var photos = [PhotoCard]()
@@ -90,6 +94,33 @@ class ProfileTableViewController: UIViewController, ProfileInfoCellDelegate, UIT
         }
     }
     
+    func likePressed(_ sender: PhotoCardCell) {
+        guard let tappedIndexPath = self.profileTableView.indexPath(for: sender) else { return }
+        // Toggle between "like" and "unlike" icons when pressed
+        if sender.btnLike.imageView!.image == UIImage(named: "icon_heart_empty") {
+            photos[tappedIndexPath.row - 1].liked = true
+            photos[tappedIndexPath.row - 1].likeCount += 1
+        } else {
+            photos[tappedIndexPath.row - 1].liked = false
+            photos[tappedIndexPath.row - 1].likeCount -= 1
+        }
+        
+        Api.likePost(postID: sender.photoID, postType: "photo") { (response, error) in
+            if let _ = error {
+                print("Error — An error occurred when liking post with photoID: \(sender.photoID ?? "null")")
+            }
+            if let _ = response {
+                // Next few lines of code makes sure that when reloading, the table don't auto scroll to top
+                let lastScrollOffset = self.profileTableView.contentOffset
+                self.profileTableView.beginUpdates()
+                self.profileTableView.reloadRows(at: [tappedIndexPath], with: .none)
+                self.profileTableView.endUpdates()
+                self.profileTableView.layer.removeAllAnimations()
+                self.profileTableView.setContentOffset(lastScrollOffset, animated: false)
+            }
+        }
+    }
+    
     func didChangeFollowStatus(_ sender: ProfileInfoCell) {
         //guard let _ = self.profileTableView.indexPath(for: sender) else { return }
         
@@ -100,6 +131,7 @@ class ProfileTableViewController: UIViewController, ProfileInfoCellDelegate, UIT
                 }
                 if let _ = response {
                     ProfileDataCache.userIDToUsername?.removeValue(forKey: sender.userID)  // Remove from cache
+                    ProfileDataCache.userIDToProfilePhoto?.removeValue(forKey: sender.userID)  // Remove from cache
                     print("Successfully UNFOLLOWED user with id: \(sender.userID).")
                 }
             }
@@ -111,6 +143,7 @@ class ProfileTableViewController: UIViewController, ProfileInfoCellDelegate, UIT
                 }
                 if let _ = response {
                     ProfileDataCache.userIDToUsername?[sender.userID] = sender.username.text?.replacingOccurrences(of: "@", with: "")
+                    ProfileDataCache.userIDToProfilePhoto?[sender.userID] = sender.profilePhoto.image!
                     print("Successfully FOLLOWED user with id: \(sender.userID).")
                 }
             }
@@ -210,6 +243,8 @@ class ProfileTableViewController: UIViewController, ProfileInfoCellDelegate, UIT
             return cell
         } else {  // The remaining cells are the "PhotoCard" cells
             let cell = tableView.dequeueReusableCell(withIdentifier: "photoCardCell", for: indexPath) as! PhotoCardCell
+            cell.delegate = self
+            cell.photoID = photos[indexPath.row - 1].photoID
             
             if profile.first!.userID == user!.userID {  // Current user
                 if let photo = ProfileDataCache.profilePhoto {
@@ -228,6 +263,21 @@ class ProfileTableViewController: UIViewController, ProfileInfoCellDelegate, UIT
             let username = profile.first!.username  // TODO: check username
             cell.username.text = username
             cell.date.text = photos[indexPath.row - 1].date
+            
+            // Set up like button and number of likes
+            if photos[indexPath.row - 1].liked {
+                cell.btnLike.setImage(UIImage(named: "icon_heart_filled"), for: .normal)
+            } else {
+                cell.btnLike.setImage(UIImage(named: "icon_heart_empty"), for: .normal)
+            }
+            
+            let likeCount = photos[indexPath.row - 1].likeCount
+            if likeCount == 0 {
+                cell.lblNumLikes.isHidden = true  // Don't show "number of likes" label if photo has no likes
+            } else {
+                cell.lblNumLikes.isHidden = false
+                cell.lblNumLikes.text = likeCount > 1 ? "\(likeCount) likes" : "1 like"
+            }
             
             // Scale photos before displaying them in UIImageView
             let photo = photos[indexPath.row - 1].photo
@@ -348,7 +398,10 @@ class ProfileTableViewController: UIViewController, ProfileInfoCellDelegate, UIT
                                                       date: date,
                                                       photo: photoToDisplay,
                                                       caption: photo.caption,
-                                                      tags: photo.tags))
+                                                      tags: photo.tags,
+                                                      liked: photo.liked,
+                                                      likeCount: photo.likeCount,
+                                                      photoID: photo.photoID))
                 }  // for-loop
                 
                 self.showLoadingCell = false  // No photos so don't try loading any photos when reloading table view
@@ -405,7 +458,7 @@ class ProfileTableViewController: UIViewController, ProfileInfoCellDelegate, UIT
             
             // Purge the cache
             ProfileTableViewController.profileInfo = nil
-            ProfileDataCache.loadedPhotos?.removeAll()
+            ProfileDataCache.loadedPhotos = nil
             ProfileDataCache.userIDToProfilePhoto = nil
             ProfileDataCache.userIDToUsername = nil
             ProfileDataCache.profilePhoto = nil
