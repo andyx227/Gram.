@@ -46,6 +46,15 @@ struct Api {
         var likeCount : Int
         var photoID : String
     }
+    
+    struct comment {
+        var datePosted : String
+        var userID : String
+        var message : String
+        var photoID : String
+        var commentID : String
+    }
+    
     static func checkUserExists(username: String, completion: @escaping ApiCompletionURL) {
         let userNameCheck = db.collection("users").whereField("username", isEqualTo: username)
         userNameCheck.getDocuments { (querySnapshot, err) in
@@ -248,6 +257,62 @@ struct Api {
         }
     }
     
+    static func postComment(message: String, pid: String, completion: @escaping ApiCompletionURL) {
+        guard let user = user else {
+            print("Global user not filled")
+            completion(nil, "Global user not filled")
+            return
+        }
+        
+        db.collection("comments").addDocument(data: [
+            "UID" : user.userID,
+            "message" : message,
+            "datePosted" : Timestamp(date: Date()),
+            "PID" : pid]) { err in
+                if let err = err {
+                    print("Error creating comment document: \(err)")
+                    completion(nil, err as? String);
+                }
+        }
+        
+        completion("success", nil)
+    }
+    
+    static func getComments(pid: String, completion: @escaping ApiCompletionComments) {
+        let docRef = db.collection("comments")
+        let query = docRef.whereField("PID", isEqualTo: pid).order(by: "datePosted", descending: true)
+        
+        query.getDocuments { (querySnapshot, error) in
+            if let documents = querySnapshot?.documents {
+                var comments : [comment] = []
+                
+                for document in documents {
+                    var docData = document.data().mapValues { String.init(describing: $0)}
+                    var comment = self.comment.init(datePosted: docData["datePosted"] ?? "",
+                                                    userID: docData["UID"] ?? "",
+                                                    message: docData["message"] ?? "",
+                                                    photoID: docData["PID"] ?? "",
+                                                    commentID: document.documentID)
+                    
+                    let start = comment.datePosted.index(comment.datePosted.startIndex, offsetBy: 22)
+                    let end = comment.datePosted.index(comment.datePosted.endIndex, offsetBy: -23)
+                    let range = start..<end
+                    let sec = Double(String(comment.datePosted[range])) //get sec from substring
+                    let interval = TimeInterval(exactly: sec ?? 0)// time interval of sec in seconds
+                    let date = Date(timeIntervalSince1970: interval!) // get time from 1970
+                    let dateString = DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .medium) //make date nice and localized
+                    comment.datePosted = dateString
+                    
+                    comments.append(comment)
+                }
+                
+                completion(comments, nil)
+            } else if error != nil{
+                completion(nil, "Error occurred retrieving comments: \(error.debugDescription)")
+            }
+        }
+    }
+    
     /**
     Return the photos of the current logged in user in reverse chronological order
     */
@@ -257,7 +322,6 @@ struct Api {
         
         query.getDocuments { (querySnapshot, error) in
             if let documents = querySnapshot?.documents {
-                dump(documents)
                 var photos : [photoURL] = []
                 for document in documents {
                     var docData = document.data().mapValues { String.init(describing: $0)}
@@ -626,7 +690,6 @@ struct Api {
                 if documents.count == 0 {
                     completion(false, nil)
                 } else {
-                    docRef.document(documents[0].documentID).delete()
                     completion(true, nil)
                 }
             } else {
@@ -729,5 +792,6 @@ struct Api {
     typealias ApiCompletionInt = ((_ response: Int?, _ error: String?) -> Void)
     typealias ApiCompletionPhotos = ((_ response: [photoURL]?, _ error: String?) -> Void)
     typealias ApiCompletionBool = ((_ response: Bool?, _ error: String?) -> Void)
+    typealias ApiCompletionComments = ((_ response: [comment]?, _ error: String?) -> Void)
 }
 
