@@ -346,7 +346,7 @@ struct Api {
                     photos.append(photo)
                 }
                 
-                completion(photos, nil)
+                likeInfo(photos: photos, completion: completion)
             } else if error != nil{
                 completion(nil, "Error occurred retrieving profile photos: \(error.debugDescription)")
             }
