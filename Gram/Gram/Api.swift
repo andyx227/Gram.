@@ -251,9 +251,21 @@ struct Api {
                             print("Error creating photo document: \(err)")
                             completion(nil, err as? String);
                         }
+                        let docRef = db.collection("photos")
+                        let query = docRef.whereField("url", isEqualTo: photoURL?.absoluteString ?? "")
+                        query.getDocuments(completion: { (querySnapshot, error) in
+                            guard let snapshot = querySnapshot else {
+                                print("Error retrieving pid after photo post: \(error.debugDescription)")
+                                completion(nil, "Error retrieving pid after photo post: \(error.debugDescription)")
+                                return
+                            }
+                            if snapshot.documents.count == 1 {
+                                completion(snapshot.documents[0].documentID, nil)
+                            } else {
+                                print("0 or more than 1 pid found for image url: \(photoURL?.absoluteString ?? "")")
+                            }
+                        })
                 }
-                
-                completion(photoURL?.absoluteString, nil)
             }
         }
     }
