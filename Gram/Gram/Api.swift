@@ -44,6 +44,7 @@ struct Api {
         var tags : [String]?
         var liked : Bool
         var likeCount : Int
+        var commentCount : Int
         var photoID : String
     }
     
@@ -332,6 +333,7 @@ struct Api {
                                          tags: extractTags(text: docData["tags"] ?? ""),
                                          liked: false,
                                          likeCount: 0,
+                                         commentCount: 0,
                                          photoID: document.documentID)
                     
                     let start = photo.datePosted.index(photo.datePosted.startIndex, offsetBy: 22)
@@ -400,6 +402,7 @@ struct Api {
                                                  tags: extractTags(text: docData["tags"] ?? ""),
                                                  liked: false,
                                                  likeCount: 0,
+                                                 commentCount: 0,
                                                  photoID: document.documentID)
                             
                             let start = photo.datePosted.index(photo.datePosted.startIndex, offsetBy: 22)
@@ -616,6 +619,15 @@ struct Api {
                 }
                 
                 group.enter()
+                commentCount(pid: photos[i].photoID) { (comments, err) in
+                    if let comments = comments {
+                        photos[i].commentCount = comments
+                    }
+                    
+                    group.leave()
+                }
+                
+                group.enter()
                 isLiked(postID: photos[i].photoID, postType: "photo") { (liked, err) in
                     if let liked = liked {
                         photos[i].liked = liked
@@ -659,7 +671,20 @@ struct Api {
         }
     }
     
-    
+    static func commentCount(pid: String, completion: @escaping ApiCompletionInt) {
+        let docRef = db.collection("comments")
+        let query = docRef.whereField("PID", isEqualTo: pid)
+        
+        query.getDocuments { (querySnapshot, error) in
+            if let documents = querySnapshot?.documents {
+                completion(documents.count, nil)
+            } else {
+                print("error type:")
+                dump(error!)
+                completion(nil, "Collection does not exist")
+            }
+        }
+    }
     
     /**
      Gets the total likes on a post, expecting the post id and post type (a string) as argument
@@ -756,6 +781,7 @@ struct Api {
                                          tags: extractTags(text: docData["tags"] ?? ""),
                                          liked: false,
                                          likeCount: 0,
+                                         commentCount: 0,
                                          photoID: document.documentID)
                     
                     let start = photo.datePosted.index(photo.datePosted.startIndex, offsetBy: 22)
