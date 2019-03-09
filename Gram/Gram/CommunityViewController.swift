@@ -8,13 +8,23 @@
 
 import UIKit
 
-class CommunityViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
+class CommunityViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, photoCardCellDelegate {
     
     @IBOutlet weak var viewNoPhotos: UILabel!
     @IBOutlet weak var communityTableView: UITableView!
     @IBOutlet weak var communitySearchBar: UISearchBar!
     var photos = [PhotoCard]()
     var showLoadingCell = true
+    var pullToRefresh: PullToRefresh?
+    var tagSearched = ""
+    
+    var tableViewRefreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.backgroundColor = .white
+        refreshControl.tintColor = .clear
+        refreshControl.addTarget(self, action: #selector(refreshCommunityFeed), for: .valueChanged)
+        return refreshControl
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,11 +36,30 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
         communitySearchBar.delegate = self
         communitySearchBar.autocapitalizationType = .none
         
+        // Set up RefreshControl for NewsfeedTableView
+        communityTableView.refreshControl = tableViewRefreshControl
+        getRefereshView()
+        
         viewNoPhotos.isHidden = false  // Initially, show "no photos" message
     }
     
     override func viewWillAppear(_ animated: Bool) {
         changeStatusBarColor(forView: self)
+    }
+    
+    func getRefereshView() {
+        if let objOfRefreshView = Bundle.main.loadNibNamed("PullToRefreshView", owner: self, options: nil)?.first as? PullToRefresh {
+            pullToRefresh = objOfRefreshView
+            pullToRefresh!.frame = tableViewRefreshControl.frame
+            tableViewRefreshControl.addSubview(pullToRefresh!)
+        }
+    }
+    
+    @objc func refreshCommunityFeed() {
+        if let pullToRefresh = pullToRefresh {
+            pullToRefresh.startAnimation()
+            getCommunityPhotos(tagSearched, true)
+        }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -54,6 +83,8 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
             return cell
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "photoCardCell", for: indexPath) as! PhotoCardCell
+            cell.delegate = self
+            cell.photoID = photos[indexPath.row].photoID
             cell.username.text = photos[indexPath.row].username
             cell.date.text = photos[indexPath.row].date
             if let caption = photos[indexPath.row].caption {
@@ -93,6 +124,33 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
+    func likePressed(_ sender: PhotoCardCell) {
+        guard let tappedIndexPath = self.communityTableView.indexPath(for: sender) else { return }
+        // Toggle between "like" and "unlike" icons when pressed
+        if sender.btnLike.imageView!.image == UIImage(named: "icon_heart_empty") {
+            photos[tappedIndexPath.row].liked = true
+            photos[tappedIndexPath.row].likeCount += 1
+        } else {
+            photos[tappedIndexPath.row].liked = false
+            photos[tappedIndexPath.row].likeCount -= 1
+        }
+        
+        Api.likePost(postID: sender.photoID, postType: "photo") { (response, error) in
+            if let _ = error {
+                print("Error — An error occurred when liking post with photoID: \(sender.photoID ?? "null")")
+            }
+            if let _ = response {
+                // Next few lines of code makes sure that when reloading, the table don't auto scroll to top
+                let lastScrollOffset = self.communityTableView.contentOffset
+                self.communityTableView.beginUpdates()
+                self.communityTableView.reloadRows(at: [tappedIndexPath], with: .none)
+                self.communityTableView.endUpdates()
+                self.communityTableView.layer.removeAllAnimations()
+                self.communityTableView.setContentOffset(lastScrollOffset, animated: false)
+            }
+        }
+    }
+    
     @IBAction func searchCommunity(_ sender: Any) {
         var searchText = communitySearchBar.text ?? ""
         
@@ -106,6 +164,7 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
         
         if searchText.first! == "#" { searchText.removeFirst() }  // Remove hashtag symbol
         searchText = searchText.lowercased()  // No capital letters!
+        tagSearched = searchText  // Save the tag the user is searching for
         
         communityTableView.isHidden = false
         viewNoPhotos.isHidden = true
@@ -114,7 +173,7 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
         self.communityTableView.reloadData()  // Show loading cell by reloading table
         
         // Search for community photos
-        getCommunityPhotos(searchText)
+        getCommunityPhotos(searchText, false)
     }
     
     // User clicked "Search" button on keyboard; has same behavior as clicking the "checkmark" button
@@ -131,6 +190,7 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
         
         if searchText.first! == "#" { searchText.removeFirst() }  // Remove hashtag symbol
         searchText = searchText.lowercased()  // No capital letters!
+        tagSearched = searchText  // Save the tag the user is searching for
         
         communityTableView.isHidden = false
         viewNoPhotos.isHidden = true
@@ -139,11 +199,13 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
         self.communityTableView.reloadData()  // Show loading cell by reloading table
         
         // Search for community photos
-        getCommunityPhotos(searchText)
+        getCommunityPhotos(searchText, false)
         communitySearchBar.resignFirstResponder()  // Hide the keyboard
     }
 
-    func getCommunityPhotos(_ tag: String) {
+    func getCommunityPhotos(_ tag: String, _ pulledDownToRefresh: Bool) {
+        if tag.isEmpty { return }
+        
         Api.searchTags(tag: tag) { (photosInCommunity, error) in
             if let _ = error {
                 print("Error — Error occurred when retrieving photos by hashtag: \(tag)")
@@ -242,6 +304,9 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
                     self.showLoadingCell = false
                     DispatchQueue.main.async {
                         self.communityTableView.reloadData()
+                        if pulledDownToRefresh {
+                            self.tableViewRefreshControl.endRefreshing()
+                        }
                     }
                 }
             }
