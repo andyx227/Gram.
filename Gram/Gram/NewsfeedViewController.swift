@@ -103,7 +103,6 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
         if viewController is NewsfeedViewController {
             let newsfeedVC = viewController as! NewsfeedViewController
-            changeStatusBarColor(forView: newsfeedVC)
             newsfeedVC.searchBarPeople.text = ""
             newsfeedVC.searchPeopleTableView.isHidden = true
             newsfeedVC.newsfeedTableView.isHidden = false
@@ -169,6 +168,10 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                 self.newsfeedTableView.isHidden = false  // Show Newsfeed
             }
         }
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {

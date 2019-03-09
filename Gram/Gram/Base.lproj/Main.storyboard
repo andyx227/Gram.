@@ -278,7 +278,7 @@
                                     <searchBar contentMode="redraw" searchBarStyle="minimal" placeholder="Search People" translatesAutoresizingMaskIntoConstraints="NO" id="mvz-xl-Eum">
                                         <rect key="frame" x="48" y="4" width="284" height="56"/>
                                         <color key="backgroundColor" red="0.96862745100000003" green="0.96078431369999995" blue="0.91372549020000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" smartDashesType="no"/>
+                                        <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" returnKeyType="done" smartDashesType="no"/>
                                         <scopeButtonTitles>
                                             <string>Title</string>
                                             <string>Title</string>
@@ -1120,7 +1120,7 @@
                                     <constraint firstAttribute="trailing" secondItem="0kK-mF-7On" secondAttribute="trailing" constant="8" id="zlB-87-UqY"/>
                                 </constraints>
                             </view>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="1hH-cq-f8m">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="1hH-cq-f8m">
                                 <rect key="frame" x="0.0" y="84" width="375" height="534"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
@@ -1214,6 +1214,15 @@
                                                             </constraints>
                                                             <state key="normal" image="icon_star_empty"/>
                                                         </button>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1 like" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="U00-yP-hJb">
+                                                            <rect key="frame" x="38" y="7" width="108" height="15"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="108" id="fUW-sw-z4P"/>
+                                                            </constraints>
+                                                            <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="12"/>
+                                                            <nil key="textColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
                                                     </subviews>
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <constraints>
@@ -1224,9 +1233,13 @@
                                                         <constraint firstAttribute="height" constant="30" id="B7z-hH-8UC"/>
                                                         <constraint firstItem="BJi-N4-kex" firstAttribute="leading" secondItem="upz-VL-dbj" secondAttribute="trailing" constant="9" id="GdB-Zn-ywK"/>
                                                         <constraint firstItem="oLC-7F-0Ke" firstAttribute="centerY" secondItem="pQn-Sd-EqV" secondAttribute="centerY" id="QWd-od-O8u"/>
+                                                        <constraint firstItem="U00-yP-hJb" firstAttribute="top" secondItem="pQn-Sd-EqV" secondAttribute="top" constant="7" id="USB-tJ-fMs"/>
                                                         <constraint firstItem="BJi-N4-kex" firstAttribute="centerY" secondItem="pQn-Sd-EqV" secondAttribute="centerY" id="V1h-ff-Ear"/>
                                                         <constraint firstItem="o1X-km-8wb" firstAttribute="centerY" secondItem="pQn-Sd-EqV" secondAttribute="centerY" id="VGp-hI-b05"/>
                                                         <constraint firstAttribute="trailing" secondItem="oLC-7F-0Ke" secondAttribute="trailing" constant="8" id="XGe-vo-xWl"/>
+                                                        <constraint firstAttribute="bottom" secondItem="U00-yP-hJb" secondAttribute="bottom" constant="8" id="XPK-Il-fln"/>
+                                                        <constraint firstItem="upz-VL-dbj" firstAttribute="leading" secondItem="U00-yP-hJb" secondAttribute="trailing" constant="141" id="jTW-EV-ayo"/>
+                                                        <constraint firstItem="U00-yP-hJb" firstAttribute="leading" secondItem="o1X-km-8wb" secondAttribute="trailing" constant="8" id="m8y-5a-qzM"/>
                                                         <constraint firstItem="BJi-N4-kex" firstAttribute="leading" secondItem="upz-VL-dbj" secondAttribute="trailing" constant="9" id="qMO-2Q-06Z"/>
                                                     </constraints>
                                                 </view>
@@ -1267,6 +1280,7 @@
                                             <outlet property="btnLike" destination="o1X-km-8wb" id="Zib-og-Tsl"/>
                                             <outlet property="caption" destination="bmS-R5-G4n" id="1hS-6V-oRj"/>
                                             <outlet property="date" destination="nA4-HQ-Nbm" id="ZfE-5h-2Af"/>
+                                            <outlet property="lblNumLikes" destination="U00-yP-hJb" id="qAl-Ti-dhN"/>
                                             <outlet property="photo" destination="i92-k0-2Mo" id="fQl-dv-3uR"/>
                                             <outlet property="photoHeightConstraint" destination="XvJ-1X-zPl" id="6WQ-Fz-Ck1"/>
                                             <outlet property="profilePhoto" destination="UUu-c2-wXV" id="DP1-Qt-XyX"/>
