@@ -1187,7 +1187,7 @@
                                                             </constraints>
                                                             <state key="normal" image="icon_heart_empty"/>
                                                             <connections>
-                                                                <action selector="likePhoto:" destination="VZe-bq-WdX" eventType="touchUpInside" id="TFV-cn-I7z"/>
+                                                                <action selector="likePhoto:" destination="VZe-bq-WdX" eventType="touchUpInside" id="YZK-Eh-9zN"/>
                                                             </connections>
                                                         </button>
                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="upz-VL-dbj">

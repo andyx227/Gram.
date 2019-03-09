@@ -171,6 +171,7 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
         showLoadingCell = true
         photos.removeAll()
         self.communityTableView.reloadData()  // Show loading cell by reloading table
+        self.communityTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)  // Auto scroll to top of CommunityTableVIew
         
         // Search for community photos
         getCommunityPhotos(searchText, false)
@@ -197,6 +198,7 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
         showLoadingCell = true
         photos.removeAll()
         self.communityTableView.reloadData()  // Show loading cell by reloading table
+        self.communityTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)  // Auto scroll to top of CommunityTableVIew
         
         // Search for community photos
         getCommunityPhotos(searchText, false)
