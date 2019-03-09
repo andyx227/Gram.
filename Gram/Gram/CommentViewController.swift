@@ -21,6 +21,7 @@ class CommentViewController: UIViewController, UITextViewDelegate, UITableViewDe
     @IBOutlet weak var commentTableView: UITableView!
     @IBOutlet weak var commentTextField: MultilineTextField!
     @IBOutlet weak var tableViewHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var profilePhotoCurrentUser: UIImageView!
     var comments = [Comment]()
     var photoID: String?  // Photo id of photo to show comments for
     var showLoadingCell = true
@@ -46,8 +47,11 @@ class CommentViewController: UIViewController, UITextViewDelegate, UITableViewDe
     override func viewDidLoad() {
         super.viewDidLoad()
         changeStatusBarColor(forView: self)
+        hideKeyboard()
         commentTableView.delegate = self
         commentTableView.dataSource = self
+        
+        profilePhotoCurrentUser.image = ProfileDataCache.profilePhoto!
         
         if let photoID = photoID {
             getComments(photoID)

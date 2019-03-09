@@ -673,6 +673,7 @@
                     <connections>
                         <outlet property="commentTableView" destination="22g-CY-mSL" id="1eZ-Eq-BYt"/>
                         <outlet property="commentTextField" destination="YOH-te-kvg" id="99o-gn-TtB"/>
+                        <outlet property="profilePhotoCurrentUser" destination="kyY-vx-mae" id="DcF-C7-xEq"/>
                         <outlet property="tableViewHeightConstraint" destination="HEp-bB-Zci" id="IdQ-kM-FUe"/>
                     </connections>
                 </viewController>
