@@ -12,6 +12,7 @@ import ActiveLabel
 
 protocol photoCardCellDelegate {
     func likePressed(_ sender: PhotoCardCell)
+    func commentPressed(_ sender: PhotoCardCell)
 }
 
 class PhotoCardCell: UITableViewCell {
@@ -31,5 +32,9 @@ class PhotoCardCell: UITableViewCell {
    
     @IBAction func likePhoto(_ sender: Any) {  // Or "unlike" if user already liked
         delegate?.likePressed(self)
+    }
+    
+    @IBAction func commentPhoto(_ sender: Any) {
+        delegate?.commentPressed(self)
     }
 }

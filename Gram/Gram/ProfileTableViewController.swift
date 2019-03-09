@@ -121,6 +121,13 @@ UITableViewDataSource, UITableViewDelegate, photoCardCellDelegate {
         }
     }
     
+    func commentPressed(_ sender: PhotoCardCell) {  // User pressed comment button; navigate them to CommentVC
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let commentVC = storyboard.instantiateViewController(withIdentifier: "commentViewController") as! CommentViewController
+        commentVC.photoID = sender.photoID  // Pass the photoID to CommentViewController
+        self.navigationController?.pushViewController(commentVC, animated: true)
+    }
+    
     func didChangeFollowStatus(_ sender: ProfileInfoCell) {
         //guard let _ = self.profileTableView.indexPath(for: sender) else { return }
         

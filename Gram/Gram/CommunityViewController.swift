@@ -151,6 +151,13 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
+    func commentPressed(_ sender: PhotoCardCell) {  // User pressed comment button; navigate them to CommentVC
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let commentVC = storyboard.instantiateViewController(withIdentifier: "commentViewController") as! CommentViewController
+        commentVC.photoID = sender.photoID  // Pass the photoID to CommentViewController
+        self.navigationController?.pushViewController(commentVC, animated: true)
+    }
+    
     @IBAction func searchCommunity(_ sender: Any) {
         var searchText = communitySearchBar.text ?? ""
         

@@ -100,6 +100,13 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
         }
     }
     
+    func commentPressed(_ sender: PhotoCardCell) {  // User pressed comment button; navigate them to CommentVC
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let commentVC = storyboard.instantiateViewController(withIdentifier: "commentViewController") as! CommentViewController
+        commentVC.photoID = sender.photoID  // Pass the photoID to CommentViewController
+        self.navigationController?.pushViewController(commentVC, animated: true)
+    }
+    
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
         if viewController is NewsfeedViewController {
             let newsfeedVC = viewController as! NewsfeedViewController
