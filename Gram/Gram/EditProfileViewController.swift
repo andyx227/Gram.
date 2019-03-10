@@ -102,21 +102,50 @@ class EditProfileViewController: UIViewController, UIImagePickerControllerDelega
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        if let imgURL = (info[UIImagePickerController.InfoKey.imageURL] as? URL) {
-            print("img url: ", imgURL)
-            Api.uploadProfilePhoto(path: imgURL) { (response, error) in
-                if let _ = error {
-                    self.presentAlertPopup(withTitle: "An error has occurred",
-                                           withMessage: "Could not successfully update your profile photo. Please try again.")
-                    return
+        let newProfilePhoto = info[UIImagePickerController.InfoKey.originalImage] as! UIImage
+        
+        // Compress profile photo
+        guard let profilePhotoData = newProfilePhoto.jpegData(compressionQuality: 0.05) else {
+            self.presentAlertPopup(withTitle: "An error has occurred",
+                                   withMessage: "Could not successfully update your profile photo. Please try again.")
+            return
+        }
+        guard let compressedProfilePhoto = UIImage(data: profilePhotoData) else {
+            self.presentAlertPopup(withTitle: "An error has occurred",
+                                   withMessage: "Could not successfully update your profile photo. Please try again.")
+            return
+        }
+        
+        // Save compressed profile photo to temp dir and get the url
+        guard let url = compressedProfilePhoto.saveToTempDir(profilePhotoData) else {
+            self.presentAlertPopup(withTitle: "An error has occurred",
+                                   withMessage: "Could not successfully update your profile photo. Please try again.")
+            return
+        }
+        
+        // Save compressed image to Firebase
+        Api.uploadProfilePhoto(path: url) { (response, error) in
+            if let _ = error {
+                self.presentAlertPopup(withTitle: "An error has occurred",
+                                       withMessage: "Could not successfully update your profile photo. Please try again.")
+                return
+            }
+            if let _ = response {
+                // Delete the compressed image from temp dir
+                do {
+                    let fm = FileManager()
+                    try fm.removeItem(at: url)
+                } catch {
+                    print("Error — Could not delete compressed image from user's phone!")
                 }
             }
-           
-            ProfileDataCache.profilePhoto = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
-            ProfileDataCache.clean = false  // Mark cache as dirty since we just updated profile photo
-            profilePhoto.showAnimatedGradientSkeleton()
-            self.dismiss(animated: true, completion: nil)
         }
+        
+       
+        ProfileDataCache.profilePhoto = compressedProfilePhoto
+        profilePhoto.showAnimatedGradientSkeleton()
+        self.dismiss(animated: true, completion: nil)
+        
     }
 }
 

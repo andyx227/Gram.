@@ -8,12 +8,15 @@
 
 import UIKit
 import MultilineTextField
+import NVActivityIndicatorView
 
 class PostPhotoViewController: UIViewController, UITextViewDelegate {
     
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var caption: MultilineTextField!
     @IBOutlet weak var photoHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var loadingIndicator: NVActivityIndicatorView!
+    @IBOutlet weak var postButton: UIButton!
     var photo: UIImage?
     var photoUrl: URL?
     var tags: [String]?
@@ -43,7 +46,7 @@ class PostPhotoViewController: UIViewController, UITextViewDelegate {
     }
     
     @IBAction func btnPost(_ sender: Any) {
-        guard let imgUrl = photoUrl else {
+        guard let _ = photoUrl else {
             presentAlertPopup(withTitle: "Something went wrong!", withMessage: "Could not upload your photo. Please try again.")
             return
         }
@@ -52,6 +55,40 @@ class PostPhotoViewController: UIViewController, UITextViewDelegate {
             return
         }
         guard let photoCaption = caption else {
+            presentAlertPopup(withTitle: "Something went wrong!", withMessage: "Could not upload your photo. Please try again.")
+            return
+        }
+        
+        loadingIndicator.isHidden = false // Show loading indicator
+        loadingIndicator.startAnimating()
+        postButton.isEnabled = false  // Don't allow user to press "Post" button again
+        postButton.alpha = 0.5
+        
+        let compressedPhoto = photoToPost.jpegData(compressionQuality: 0.1)  // Compress photo
+        guard let compressedPhotoData = compressedPhoto else {
+            loadingIndicator.isHidden = true // HIde loading indicator
+            loadingIndicator.stopAnimating()
+            postButton.isEnabled = true  // Allow user to press "Post" button again
+            postButton.alpha = 1.0
+            presentAlertPopup(withTitle: "Something went wrong!", withMessage: "Could not upload your photo. Please try again.")
+            return
+        }
+        
+        guard let compressedPhotoToPost = UIImage(data: compressedPhotoData) else {
+            loadingIndicator.isHidden = true // HIde loading indicator
+            loadingIndicator.stopAnimating()
+            postButton.isEnabled = true  // Allow user to press "Post" button again
+            postButton.alpha = 1.0
+            presentAlertPopup(withTitle: "Something went wrong!", withMessage: "Could not upload your photo. Please try again.")
+            return
+        }
+        
+        // Get a temp url to compressed photo
+        guard let urlWhereCompressedImageIsSaved = compressedPhotoToPost.saveToTempDir(compressedPhotoData) else {
+            loadingIndicator.isHidden = true // HIde loading indicator
+            loadingIndicator.stopAnimating()
+            postButton.isEnabled = true  // Allow user to press "Post" button again
+            postButton.alpha = 1.0
             presentAlertPopup(withTitle: "Something went wrong!", withMessage: "Could not upload your photo. Please try again.")
             return
         }
@@ -67,65 +104,37 @@ class PostPhotoViewController: UIViewController, UITextViewDelegate {
         let photoCard = PhotoCard.init(profilePhoto: UIImage(named: "A")!,  // Won't be using profilePhoto so this won't matter
                                        username: user!.username,
                                        date: formattedDate,  // Don't need to pass in date, Firebase will take care of that
-                                       photo: photoToPost,
+                                       photo: compressedPhotoToPost,
                                        caption: photoCaption.text,
                                        tags: tags,
                                        liked: false,
                                        likeCount: 0,
-                                       photoID: "null")  // TODO: must get photoID from Api call!
+                                       photoID: "null")  // photoID will be updated from Api call down below!
         
-        if ProfileDataCache.loadedPhotos == nil {
-            ProfileDataCache.loadedPhotos = [PhotoCard]()  // Initialize
-        }
-        ProfileDataCache.loadedPhotos!.insert(photoCard, at: 0)  // Prepend PhotoCard to array saved in cache
-        ProfileDataCache.newPost = true
-        
-        Api.postPhoto(path: imgUrl, photo: photoCard) { (url, error) in
+        Api.postPhoto(path: urlWhereCompressedImageIsSaved, photo: photoCard) { (photoID, error) in
             if let _ = error {
                 self.presentAlertPopup(withTitle: "Something went wrong!", withMessage: "Could not upload your photo. Please try again.")
-                return
+            }
+            if let photoID = photoID {
+                var uploadedPhotoCard = photoCard
+                uploadedPhotoCard.photoID = photoID  // Save the photo ID
+                if ProfileDataCache.photosNoYetFetched == false {  // Photos have been fetched and saved in cache, so prepend uploaded photo into the "loadedPhotos" array in cache
+                    ProfileDataCache.loadedPhotos!.insert(uploadedPhotoCard, at: 0)  // Prepend PhotoCard to array saved in cache
+                }
+            }
+            
+            self.navigationController?.popViewController(animated: true)
+            // Finally, remove compressed image from user's phone
+            let fm = FileManager()
+            do {
+                try fm.removeItem(at: urlWhereCompressedImageIsSaved)
+            } catch {
+                print("Error — Could not delete compressed image from user's phone!")
             }
         }
-        
-        self.navigationController?.popViewController(animated: true)
     }
     
     /**** Helper Functions Below ****/
-
-    private func formatCaption(_ caption: String) -> NSAttributedString {
-        let usernameAttributes: [NSAttributedString.Key: Any] = [
-            NSAttributedString.Key.font: UIFont(name: "HelveticaNeue-Bold", size: 13)!
-        ]
-        let captionAttributes: [NSAttributedString.Key: Any] = [
-            NSAttributedString.Key.font: UIFont(name: "HelveticaNeue-Light", size: 13)!
-        ]
-        let hashtagAttributes: [NSAttributedString.Key: Any] = [
-            NSAttributedString.Key.foregroundColor: UIColor(red: 51/255, green: 153/255, blue: 255/255, alpha: 1),
-            NSAttributedString.Key.font: UIFont(name: "HelveticaNeue-Light", size: 13)!
-        ]
-        
-        // Set attribute to actual caption
-        let attributedCaptionString = NSMutableAttributedString()
-        
-        // Tokenize photo caption, delimited by whitespace
-        let tokenized_caption = caption.components(separatedBy: " ")
-        var attributedToken: NSAttributedString
-        for token in tokenized_caption {
-            if token.contains("#") {  // Hashtags should be in blue
-                attributedToken = NSAttributedString(string: token, attributes: hashtagAttributes)
-                if tags == nil { tags = [] }  // Initialize "tags" array if nil
-                tags!.append(token)  // Save tags (NOTE: each tag includes the # symbol!)
-            } else if token.contains("@") {  // Tagged username should have bolded text
-                attributedToken = NSAttributedString(string: token, attributes: usernameAttributes)
-            } else {
-                attributedToken = NSAttributedString(string: token, attributes: captionAttributes)
-            }
-            attributedCaptionString.append(attributedToken)
-            attributedCaptionString.append(NSAttributedString(string: " "))
-        }
-        
-        return attributedCaptionString
-    }
     
     private func extractTags(_ caption: String) -> [String] {
         var tags = [String]()

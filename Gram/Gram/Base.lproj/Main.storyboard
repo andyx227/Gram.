@@ -432,11 +432,28 @@
                                             <action selector="btnPost:" destination="tiE-Ee-ZQ9" eventType="touchUpInside" id="Ysi-Oj-ArA"/>
                                         </connections>
                                     </button>
+                                    <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eCq-5r-jTU" customClass="NVActivityIndicatorView" customModule="NVActivityIndicatorView">
+                                        <rect key="frame" x="269" y="27" width="20" height="20"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="20" id="CyZ-p1-ncd"/>
+                                            <constraint firstAttribute="height" constant="20" id="jzU-aO-dUi"/>
+                                        </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="typeName" value="circleStrokeSpin"/>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="color">
+                                                <color key="value" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </view>
                                 </subviews>
                                 <constraints>
+                                    <constraint firstItem="eCq-5r-jTU" firstAttribute="top" secondItem="pXL-DV-7mo" secondAttribute="top" constant="27" id="4FE-bB-p13"/>
                                     <constraint firstItem="EYj-d4-p3C" firstAttribute="leading" secondItem="pXL-DV-7mo" secondAttribute="leading" constant="8" id="Hy2-ms-Znr"/>
                                     <constraint firstAttribute="height" constant="64" id="cy0-jg-zqC"/>
+                                    <constraint firstAttribute="bottom" secondItem="eCq-5r-jTU" secondAttribute="bottom" constant="17" id="pV8-6K-cYz"/>
                                     <constraint firstAttribute="trailing" secondItem="mZG-QM-SXL" secondAttribute="trailing" constant="8" id="qYa-05-MV3"/>
+                                    <constraint firstItem="mZG-QM-SXL" firstAttribute="leading" secondItem="eCq-5r-jTU" secondAttribute="trailing" constant="8" id="syA-mt-Mto"/>
                                     <constraint firstAttribute="bottom" secondItem="EYj-d4-p3C" secondAttribute="bottom" constant="12" id="tze-nM-uWn"/>
                                     <constraint firstItem="mZG-QM-SXL" firstAttribute="centerY" secondItem="pXL-DV-7mo" secondAttribute="centerY" constant="5.5" id="vSy-GA-9e5"/>
                                     <constraint firstItem="mZG-QM-SXL" firstAttribute="leading" secondItem="EYj-d4-p3C" secondAttribute="trailing" constant="259" id="vbo-aa-WMG"/>
@@ -473,7 +490,9 @@
                     <connections>
                         <outlet property="caption" destination="hCS-6l-Jg0" id="VCa-8G-Kfa"/>
                         <outlet property="imageView" destination="A0S-PD-1v0" id="OqS-X0-6ZR"/>
+                        <outlet property="loadingIndicator" destination="eCq-5r-jTU" id="9Va-pG-vcr"/>
                         <outlet property="photoHeightConstraint" destination="qpt-08-37o" id="gOS-1B-zeR"/>
+                        <outlet property="postButton" destination="mZG-QM-SXL" id="KJv-4m-wpx"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ajt-UE-mpz" userLabel="First Responder" sceneMemberID="firstResponder"/>

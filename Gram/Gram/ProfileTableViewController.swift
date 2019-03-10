@@ -64,9 +64,12 @@ UITableViewDataSource, UITableViewDelegate, photoCardCellDelegate {
             self.profileTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)  // Auto scroll to top when viewing a different profile
         }
         else if profile.first!.userID == user!.userID {  // Viewing own profile
-            if ProfileDataCache.loadedPhotos == nil {
-                ProfileDataCache.loadedPhotos = [PhotoCard]()  // Initialize
+            if ProfileDataCache.photosNoYetFetched {
+                if ProfileDataCache.loadedPhotos == nil {
+                    ProfileDataCache.loadedPhotos = [PhotoCard]()  // Initialize
+                }
                 getUserPhotos()  // Fetch user's own photos for the first time from Firebase (will be saved in cache)
+                ProfileDataCache.photosNoYetFetched = false  // Photos fetched!
             } else {
                 photos = ProfileDataCache.loadedPhotos!
                 profileTableView.reloadData()
@@ -466,11 +469,10 @@ UITableViewDataSource, UITableViewDelegate, photoCardCellDelegate {
             // Purge the cache
             ProfileTableViewController.profileInfo = nil
             ProfileDataCache.loadedPhotos = nil
+            ProfileDataCache.photosNoYetFetched = true
             ProfileDataCache.userIDToProfilePhoto = nil
             ProfileDataCache.userIDToUsername = nil
             ProfileDataCache.profilePhoto = nil
-            ProfileDataCache.clean = false
-            ProfileDataCache.newPost = false
             
             self.navigationController?.popToRootViewController(animated: true)
         } catch let signOutError as NSError {
@@ -480,6 +482,19 @@ UITableViewDataSource, UITableViewDelegate, photoCardCellDelegate {
 }
 
 extension UIImage {
+    func saveToTempDir(_ data: Data) -> URL? {
+        let url = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+            .appendingPathComponent("img", isDirectory: false)
+            .appendingPathExtension("jpeg")
+        // Write to disk
+        do {
+            try data.write(to: url)
+        } catch {
+            return nil
+        }
+        return url
+    }
+    
     func getCropRatio() -> CGFloat {
         let width = self.size.width
         let height = self.size.height
