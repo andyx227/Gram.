@@ -22,6 +22,7 @@ class CommentViewController: UIViewController, UITextViewDelegate, UITableViewDe
     @IBOutlet weak var commentTextField: MultilineTextField!
     @IBOutlet weak var tableViewHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var profilePhotoCurrentUser: UIImageView!
+    @IBOutlet weak var btnPost: UIButton!
     var comments = [Comment]()
     var photoID: String?  // Photo id of photo to show comments for
     var showLoadingCell = true
@@ -50,16 +51,71 @@ class CommentViewController: UIViewController, UITextViewDelegate, UITableViewDe
         hideKeyboard()
         commentTableView.delegate = self
         commentTableView.dataSource = self
+        commentTextField.delegate = self
         
+        // Disable the "Post" button initially
+        btnPost.isEnabled = false
+        btnPost.alpha = 0.5
+        
+        // Set profile photo to be round
+        profilePhotoCurrentUser.layer.cornerRadius = profilePhotoCurrentUser.frame.height / 2
+        profilePhotoCurrentUser.clipsToBounds = true
         profilePhotoCurrentUser.image = ProfileDataCache.profilePhoto!
+        
+        // Use dyanamic cell height
+        commentTableView.rowHeight = UITableView.automaticDimension
+        commentTableView.estimatedRowHeight = 200
         
         if let photoID = photoID {
             getComments(photoID)
         }
     }
+    
+    func textViewDidChange(_ textView: UITextView) {
+        if textView.text.isEmpty {
+            btnPost.isEnabled = false
+            btnPost.alpha = 0.5
+        } else {
+            btnPost.isEnabled = true
+            btnPost.alpha = 1.0
+        }
+    }
+    
 
     @IBAction func backButtonPressed(_ sender: Any) {
         self.navigationController?.popViewController(animated: true)
+    }
+    
+    @IBAction func postComment(_ sender: Any) {
+        // Format the date (want something like [Jan 2, 2019])
+        let date = Date()
+        let format = DateFormatter()
+        format.dateFormat = "MMM d, yyyy"
+        let formattedDate = format.string(from: date)
+        
+        if let photoID = photoID, let comment = commentTextField.text {
+            Api.postComment(message: comment, pid: photoID) { (response, error) in
+                if let _ = error {
+                    print("Error — Error when posting comment for photo with photoID: \(photoID)")
+                }
+                if let _ = response {
+                    self.comments.append(Comment.init(date: formattedDate,
+                                                 username: "@" + user!.username,
+                                                 comment: comment,
+                                                 commentID: "",
+                                                 profilePhoto: ProfileDataCache.profilePhoto!))
+                    
+                    // Insert comment into CommentTableView
+                    self.commentTableView.beginUpdates()
+                    self.commentTableView.insertRows(at: [IndexPath(row: self.comments.count - 1, section: 0)], with: .automatic)
+                    self.commentTableView.endUpdates()
+                    // Auto scroll to bottom of table, where the new comment is located
+                    self.commentTableView.scrollToRow(at: IndexPath(row: self.comments.count - 1, section: 0), at: .bottom, animated: true)
+                    
+                    self.commentTextField.text = ""  // Reset TextView
+                }
+            }
+        }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -77,7 +133,12 @@ class CommentViewController: UIViewController, UITextViewDelegate, UITableViewDe
             return cell
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "commentCell", for: indexPath) as! CommentCell
+            
+            // Make profile photo round
+            cell.profilePhoto.layer.cornerRadius = cell.profilePhoto.frame.height / 2
+            cell.profilePhoto.clipsToBounds = true
             cell.profilePhoto.image = comments[indexPath.row].profilePhoto
+            
             cell.lblUsername.text = comments[indexPath.row].username
             cell.lblDate.text = comments[indexPath.row].date
             cell.lblComment.text = comments[indexPath.row].comment
@@ -113,9 +174,15 @@ class CommentViewController: UIViewController, UITextViewDelegate, UITableViewDe
                                 }
                             }
                             
+                            // Format upload date for this photo
+                            var commentDate = comment.datePosted
+                            if let rangeToRemove = commentDate.range(of: " at") {  // Remove the time part of date (Only want [MM DD, YYYY] part)
+                                commentDate.removeSubrange(rangeToRemove.lowerBound ..< commentDate.endIndex)
+                            }
+                            
                             // Construct comment object
-                            self.comments.append(Comment.init(date: comment.datePosted,
-                                                              username: username,
+                            self.comments.append(Comment.init(date: commentDate,
+                                                              username: "@" + username,
                                                               comment: comment.message,
                                                               commentID: comment.commentID,
                                                               profilePhoto: profilePhoto!))
