@@ -19,7 +19,6 @@
 		A1617C0122237F6700B7C9EB /* LoadingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1617C0022237F6700B7C9EB /* LoadingCell.swift */; };
 		A16A3E8B21FE5F2300E13C81 /* SignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16A3E8A21FE5F2300E13C81 /* SignUpViewController.swift */; };
 		A17D05C121FA53C300205E1D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17D05C021FA53C300205E1D /* AppDelegate.swift */; };
-		A17D05C321FA53C300205E1D /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17D05C221FA53C300205E1D /* FirstViewController.swift */; };
 		A17D05C521FA53C300205E1D /* CommunityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17D05C421FA53C300205E1D /* CommunityViewController.swift */; };
 		A17D05C821FA53C300205E1D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A17D05C621FA53C300205E1D /* Main.storyboard */; };
 		A17D05CA21FA53C400205E1D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A17D05C921FA53C400205E1D /* Assets.xcassets */; };
@@ -51,7 +50,6 @@
 		A16A3E8A21FE5F2300E13C81 /* SignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewController.swift; sourceTree = "<group>"; };
 		A17D05BD21FA53C300205E1D /* Gram.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Gram.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A17D05C021FA53C300205E1D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		A17D05C221FA53C300205E1D /* FirstViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstViewController.swift; sourceTree = "<group>"; };
 		A17D05C421FA53C300205E1D /* CommunityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityViewController.swift; sourceTree = "<group>"; };
 		A17D05C721FA53C300205E1D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		A17D05C921FA53C400205E1D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -103,7 +101,6 @@
 			children = (
 				A1DE5B1B22113BCB00CF49DE /* Custom Cells */,
 				A17D05C021FA53C300205E1D /* AppDelegate.swift */,
-				A17D05C221FA53C300205E1D /* FirstViewController.swift */,
 				A1BA1F01223394A600CEA81C /* CommentViewController.swift */,
 				A17D05C421FA53C300205E1D /* CommunityViewController.swift */,
 				A17D05C621FA53C300205E1D /* Main.storyboard */,
@@ -345,7 +342,6 @@
 				A17D05C121FA53C300205E1D /* AppDelegate.swift in Sources */,
 				A12AC1FA220EC880000036E3 /* PhotoCardCell.swift in Sources */,
 				A1617C0122237F6700B7C9EB /* LoadingCell.swift in Sources */,
-				A17D05C321FA53C300205E1D /* FirstViewController.swift in Sources */,
 				A1A9A3EA2224B72F000ACF84 /* PullToRefresh.swift in Sources */,
 				A12AC1FE221018B2000036E3 /* PeopleCell.swift in Sources */,
 				A1BA1F0422339E7900CEA81C /* CommentCell.swift in Sources */,

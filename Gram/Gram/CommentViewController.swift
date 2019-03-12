@@ -17,6 +17,10 @@ struct Comment {
     var profilePhoto: UIImage
 }
 
+protocol CommentViewControllerDelegate {
+    func commentPosted(_ indexPath: IndexPath)
+}
+
 class CommentViewController: UIViewController, UITextViewDelegate, UITableViewDelegate, UITableViewDataSource {
     @IBOutlet weak var commentTableView: UITableView!
     @IBOutlet weak var commentTextField: MultilineTextField!
@@ -26,6 +30,8 @@ class CommentViewController: UIViewController, UITextViewDelegate, UITableViewDe
     var comments = [Comment]()
     var photoID: String?  // Photo id of photo to show comments for
     var showLoadingCell = true
+    var delegate: CommentViewControllerDelegate?
+    var indexPathOfPhotoCard: IndexPath!
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -113,6 +119,14 @@ class CommentViewController: UIViewController, UITextViewDelegate, UITableViewDe
                     self.commentTableView.scrollToRow(at: IndexPath(row: self.comments.count - 1, section: 0), at: .bottom, animated: true)
                     
                     self.commentTextField.text = ""  // Reset TextView
+                    
+                    // If we are updating photos cards in the ProfileViewController,
+                    // then update the PhotoCards stored inside the cache directly
+                    if self.delegate is ProfileTableViewController {
+                        ProfileDataCache.loadedPhotos?[self.indexPathOfPhotoCard.row - 1].commentCount += 1
+                    } else {
+                        self.delegate?.commentPosted(self.indexPathOfPhotoCard)
+                    }
                 }
             }
         }

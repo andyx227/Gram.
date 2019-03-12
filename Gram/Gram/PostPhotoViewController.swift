@@ -109,6 +109,7 @@ class PostPhotoViewController: UIViewController, UITextViewDelegate {
                                        tags: tags,
                                        liked: false,
                                        likeCount: 0,
+                                       commentCount: 0,
                                        photoID: "null")  // photoID will be updated from Api call down below!
         
         Api.postPhoto(path: urlWhereCompressedImageIsSaved, photo: photoCard) { (photoID, error) in

@@ -28,11 +28,12 @@ struct PhotoCard {
     var tags: [String]?
     var liked: Bool
     var likeCount: Int
+    var commentCount: Int
     var photoID: String
 }
 
 class ProfileTableViewController: UIViewController, ProfileInfoCellDelegate, UITabBarControllerDelegate,
-UITableViewDataSource, UITableViewDelegate, photoCardCellDelegate {
+UITableViewDataSource, UITableViewDelegate, photoCardCellDelegate, CommentViewControllerDelegate {
     static var profileInfo: [Api.profileInfo]?
     var profile = [Api.profileInfo]()
     var photos = [PhotoCard]()
@@ -108,6 +109,9 @@ UITableViewDataSource, UITableViewDelegate, photoCardCellDelegate {
             photos[tappedIndexPath.row - 1].likeCount -= 1
         }
         
+        // Update the cache
+        ProfileDataCache.loadedPhotos = photos
+        
         Api.likePost(postID: sender.photoID, postType: "photo") { (response, error) in
             if let _ = error {
                 print("Error — An error occurred when liking post with photoID: \(sender.photoID ?? "null")")
@@ -128,7 +132,13 @@ UITableViewDataSource, UITableViewDelegate, photoCardCellDelegate {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let commentVC = storyboard.instantiateViewController(withIdentifier: "commentViewController") as! CommentViewController
         commentVC.photoID = sender.photoID  // Pass the photoID to CommentViewController
+        commentVC.indexPathOfPhotoCard = self.profileTableView.indexPath(for: sender)
+        commentVC.delegate = self
         self.navigationController?.pushViewController(commentVC, animated: true)
+    }
+    
+    func commentPosted(_ indexPath: IndexPath) {
+        return  // Special case for ProfileVC: CommentVC should have already updated the PhotoCard in cache directly!
     }
     
     func didChangeFollowStatus(_ sender: ProfileInfoCell) {
@@ -282,11 +292,28 @@ UITableViewDataSource, UITableViewDelegate, photoCardCellDelegate {
             }
             
             let likeCount = photos[indexPath.row - 1].likeCount
-            if likeCount == 0 {
-                cell.lblNumLikes.isHidden = true  // Don't show "number of likes" label if photo has no likes
+            let commentCount = photos[indexPath.row - 1].commentCount
+            cell.lblNumLikesNumComments.text = ""  // Reset
+            
+            if likeCount == 0 && commentCount == 0 {
+                cell.lblNumLikesNumComments.isHidden = true  // Don't show label if photo has no likes and comments
             } else {
-                cell.lblNumLikes.isHidden = false
-                cell.lblNumLikes.text = likeCount > 1 ? "\(likeCount) likes" : "1 like"
+                cell.lblNumLikesNumComments.isHidden = false
+            }
+            
+            if likeCount >= 1 {
+                cell.lblNumLikesNumComments.text = likeCount > 1 ? "\(likeCount) likes" : "1 like"
+            }
+        
+            if likeCount > 0 && commentCount > 0 {
+                cell.lblNumLikesNumComments.text?.append(" • ")  // Use bullet point as separator
+            }
+            
+            // Set comment count
+            if commentCount == 1 {
+                cell.lblNumLikesNumComments.text?.append("1 comment")
+            } else if commentCount > 1 {
+                cell.lblNumLikesNumComments.text?.append("\(commentCount) comments")
             }
             
             // Scale photos before displaying them in UIImageView
@@ -411,6 +438,7 @@ UITableViewDataSource, UITableViewDelegate, photoCardCellDelegate {
                                                       tags: photo.tags,
                                                       liked: photo.liked,
                                                       likeCount: photo.likeCount,
+                                                      commentCount: photo.commentCount,
                                                       photoID: photo.photoID))
                 }  // for-loop
                 

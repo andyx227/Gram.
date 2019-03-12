@@ -8,7 +8,8 @@
 
 import UIKit
 
-class CommunityViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, photoCardCellDelegate {
+class CommunityViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, photoCardCellDelegate, CommentViewControllerDelegate {
+    
     
     @IBOutlet weak var viewNoPhotos: UILabel!
     @IBOutlet weak var communityTableView: UITableView!
@@ -103,15 +104,28 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
                 cell.btnLike.setImage(UIImage(named: "icon_heart_empty"), for: .normal)
             }
             
-            // Set like count
             let likeCount = photos[indexPath.row].likeCount
-            cell.likeCount = likeCount
+            let commentCount = photos[indexPath.row].commentCount
             
-            if likeCount == 0 {
-                cell.lblNumLikes.isHidden = true  // Don't show "number of likes" label if photo has no likes
+            if likeCount == 0 && commentCount == 0 {
+                cell.lblNumLikesNumComments.isHidden = true  // Don't show label if photo has no likes and comments
             } else {
-                cell.lblNumLikes.isHidden = false
-                cell.lblNumLikes.text = likeCount > 1 ? "\(likeCount) likes" : "1 like"
+                cell.lblNumLikesNumComments.isHidden = false
+            }
+            
+            if likeCount >= 1 {
+                cell.lblNumLikesNumComments.text = likeCount > 1 ? "\(likeCount) likes" : "1 like"
+            }
+            
+            if likeCount > 0 && commentCount > 0 {
+                cell.lblNumLikesNumComments.text?.append(" • ")  // Use bullet point as separator
+            }
+            
+            // Set comment count
+            if commentCount == 1 {
+                cell.lblNumLikesNumComments.text?.append("1 comment")
+            } else if commentCount > 1 {
+                cell.lblNumLikesNumComments.text?.append("\(commentCount) comments")
             }
             
             // Scale photos before displaying them in UIImageView
@@ -155,7 +169,19 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let commentVC = storyboard.instantiateViewController(withIdentifier: "commentViewController") as! CommentViewController
         commentVC.photoID = sender.photoID  // Pass the photoID to CommentViewController
+        commentVC.indexPathOfPhotoCard = communityTableView.indexPath(for: sender)
+        commentVC.delegate = self
         self.navigationController?.pushViewController(commentVC, animated: true)
+    }
+    
+    func commentPosted(_ indexPath: IndexPath) {
+        photos[indexPath.row].commentCount += 1
+        let lastScrollOffset = self.communityTableView.contentOffset
+        self.communityTableView.beginUpdates()
+        self.communityTableView.reloadRows(at: [indexPath], with: .none)
+        self.communityTableView.endUpdates()
+        self.communityTableView.layer.removeAllAnimations()
+        self.communityTableView.setContentOffset(lastScrollOffset, animated: false)
     }
     
     @IBAction func searchCommunity(_ sender: Any) {
@@ -304,6 +330,7 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
                                                           tags: photo.tags,
                                                           liked: photo.liked,
                                                           likeCount: photo.likeCount,
+                                                          commentCount: photo.commentCount,
                                                           photoID: photo.photoID))
                     }
                 }  // For()

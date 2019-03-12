@@ -24,7 +24,7 @@ class PhotoCardCell: UITableViewCell {
     @IBOutlet weak var photoHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var caption: ActiveLabel!
     @IBOutlet weak var btnLike: UIButton!
-    @IBOutlet weak var lblNumLikes: UILabel!
+    @IBOutlet weak var lblNumLikesNumComments: UILabel!
     var photoID: String!
     var likeCount: Int!
     

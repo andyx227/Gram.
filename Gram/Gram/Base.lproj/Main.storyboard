@@ -168,7 +168,7 @@
                                                             <state key="normal" image="icon_star_empty"/>
                                                         </button>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1 like" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6VI-MK-6yV">
-                                                            <rect key="frame" x="38" y="7" width="108" height="15"/>
+                                                            <rect key="frame" x="38" y="7" width="241" height="15"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="108" id="YRe-yg-9BW"/>
                                                             </constraints>
@@ -190,7 +190,7 @@
                                                         <constraint firstAttribute="trailing" secondItem="bx8-d2-CAS" secondAttribute="trailing" constant="8" id="L2C-fF-6Na"/>
                                                         <constraint firstItem="bx8-d2-CAS" firstAttribute="leading" secondItem="dM5-bM-PAb" secondAttribute="trailing" constant="8" id="NQx-YQ-oJ2"/>
                                                         <constraint firstItem="u43-yv-zMG" firstAttribute="centerY" secondItem="fem-wp-7ri" secondAttribute="centerY" id="cuw-N4-3Ql"/>
-                                                        <constraint firstItem="u43-yv-zMG" firstAttribute="leading" secondItem="6VI-MK-6yV" secondAttribute="trailing" constant="141" id="kaZ-w4-z1o"/>
+                                                        <constraint firstItem="u43-yv-zMG" firstAttribute="leading" secondItem="6VI-MK-6yV" secondAttribute="trailing" constant="8" id="kaZ-w4-z1o"/>
                                                         <constraint firstItem="6VI-MK-6yV" firstAttribute="top" secondItem="fem-wp-7ri" secondAttribute="top" constant="7" id="sJW-Ur-Npf"/>
                                                         <constraint firstItem="bx8-d2-CAS" firstAttribute="centerY" secondItem="fem-wp-7ri" secondAttribute="centerY" id="yaQ-EG-36C"/>
                                                         <constraint firstItem="dM5-bM-PAb" firstAttribute="leading" secondItem="u43-yv-zMG" secondAttribute="trailing" constant="9" id="yvu-hU-FdN"/>
@@ -233,7 +233,7 @@
                                             <outlet property="btnLike" destination="LLg-ap-lcd" id="HkS-x7-SCh"/>
                                             <outlet property="caption" destination="wzT-Ry-tuL" id="fJP-lv-Ttn"/>
                                             <outlet property="date" destination="5Pf-iQ-Idc" id="IT1-p6-GRB"/>
-                                            <outlet property="lblNumLikes" destination="6VI-MK-6yV" id="loK-Pt-IJh"/>
+                                            <outlet property="lblNumLikesNumComments" destination="6VI-MK-6yV" id="d2z-2j-jaJ"/>
                                             <outlet property="photo" destination="wPH-R7-LeB" id="rbc-sT-0qN"/>
                                             <outlet property="photoHeightConstraint" destination="y3X-zZ-XPv" id="RKG-O8-l7R"/>
                                             <outlet property="profilePhoto" destination="0Hp-Gx-ZfV" id="eMD-rw-6cQ"/>
@@ -1003,7 +1003,7 @@
                                                             <state key="normal" image="icon_star_empty"/>
                                                         </button>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1 like" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pgs-5H-Z2h">
-                                                            <rect key="frame" x="38" y="7" width="108" height="15"/>
+                                                            <rect key="frame" x="38" y="7" width="241" height="15"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="108" id="AN3-cc-cwL"/>
                                                             </constraints>
@@ -1023,7 +1023,7 @@
                                                         <constraint firstItem="zSW-KY-TOR" firstAttribute="centerY" secondItem="Vun-Yw-oMB" secondAttribute="centerY" id="URm-hN-ycl"/>
                                                         <constraint firstItem="4LE-Nh-nCj" firstAttribute="centerY" secondItem="Vun-Yw-oMB" secondAttribute="centerY" id="aee-aL-Ag5"/>
                                                         <constraint firstAttribute="bottom" secondItem="pgs-5H-Z2h" secondAttribute="bottom" constant="8" id="afN-zv-vfj"/>
-                                                        <constraint firstItem="vc8-aX-5Tl" firstAttribute="leading" secondItem="pgs-5H-Z2h" secondAttribute="trailing" constant="141" id="bxJ-ot-uLp"/>
+                                                        <constraint firstItem="vc8-aX-5Tl" firstAttribute="leading" secondItem="pgs-5H-Z2h" secondAttribute="trailing" constant="8" id="bxJ-ot-uLp"/>
                                                         <constraint firstItem="pgs-5H-Z2h" firstAttribute="leading" secondItem="WHc-B0-Eos" secondAttribute="trailing" constant="8" id="hMg-hM-Nqe"/>
                                                         <constraint firstItem="zSW-KY-TOR" firstAttribute="leading" secondItem="4LE-Nh-nCj" secondAttribute="trailing" constant="8" id="jxL-iS-KC5"/>
                                                         <constraint firstItem="pgs-5H-Z2h" firstAttribute="top" secondItem="Vun-Yw-oMB" secondAttribute="top" constant="7" id="qId-IT-Z14"/>
@@ -1067,7 +1067,7 @@
                                             <outlet property="btnLike" destination="WHc-B0-Eos" id="jKb-8l-BCd"/>
                                             <outlet property="caption" destination="RQZ-eC-VvE" id="gd5-OR-ssg"/>
                                             <outlet property="date" destination="G1K-h3-uvp" id="Zcn-cR-B17"/>
-                                            <outlet property="lblNumLikes" destination="pgs-5H-Z2h" id="BJN-Z1-hec"/>
+                                            <outlet property="lblNumLikesNumComments" destination="pgs-5H-Z2h" id="xJm-Zs-uNe"/>
                                             <outlet property="photo" destination="HtV-Ly-oFS" id="ML6-XD-G78"/>
                                             <outlet property="photoHeightConstraint" destination="9DE-Cq-xaQ" id="3if-KG-V7G"/>
                                             <outlet property="profilePhoto" destination="pJ8-de-n0H" id="hj4-zt-N1R"/>
@@ -1465,7 +1465,7 @@
                                                             <state key="normal" image="icon_star_empty"/>
                                                         </button>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1 like" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="U00-yP-hJb">
-                                                            <rect key="frame" x="38" y="7" width="108" height="15"/>
+                                                            <rect key="frame" x="38" y="7" width="241" height="15"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="108" id="fUW-sw-z4P"/>
                                                             </constraints>
@@ -1488,7 +1488,7 @@
                                                         <constraint firstItem="o1X-km-8wb" firstAttribute="centerY" secondItem="pQn-Sd-EqV" secondAttribute="centerY" id="VGp-hI-b05"/>
                                                         <constraint firstAttribute="trailing" secondItem="oLC-7F-0Ke" secondAttribute="trailing" constant="8" id="XGe-vo-xWl"/>
                                                         <constraint firstAttribute="bottom" secondItem="U00-yP-hJb" secondAttribute="bottom" constant="8" id="XPK-Il-fln"/>
-                                                        <constraint firstItem="upz-VL-dbj" firstAttribute="leading" secondItem="U00-yP-hJb" secondAttribute="trailing" constant="141" id="jTW-EV-ayo"/>
+                                                        <constraint firstItem="upz-VL-dbj" firstAttribute="leading" secondItem="U00-yP-hJb" secondAttribute="trailing" constant="8" id="jTW-EV-ayo"/>
                                                         <constraint firstItem="U00-yP-hJb" firstAttribute="leading" secondItem="o1X-km-8wb" secondAttribute="trailing" constant="8" id="m8y-5a-qzM"/>
                                                         <constraint firstItem="BJi-N4-kex" firstAttribute="leading" secondItem="upz-VL-dbj" secondAttribute="trailing" constant="9" id="qMO-2Q-06Z"/>
                                                     </constraints>
@@ -1530,7 +1530,7 @@
                                             <outlet property="btnLike" destination="o1X-km-8wb" id="Zib-og-Tsl"/>
                                             <outlet property="caption" destination="bmS-R5-G4n" id="1hS-6V-oRj"/>
                                             <outlet property="date" destination="nA4-HQ-Nbm" id="ZfE-5h-2Af"/>
-                                            <outlet property="lblNumLikes" destination="U00-yP-hJb" id="qAl-Ti-dhN"/>
+                                            <outlet property="lblNumLikesNumComments" destination="U00-yP-hJb" id="YDm-2a-u4X"/>
                                             <outlet property="photo" destination="i92-k0-2Mo" id="fQl-dv-3uR"/>
                                             <outlet property="photoHeightConstraint" destination="XvJ-1X-zPl" id="6WQ-Fz-Ck1"/>
                                             <outlet property="profilePhoto" destination="UUu-c2-wXV" id="DP1-Qt-XyX"/>
