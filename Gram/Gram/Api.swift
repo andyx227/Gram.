@@ -23,7 +23,7 @@ struct Api {
         var email : String
         var summary : String
         var userID : String
-        var tags : [String]?
+        var tags : [String]
         var profilePhoto: String?
     }
     
@@ -37,7 +37,7 @@ struct Api {
         var profilePhoto: String?
     }
     
-    struct photoURL {
+    struct photoURL : Hashable, Equatable {
         var URL : String
         var userID : String
         var datePosted : String
@@ -47,6 +47,11 @@ struct Api {
         var likeCount : Int
         var commentCount : Int
         var photoID : String
+        var timePosted : Double
+        var hashValue : Int { get {return photoID.hashValue}}
+        static func ==(left: photoURL, right: photoURL) -> Bool {
+            return left.photoID == right.photoID
+        }
     }
     
     struct comment {
@@ -56,6 +61,8 @@ struct Api {
         var photoID : String
         var commentID : String
     }
+    
+    
     
     static func checkUserExists(username: String, completion: @escaping ApiCompletionURL) {
         let userNameCheck = db.collection("users").whereField("username", isEqualTo: username)
@@ -317,6 +324,7 @@ struct Api {
                     let dateString = DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .medium) //make date nice and localized
                     comment.datePosted = dateString
                     
+                    
                     comments.append(comment)
                 }
                 
@@ -347,7 +355,7 @@ struct Api {
                                          liked: false,
                                          likeCount: 0,
                                          commentCount: 0,
-                                         photoID: document.documentID)
+                                         photoID: document.documentID, timePosted: 0)
                     
                     let start = photo.datePosted.index(photo.datePosted.startIndex, offsetBy: 22)
                     let end = photo.datePosted.index(photo.datePosted.endIndex, offsetBy: -23)
@@ -357,6 +365,7 @@ struct Api {
                     let date = Date(timeIntervalSince1970: interval!) // get time from 1970
                     let dateString = DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .medium) //make date nice and localized
                     photo.datePosted = dateString
+                    
                     
                     photos.append(photo)
                 }
@@ -416,7 +425,7 @@ struct Api {
                                                  liked: false,
                                                  likeCount: 0,
                                                  commentCount: 0,
-                                                 photoID: document.documentID)
+                                                 photoID: document.documentID, timePosted: 0)
                             
                             let start = photo.datePosted.index(photo.datePosted.startIndex, offsetBy: 22)
                             let end = photo.datePosted.index(photo.datePosted.endIndex, offsetBy: -23)
@@ -444,6 +453,9 @@ struct Api {
     }
     
     static func extractTags(text: String) -> [String]{
+        if text == "" {
+            return []
+        }
         let tagString = String(text.replacingOccurrences(of: " ", with: "")
                                    .replacingOccurrences(of: " ", with: "")
                                    .replacingOccurrences(of: "(", with: "")
@@ -756,7 +768,7 @@ struct Api {
             "lastName" : user.lastName,
             "username" : user.username,
             "summary" : user.summary,
-            "tags" : user.tags ?? []
+            "tags" : user.tags
         ]
         
         let docRef = db.collection("users").document(user.userID)
@@ -796,7 +808,7 @@ struct Api {
                                          liked: false,
                                          likeCount: 0,
                                          commentCount: 0,
-                                         photoID: document.documentID)
+                                         photoID: document.documentID, timePosted: 0)
                     
                     let start = photo.datePosted.index(photo.datePosted.startIndex, offsetBy: 22)
                     let end = photo.datePosted.index(photo.datePosted.endIndex, offsetBy: -23)
@@ -806,6 +818,7 @@ struct Api {
                     let date = Date(timeIntervalSince1970: interval!) // get time from 1970
                     let dateString = DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .medium) //make date nice and localized
                     photo.datePosted = dateString
+                    photo.timePosted = sec!
                     
                     photos.append(photo)
                 }
@@ -819,8 +832,46 @@ struct Api {
         }
     }
     
-    static func getUser(email : String, completion : @escaping ApiCompletion) {
+    //return list of photos tagged by a user
+    static func getUserTags(completion: @escaping ApiCompletionPhotos) {
+        guard let user = user else {
+            completion(nil,"Global user not set")
+            return
+        }
         
+        let serialQueue = DispatchQueue(label: "addPhotos")
+        let group = DispatchGroup()
+        var photos : [photoURL] = []
+        
+        //search every tag of user
+        for tag in user.tags {
+            group.enter()
+            searchTags(tag: tag) { (tagPhotos, error) in
+                if let tagPhotos = tagPhotos {
+                    //append tag's photos to photo list
+                    //serial queue to lock access to photos container
+                    serialQueue.async {
+                        photos.append(contentsOf: tagPhotos)
+                        group.leave()
+                    }
+                } else {
+                    //error when getting tag
+                    serialQueue.async {
+                        group.leave()
+                    }
+                }
+            }
+        }
+        
+        group.wait()
+        
+        //filter duplicate images
+        var uniquePhotos = Array(Set(photos))
+        
+        //sort all photos
+        uniquePhotos.sort { (photo1, photo2) -> Bool in
+            return photo1.timePosted > photo2.timePosted
+        }
     }
     
     typealias ApiCompletion = ((_ response: [String: Any]?, _ error: String?) -> Void)

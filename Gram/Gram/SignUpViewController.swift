@@ -99,7 +99,7 @@ class SignUpViewController: UIViewController, UITextFieldDelegate {
                                                                    email: email,
                                                                    summary: "",
                                                                    userID: "",
-                                                                   tags: nil,
+                                                                   tags: [],
                                                                    profilePhoto: nil)
                                 user = profile
                                 

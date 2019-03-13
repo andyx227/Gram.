@@ -325,7 +325,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
                                                  email: "",
                                                  summary: people[indexPath.row].summary,  // TODO: userInfo should include a summary field too, using empty string for now
                                                  userID: people[indexPath.row].userID,
-                                                 tags: nil, // TODO: Change this to display tag info
+                                                 tags: [], // TODO: Change this to display tag info
                                                  profilePhoto: people[indexPath.row].profilePhoto)
         ]
 
