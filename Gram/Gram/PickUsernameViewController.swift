@@ -108,6 +108,7 @@ class PickUsernameViewController: UIViewController {
                                        email: userEmail,
                                        summary: "",
                                        userID: "",
+                                       tags: [],
                                        profilePhoto: nil)
         
         return profile
