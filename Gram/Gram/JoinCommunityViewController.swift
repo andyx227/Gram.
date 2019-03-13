@@ -33,6 +33,7 @@ class JoinCommunityViewController: UIViewController, UITableViewDelegate, UITabl
                         self.present(errorAlert, animated: true, completion: nil)
                     } else {
                         ProfileDataCache.CommunitiesJoined!.append(community)  // Update array in cache
+                        ProfileDataCache.communityChanged = true
                         self.communitiesJoinedTableView.insertRows(at: [IndexPath(row: ProfileDataCache.CommunitiesJoined!.count - 1, section: 0)], with: .automatic)
                     }
                 }
@@ -44,6 +45,14 @@ class JoinCommunityViewController: UIViewController, UITableViewDelegate, UITabl
     }
     
     @IBAction func backButtonPressed(_ sender: Any) {
+        user?.tags = ProfileDataCache.CommunitiesJoined!  // Update user data before exiting view
+        Api.updateUser { (response, error) in  
+            if let _ = error {
+                let errorAlert = UIAlertController(title: "Something Went Wrong", message: "An internal error occurred while updating your communities list. Please try again.", preferredStyle: .alert)
+                errorAlert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: nil))
+                self.present(errorAlert, animated: true, completion: nil)
+            }
+        }
         self.navigationController?.popViewController(animated: true)
     }
     
@@ -54,8 +63,9 @@ class JoinCommunityViewController: UIViewController, UITableViewDelegate, UITabl
         communitiesJoinedTableView.delegate = self
         communitiesJoinedTableView.dataSource = self
         
-        ProfileDataCache.CommunitiesJoined = ["flowers", "beach", "nature"]
-        ProfileDataCache.CommunitiesJoined!.sort()
+        if ProfileDataCache.CommunitiesJoined!.isEmpty == false {
+            ProfileDataCache.CommunitiesJoined!.sort()  // Only sort when array isn't empty
+        }
 
         if ProfileDataCache.CommunitiesJoined!.isEmpty {
             communitiesJoinedTableView.isHidden = true
@@ -68,8 +78,12 @@ class JoinCommunityViewController: UIViewController, UITableViewDelegate, UITabl
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if ProfileDataCache.CommunitiesJoined!.isEmpty {
+            viewNoCommunities.isHidden = false
+            communitiesJoinedTableView.isHidden = true
             return 0
         } else {
+            viewNoCommunities.isHidden = true
+            communitiesJoinedTableView.isHidden = false
             return ProfileDataCache.CommunitiesJoined!.count
         }
     }
@@ -82,14 +96,17 @@ class JoinCommunityViewController: UIViewController, UITableViewDelegate, UITabl
         return cell
     }
     
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
     // Override to support editing the table view.
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             // Delete the row from the data source
             ProfileDataCache.CommunitiesJoined?.remove(at: indexPath.row)
+            ProfileDataCache.communityChanged = true
             tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+        }
     }
 }

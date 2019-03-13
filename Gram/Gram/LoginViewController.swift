@@ -236,6 +236,8 @@ extension UIViewController {
     }
     
     func transitionToNewsfeedView() {
+        user?.tags.removeAll { $0.isEmpty || $0 == "\"\""}  // Remove empty string tags
+        ProfileDataCache.CommunitiesJoined = user!.tags
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let tabBarController = storyboard.instantiateViewController(withIdentifier: "tabBarController")
         self.navigationController?.pushViewController(tabBarController, animated: true)

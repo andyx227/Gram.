@@ -18,6 +18,7 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
     var showLoadingCell = true
     var pullToRefresh: PullToRefresh?
     var tagSearched = ""
+    var photosProcessed = 0
     
     var tableViewRefreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
@@ -39,19 +40,33 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
         hideKeyboard()
         communityTableView.delegate = self
         communityTableView.dataSource = self
-        communityTableView.isHidden = true  // Hide table initially since no photos to show
         communitySearchBar.delegate = self
         communitySearchBar.autocapitalizationType = .none
         
         // Set up RefreshControl for NewsfeedTableView
         communityTableView.refreshControl = tableViewRefreshControl
         getRefereshView()
-        
-        viewNoPhotos.isHidden = false  // Initially, show "no photos" message
     }
     
     override func viewWillAppear(_ animated: Bool) {
         changeStatusBarColor(forView: self)
+        
+        if ProfileDataCache.CommunitiesJoined!.isEmpty {  // User has not joined any communities
+            communityTableView.isHidden = true
+            viewNoPhotos.isHidden = false
+            return
+        }
+        
+        communityTableView.isHidden = false
+        viewNoPhotos.isHidden = true
+
+        if ProfileDataCache.loadedCommunityPhotos == nil || ProfileDataCache.communityChanged {
+            photos.removeAll()
+            showLoadingCell = true
+            communityTableView.reloadData()
+            getJoinedCommunityPhotos(false)
+            ProfileDataCache.communityChanged = false
+        }
     }
     
     func getRefereshView() {
@@ -65,7 +80,12 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
     @objc func refreshCommunityFeed() {
         if let pullToRefresh = pullToRefresh {
             pullToRefresh.startAnimation()
-            getCommunityPhotos(tagSearched, true)
+            
+            if communitySearchBar.text!.isEmpty {  // User is not searching for community, so fetch photos from own community
+                getJoinedCommunityPhotos(true)
+            } else {
+                getCommunityPhotos(tagSearched, true)  // Search for photos from a specific community
+            }
         }
     }
     
@@ -73,11 +93,9 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
         if photos.isEmpty && showLoadingCell {
             return 1  // Display the loading cell only, so return 1 cell
         } else if photos.isEmpty {
-            communityTableView.isHidden = true  // Hide table
             viewNoPhotos.isHidden = false  // Show message
             return 0
         } else {
-            communityTableView.isHidden = false  // Show table
             viewNoPhotos.isHidden = true  // Hide message
             return photos.count
         }
@@ -194,7 +212,6 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
         var searchText = communitySearchBar.text ?? ""
         
         if searchText.isEmpty && photos.isEmpty {  // No photos to show and there is no search text
-            communityTableView.isHidden = true  // Hide table
             viewNoPhotos.isHidden = false // Show "no photos" message
             return
         } else if searchText.isEmpty {  // No search text, so don't do anything
@@ -205,10 +222,10 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
         searchText = searchText.lowercased()  // No capital letters!
         tagSearched = searchText  // Save the tag the user is searching for
         
-        communityTableView.isHidden = false
         viewNoPhotos.isHidden = true
         showLoadingCell = true
         photos.removeAll()
+        self.communityTableView.isHidden = false
         self.communityTableView.reloadData()  // Show loading cell by reloading table
         self.communityTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)  // Auto scroll to top of CommunityTableVIew
         
@@ -221,7 +238,6 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
         var searchText = communitySearchBar.text ?? ""
         
         if searchText.isEmpty && photos.isEmpty {  // No photos to show and there is no search text
-            communityTableView.isHidden = true  // Hide table
             viewNoPhotos.isHidden = false // Show "no photos" message
             return
         } else if searchText.isEmpty {  // No search text, so don't do anything
@@ -232,10 +248,10 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
         searchText = searchText.lowercased()  // No capital letters!
         tagSearched = searchText  // Save the tag the user is searching for
         
-        communityTableView.isHidden = false
         viewNoPhotos.isHidden = true
         showLoadingCell = true
         photos.removeAll()
+        self.communityTableView.isHidden = false
         self.communityTableView.reloadData()  // Show loading cell by reloading table
         self.communityTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)  // Auto scroll to top of CommunityTableVIew
         
@@ -243,7 +259,50 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
         getCommunityPhotos(searchText, false)
         communitySearchBar.resignFirstResponder()  // Hide the keyboard
     }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchText.isEmpty {
+            if ProfileDataCache.loadedCommunityPhotos == nil {
+                return
+            } else {
+                photos = ProfileDataCache.loadedCommunityPhotos!
+                communityTableView.reloadData()
+            }
+        }
+    }
+    
+    /// Retrieves the photos from communities that user has joined
+    func getJoinedCommunityPhotos(_ pulledDownToRefresh: Bool) {
+        Api.getUserTags { (communityPhotos, error) in
+            if let _ = error {
+                print("Error — Error occurred when retrieving photos from communities the user has joined.")
+                self.communityTableView.isHidden = true
+                self.viewNoPhotos.isHidden = false
+            }
+            if let communityPhotos = communityPhotos {
+                self.photos.removeAll()  // Start from clean slate
+                self.processPhotos(communityPhotos)
+                
+                DispatchQueue.global(qos: .userInitiated).async {
+                    while self.photosProcessed < communityPhotos.count { continue }  // Busy wait until all photos processed (using Dispatch Group will hang program!)
+                    self.photosProcessed = 0  // Reset
+                    self.showLoadingCell = false
+                    ProfileDataCache.loadedCommunityPhotos = self.photos  // Save fetched community photos in cache
+                    DispatchQueue.main.async {
+                        self.communityTableView.reloadData()
+                        if self.photos.isEmpty {
+                            self.viewNoPhotos.isHidden = false
+                        }
+                        if pulledDownToRefresh {
+                            self.tableViewRefreshControl.endRefreshing()
+                        }
+                    }
+                }
+            }
+        }
+    }
 
+    /// Retrieves photos of community that user searched for
     func getCommunityPhotos(_ tag: String, _ pulledDownToRefresh: Bool) {
         if tag.isEmpty { return }
         
@@ -253,96 +312,11 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
             }
             if let photosInCommunity = photosInCommunity {
                 self.photos.removeAll()  // Start from clean slate
-                var photosProcessed = 0
-                
-                for photo in photosInCommunity {
-                    var errorProfilePhotoRetrieval = false
-                    var errorPhotoRetrieval = false
-                    var photoToDisplayInPhotoCard: UIImage?
-                    var profilePhoto: UIImage?
-                    var username: String?
-                    
-                    var tasksDone = 0
-                    DispatchQueue.global(qos: .userInitiated).async {
-                        do {  // Attempt to extract the photo from the given photo url
-                            let url = URL(string: photo.URL)
-                            guard let photoURL = url else {
-                                errorPhotoRetrieval = true
-                                tasksDone += 1
-                                return
-                            }
-                            let data = try Data(contentsOf: photoURL)
-                            photoToDisplayInPhotoCard = UIImage(data: data)
-                        } catch {
-                            errorPhotoRetrieval = true
-                        }
-                        tasksDone += 1
-                    }
-                    
-                    DispatchQueue.global(qos: .userInitiated).async {
-                        Api.getUserName(userID: photo.userID, completion: { (usrname) in
-                            username = usrname  // Grab username
-                            
-                            Api.getProfilePhotoWithUID(userID: photo.userID, completion: { (url, error) in
-                                if let _ = error {
-                                    print("Error — Error when retrieving profile photo of user with ID: \(photo.userID)")
-                                    errorProfilePhotoRetrieval = true
-                                    tasksDone += 1
-                                    return
-                                }
-                                if let url = url {
-                                    if url == "" {
-                                        profilePhoto = UIImage(named: String(username!.capitalized.first!))!
-                                    } else {
-                                        do {  // Attempt to extract the photo from the given photo url
-                                            let url = URL(string: url)
-                                            guard let photoURL = url else {
-                                                profilePhoto = UIImage(named: String(username!.capitalized.first!))!
-                                                tasksDone += 1
-                                                return
-                                            }
-                                            let data = try Data(contentsOf: photoURL)
-                                            profilePhoto = UIImage(data: data)!
-                                        } catch {
-                                            profilePhoto = UIImage(named: String(username!.capitalized.first!))!
-                                        }
-                                        tasksDone += 1
-                                    }
-                                }
-                            })  // Api.getProfilePhotoWithUID()
-                        })  // Api.getUserName()
-                    }
-                    
-                    DispatchQueue.global(qos: .userInitiated).async {
-                        while (tasksDone != 2) { continue }  // Busy wait until all tasks complete (using Dispatch Group will hang program!)
-                        photosProcessed += 1
-                        
-                        if errorPhotoRetrieval { return }  // If error when loading photo, try loading another photo card (skip this one)
-                        guard let photoToDisplay = photoToDisplayInPhotoCard else { return }  // If cannot load photo, skip this PhotoCard
-                        if errorProfilePhotoRetrieval { profilePhoto = UIImage(named: "A")! }
-                        
-                        // Format upload date for this photo
-                        var date = photo.datePosted
-                        if let rangeToRemove = date.range(of: " at") {  // Remove the time part of date (Only want [MM DD, YYYY] part)
-                            date.removeSubrange(rangeToRemove.lowerBound ..< date.endIndex)
-                        }
-                        
-                        // Construct PhotoCard object
-                        self.photos.append(PhotoCard.init(profilePhoto: profilePhoto!,
-                                                          username: username!,
-                                                          date: date,
-                                                          photo: photoToDisplay,
-                                                          caption: photo.caption,
-                                                          tags: photo.tags,
-                                                          liked: photo.liked,
-                                                          likeCount: photo.likeCount,
-                                                          commentCount: photo.commentCount,
-                                                          photoID: photo.photoID))
-                    }
-                }  // For()
-                
+                self.processPhotos(photosInCommunity)
+               
                 DispatchQueue.global(qos: .userInitiated).async {
-                    while photosProcessed < photosInCommunity.count { continue }  // Busy wait until all photos processed (using Dispatch Group will hang program!)
+                    while self.photosProcessed < photosInCommunity.count { continue }  // Busy wait until all photos processed (using Dispatch Group will hang program!)
+                    self.photosProcessed = 0  // Reset
                     self.showLoadingCell = false
                     DispatchQueue.main.async {
                         self.communityTableView.reloadData()
@@ -353,6 +327,94 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
                 }
             }
         }
+    }
+    
+    private func processPhotos(_ communityPhotos: [Api.photoURL]) {
+        for photo in communityPhotos {
+            var errorProfilePhotoRetrieval = false
+            var errorPhotoRetrieval = false
+            var photoToDisplayInPhotoCard: UIImage?
+            var profilePhoto: UIImage?
+            var username: String?
+            
+            var tasksDone = 0
+            DispatchQueue.global(qos: .userInitiated).async {
+                do {  // Attempt to extract the photo from the given photo url
+                    let url = URL(string: photo.URL)
+                    guard let photoURL = url else {
+                        errorPhotoRetrieval = true
+                        tasksDone += 1
+                        return
+                    }
+                    let data = try Data(contentsOf: photoURL)
+                    photoToDisplayInPhotoCard = UIImage(data: data)
+                } catch {
+                    errorPhotoRetrieval = true
+                }
+                tasksDone += 1
+            }
+            
+            DispatchQueue.global(qos: .userInitiated).async {
+                Api.getUserName(userID: photo.userID, completion: { (usrname) in
+                    username = usrname  // Grab username
+                    
+                    Api.getProfilePhotoWithUID(userID: photo.userID, completion: { (url, error) in
+                        if let _ = error {
+                            print("Error — Error when retrieving profile photo of user with ID: \(photo.userID)")
+                            errorProfilePhotoRetrieval = true
+                            tasksDone += 1
+                            return
+                        }
+                        if let url = url {
+                            if url == "" {
+                                profilePhoto = UIImage(named: String(username!.capitalized.first!))!
+                            } else {
+                                do {  // Attempt to extract the photo from the given photo url
+                                    let url = URL(string: url)
+                                    guard let photoURL = url else {
+                                        profilePhoto = UIImage(named: String(username!.capitalized.first!))!
+                                        tasksDone += 1
+                                        return
+                                    }
+                                    let data = try Data(contentsOf: photoURL)
+                                    profilePhoto = UIImage(data: data)!
+                                } catch {
+                                    profilePhoto = UIImage(named: String(username!.capitalized.first!))!
+                                }
+                                tasksDone += 1
+                            }
+                        }
+                    })  // Api.getProfilePhotoWithUID()
+                })  // Api.getUserName()
+            }
+            
+            DispatchQueue.global(qos: .userInitiated).async {
+                while (tasksDone != 2) { continue }  // Busy wait until all tasks complete (using Dispatch Group will hang program!)
+                self.photosProcessed += 1
+                
+                if errorPhotoRetrieval { return }  // If error when loading photo, try loading another photo card (skip this one)
+                guard let photoToDisplay = photoToDisplayInPhotoCard else { return }  // If cannot load photo, skip this PhotoCard
+                if errorProfilePhotoRetrieval { profilePhoto = UIImage(named: "A")! }
+                
+                // Format upload date for this photo
+                var date = photo.datePosted
+                if let rangeToRemove = date.range(of: " at") {  // Remove the time part of date (Only want [MM DD, YYYY] part)
+                    date.removeSubrange(rangeToRemove.lowerBound ..< date.endIndex)
+                }
+                
+                // Construct PhotoCard object
+                self.photos.append(PhotoCard.init(profilePhoto: profilePhoto!,
+                                                  username: username!,
+                                                  date: date,
+                                                  photo: photoToDisplay,
+                                                  caption: photo.caption,
+                                                  tags: photo.tags,
+                                                  liked: photo.liked,
+                                                  likeCount: photo.likeCount,
+                                                  commentCount: photo.commentCount,
+                                                  photoID: photo.photoID))
+            }
+        }  // For()
     }
 
 }

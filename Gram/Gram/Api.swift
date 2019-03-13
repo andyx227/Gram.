@@ -840,37 +840,39 @@ struct Api {
         }
         
         let serialQueue = DispatchQueue(label: "addPhotos")
-        let group = DispatchGroup()
+        var tagsProcessed = 0
         var photos : [photoURL] = []
         
         //search every tag of user
         for tag in user.tags {
-            group.enter()
             searchTags(tag: tag) { (tagPhotos, error) in
                 if let tagPhotos = tagPhotos {
                     //append tag's photos to photo list
                     //serial queue to lock access to photos container
                     serialQueue.async {
                         photos.append(contentsOf: tagPhotos)
-                        group.leave()
+                        tagsProcessed += 1
                     }
                 } else {
                     //error when getting tag
                     serialQueue.async {
-                        group.leave()
+                        tagsProcessed += 1
                     }
                 }
             }
         }
         
-        group.wait()
-        
-        //filter duplicate images
-        var uniquePhotos = Array(Set(photos))
-        
-        //sort all photos
-        uniquePhotos.sort { (photo1, photo2) -> Bool in
-            return photo1.timePosted > photo2.timePosted
+        DispatchQueue.global(qos: .userInitiated).async {
+            while tagsProcessed < user.tags.count { continue }  // Busy wait
+            //filter duplicate images
+            var uniquePhotos = Array(Set(photos))
+            
+            //sort all photos
+            uniquePhotos.sort { (photo1, photo2) -> Bool in
+                return photo1.timePosted > photo2.timePosted
+            }
+            
+            completion(uniquePhotos, nil)
         }
     }
     
