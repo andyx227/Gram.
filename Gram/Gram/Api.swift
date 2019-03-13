@@ -23,6 +23,7 @@ struct Api {
         var email : String
         var summary : String
         var userID : String
+        var tags : [String]?
         var profilePhoto: String?
     }
     
@@ -114,7 +115,7 @@ struct Api {
                 dump(documents)
                 
                 var docData = documents[0].data().mapValues { String.init(describing: $0)}
-                let loadedProfile = Api.profileInfo.init(firstName: docData["firstName"] ?? "", lastName: docData["lastName"] ?? "", username: docData["username"] ?? "", email: docData["email"] ?? "", summary: docData["summary"] ?? "", userID: documents[0].documentID, profilePhoto: nil)
+                let loadedProfile = Api.profileInfo.init(firstName: docData["firstName"] ?? "", lastName: docData["lastName"] ?? "", username: docData["username"] ?? "", email: docData["email"] ?? "", summary: docData["summary"] ?? "", userID: documents[0].documentID, tags: extractTags(text: docData["tags"] ?? ""), profilePhoto: nil)
                 user = loadedProfile
                 Api.getProfilePhoto(completion: { (url, err) in
                     if err != nil {
@@ -754,7 +755,8 @@ struct Api {
             "firstName" : user.firstName,
             "lastName" : user.lastName,
             "username" : user.username,
-            "summary" : user.summary
+            "summary" : user.summary,
+            "tags" : user.tags ?? []
         ]
         
         let docRef = db.collection("users").document(user.userID)
