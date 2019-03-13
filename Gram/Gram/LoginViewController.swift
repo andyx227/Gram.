@@ -163,6 +163,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
                                 self.googleLoginButton.isEnabled = true  // Re-enable Google login button
                                 self.googleLoginButton.alpha = 0.75
                                 self.transitionToNewsfeedView()
+                                
                                 return
                             }
                         }) // Api.setUserWithEmail()
@@ -177,6 +178,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, GIDSignInUIDel
                         self.navigationController?.pushViewController(pickUsernameVC, animated: true)
                         Auth.auth().removeStateDidChangeListener(AuthenticationListeners.googleAuthenticationListener!)
                         AuthenticationListeners.googleAuthenticationListener = nil
+
                         return
                     }
                 })  // Api.checkEmailExists()
