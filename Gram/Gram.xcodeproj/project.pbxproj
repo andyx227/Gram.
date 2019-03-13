@@ -26,6 +26,7 @@
 		A1A221072212B2E300A9A2EC /* AuthenticationListeners.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A221062212B2E300A9A2EC /* AuthenticationListeners.swift */; };
 		A1A9A3E82224B622000ACF84 /* PullToRefreshView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A1A9A3E72224B622000ACF84 /* PullToRefreshView.xib */; };
 		A1A9A3EA2224B72F000ACF84 /* PullToRefresh.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A9A3E92224B72F000ACF84 /* PullToRefresh.swift */; };
+		A1AB9E3C22388E7200E89757 /* JoinCommunityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB9E3B22388E7200E89757 /* JoinCommunityViewController.swift */; };
 		A1BA1F02223394A700CEA81C /* CommentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1BA1F01223394A600CEA81C /* CommentViewController.swift */; };
 		A1BA1F0422339E7900CEA81C /* CommentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1BA1F0322339E7900CEA81C /* CommentCell.swift */; };
 		A1D621AA221F4AD000E7B68B /* EditProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D621A9221F4AD000E7B68B /* EditProfileViewController.swift */; };
@@ -58,6 +59,7 @@
 		A1A221062212B2E300A9A2EC /* AuthenticationListeners.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationListeners.swift; sourceTree = "<group>"; };
 		A1A9A3E72224B622000ACF84 /* PullToRefreshView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PullToRefreshView.xib; sourceTree = "<group>"; };
 		A1A9A3E92224B72F000ACF84 /* PullToRefresh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullToRefresh.swift; sourceTree = "<group>"; };
+		A1AB9E3B22388E7200E89757 /* JoinCommunityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinCommunityViewController.swift; sourceTree = "<group>"; };
 		A1BA1F01223394A600CEA81C /* CommentViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentViewController.swift; sourceTree = "<group>"; };
 		A1BA1F0322339E7900CEA81C /* CommentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentCell.swift; sourceTree = "<group>"; };
 		A1D621A9221F4AD000E7B68B /* EditProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileViewController.swift; sourceTree = "<group>"; };
@@ -120,6 +122,7 @@
 				A1D621AC22210B1F00E7B68B /* PostPhotoViewController.swift */,
 				A1D621AE22222C7D00E7B68B /* ProfileDataCache.swift */,
 				A1A9A3E92224B72F000ACF84 /* PullToRefresh.swift */,
+				A1AB9E3B22388E7200E89757 /* JoinCommunityViewController.swift */,
 			);
 			path = Gram;
 			sourceTree = "<group>";
@@ -333,6 +336,7 @@
 				A1D621AF22222C7D00E7B68B /* ProfileDataCache.swift in Sources */,
 				A12AC1F6220EB0B2000036E3 /* ProfileTableViewController.swift in Sources */,
 				5D73C433220B7EA900E75875 /* Api.swift in Sources */,
+				A1AB9E3C22388E7200E89757 /* JoinCommunityViewController.swift in Sources */,
 				A11274DA21FD48AA00DA05D5 /* LoginViewController.swift in Sources */,
 				A17D05C521FA53C300205E1D /* CommunityViewController.swift in Sources */,
 				A12AC1F8220EB20B000036E3 /* ProfileInfoCell.swift in Sources */,

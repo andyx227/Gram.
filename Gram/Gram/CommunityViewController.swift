@@ -27,6 +27,12 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
         return refreshControl
     }()
     
+    @IBAction func editCommunityJoined(_ sender: Any) {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let joinCommunityVC = storyboard.instantiateViewController(withIdentifier: "joinCommunityViewController") as! JoinCommunityViewController
+        self.navigationController?.pushViewController(joinCommunityVC, animated: true)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         

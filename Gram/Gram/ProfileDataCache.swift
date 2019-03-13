@@ -15,4 +15,5 @@ struct ProfileDataCache {
     static var photosNoYetFetched: Bool = true // Initially, photos not yet fetched from Firebase
     static var userIDToUsername: [String: String]?
     static var userIDToProfilePhoto: [String: UIImage]?
+    static var CommunitiesJoined: [String]?
 }
