@@ -839,8 +839,7 @@ struct Api {
             completion(nil,"Global user not set")
             return
         }
-        
-        let serialQueue = DispatchQueue(label: "addPhotos")
+        //var tagsProcessed = 0
         
         DispatchQueue.global().async {
         //search every tag of user
@@ -881,8 +880,6 @@ struct Api {
             
             completion(uniquePhotos, nil)
         }
-
-
     }
     
     typealias ApiCompletion = ((_ response: [String: Any]?, _ error: String?) -> Void)

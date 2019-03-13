@@ -501,6 +501,8 @@ UITableViewDataSource, UITableViewDelegate, photoCardCellDelegate, CommentViewCo
             ProfileDataCache.userIDToProfilePhoto = nil
             ProfileDataCache.userIDToUsername = nil
             ProfileDataCache.profilePhoto = nil
+            ProfileDataCache.loadedCommunityPhotos = nil
+            ProfileDataCache.communityChanged = false
             
             self.navigationController?.popToRootViewController(animated: true)
         } catch let signOutError as NSError {

@@ -16,4 +16,6 @@ struct ProfileDataCache {
     static var userIDToUsername: [String: String]?
     static var userIDToProfilePhoto: [String: UIImage]?
     static var CommunitiesJoined: [String]?
+    static var loadedCommunityPhotos: [PhotoCard]?  // User's community photos
+    static var communityChanged = false  // Set to true when user joins/deletes a community
 }
