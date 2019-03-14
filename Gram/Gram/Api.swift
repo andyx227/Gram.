@@ -788,46 +788,47 @@ struct Api {
      that matches the input string
      */
     static func searchTags(tag: String, completion: @escaping ApiCompletionPhotos) {
-        
-        let docRef = db.collection("photos").order(by: "datePosted", descending: true).whereField("tags", arrayContains: tag)
-        docRef.getDocuments { (querySnapshot, error) in
-            if error != nil {
-                print("An error occurred retrieving all photos: \(error?.localizedDescription ?? "")")
-                completion(nil, "An error occurred retrieving all photos: \(error?.localizedDescription ?? "")")
-            }
-            
-            var photos : [photoURL] = []
-            if let documents = querySnapshot?.documents {
-                for document in documents {
-                    var docData = document.data().mapValues { String.init(describing: $0)}
-                    var photo = photoURL(URL: docData["url"] ?? "",
-                                         userID: docData["UID"] ?? "",
-                                         datePosted: docData["datePosted"] ?? "",
-                                         caption: docData["caption"] ?? "",
-                                         tags: extractTags(text: docData["tags"] ?? ""),
-                                         liked: false,
-                                         likeCount: 0,
-                                         commentCount: 0,
-                                         photoID: document.documentID, timePosted: 0)
-                    
-                    let start = photo.datePosted.index(photo.datePosted.startIndex, offsetBy: 22)
-                    let end = photo.datePosted.index(photo.datePosted.endIndex, offsetBy: -23)
-                    let range = start..<end
-                    let sec = Double(String(photo.datePosted[range])) //get sec from substring
-                    let interval = TimeInterval(exactly: sec ?? 0)// time interval of sec in seconds
-                    let date = Date(timeIntervalSince1970: interval!) // get time from 1970
-                    let dateString = DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .medium) //make date nice and localized
-                    photo.datePosted = dateString
-                    photo.timePosted = sec!
-                    
-                    photos.append(photo)
+        DispatchQueue.global().async {
+            let docRef = db.collection("photos").order(by: "datePosted", descending: true).whereField("tags", arrayContains: tag)
+            docRef.getDocuments { (querySnapshot, error) in
+                if error != nil {
+                    print("An error occurred retrieving all photos: \(error?.localizedDescription ?? "")")
+                    completion(nil, "An error occurred retrieving all photos: \(error?.localizedDescription ?? "")")
                 }
                 
-                likeInfo(photos: photos, completion: completion)
-            } else {
-                print("error type:")
-                dump(error!)
-                completion(nil, "Collection does not exist")
+                var photos : [photoURL] = []
+                if let documents = querySnapshot?.documents {
+                    for document in documents {
+                        var docData = document.data().mapValues { String.init(describing: $0)}
+                        var photo = photoURL(URL: docData["url"] ?? "",
+                                             userID: docData["UID"] ?? "",
+                                             datePosted: docData["datePosted"] ?? "",
+                                             caption: docData["caption"] ?? "",
+                                             tags: extractTags(text: docData["tags"] ?? ""),
+                                             liked: false,
+                                             likeCount: 0,
+                                             commentCount: 0,
+                                             photoID: document.documentID, timePosted: 0)
+                        
+                        let start = photo.datePosted.index(photo.datePosted.startIndex, offsetBy: 22)
+                        let end = photo.datePosted.index(photo.datePosted.endIndex, offsetBy: -23)
+                        let range = start..<end
+                        let sec = Double(String(photo.datePosted[range])) //get sec from substring
+                        let interval = TimeInterval(exactly: sec ?? 0)// time interval of sec in seconds
+                        let date = Date(timeIntervalSince1970: interval!) // get time from 1970
+                        let dateString = DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .medium) //make date nice and localized
+                        photo.datePosted = dateString
+                        photo.timePosted = sec!
+                        
+                        photos.append(photo)
+                    }
+                    
+                    likeInfo(photos: photos, completion: completion)
+                } else {
+                    print("error type:")
+                    dump(error!)
+                    completion(nil, "Collection does not exist")
+                }
             }
         }
     }
@@ -838,32 +839,37 @@ struct Api {
             completion(nil,"Global user not set")
             return
         }
+        //var tagsProcessed = 0
         
-        let serialQueue = DispatchQueue(label: "addPhotos")
-        var tagsProcessed = 0
-        var photos : [photoURL] = []
-        
+        DispatchQueue.global().async {
         //search every tag of user
-        for tag in user.tags {
-            searchTags(tag: tag) { (tagPhotos, error) in
-                if let tagPhotos = tagPhotos {
-                    //append tag's photos to photo list
-                    //serial queue to lock access to photos container
-                    serialQueue.async {
-                        photos.append(contentsOf: tagPhotos)
-                        tagsProcessed += 1
-                    }
-                } else {
-                    //error when getting tag
-                    serialQueue.async {
-                        tagsProcessed += 1
+            let group = DispatchGroup()
+            let sem = DispatchSemaphore(value: 1)
+            var photos : [photoURL] = []
+            
+            for tag in user.tags {
+                group.enter()
+                searchTags(tag: tag) { (tagPhotos, error) in
+                    if let tagPhotos = tagPhotos {
+                        //append tag's photos to photo list
+                        //serial queue to lock access to photos container
+                        //serialQueue.async
+                        sem.wait()
+                            photos.append(contentsOf: tagPhotos)
+                            group.leave()
+                        sem.signal()
+                        //}
+                    } else {
+                        //error when getting tag
+                        //serialQueue.async {
+                            group.leave()
+                        //}
                     }
                 }
             }
-        }
-        
-        DispatchQueue.global(qos: .userInitiated).async {
-            while tagsProcessed < user.tags.count { continue }  // Busy wait
+            
+            group.wait()
+            
             //filter duplicate images
             var uniquePhotos = Array(Set(photos))
             
