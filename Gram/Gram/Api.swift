@@ -875,7 +875,7 @@ struct Api {
             
             //sort all photos
             uniquePhotos.sort { (photo1, photo2) -> Bool in
-                return photo1.timePosted > photo2.timePosted
+                return photo1.timePosted < photo2.timePosted
             }
             
             completion(uniquePhotos, nil)
