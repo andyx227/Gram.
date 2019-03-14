@@ -137,6 +137,7 @@ PODS:
   - Protobuf (3.7.0)
   - SkeletonView (1.4.2)
   - TextFieldEffects (1.5.1)
+  - Toast-Swift (4.0.1)
   - UIScrollView-InfiniteScroll (1.1.0)
 
 DEPENDENCIES:
@@ -154,6 +155,7 @@ DEPENDENCIES:
   - NVActivityIndicatorView
   - SkeletonView
   - TextFieldEffects
+  - Toast-Swift (~> 4.0.0)
   - UIScrollView-InfiniteScroll (~> 1.1.0)
 
 SPEC REPOS:
@@ -185,6 +187,7 @@ SPEC REPOS:
     - Protobuf
     - SkeletonView
     - TextFieldEffects
+    - Toast-Swift
     - UIScrollView-InfiniteScroll
 
 SPEC CHECKSUMS:
@@ -215,8 +218,9 @@ SPEC CHECKSUMS:
   Protobuf: 7a877b7f3e5964e3fce995e2eb323dbc6831bb5a
   SkeletonView: c2523c3c8c6510e273e49a3bf364a434744c3914
   TextFieldEffects: 7d372f58aeaf9acd9626bbf962680aef926b085d
+  Toast-Swift: e42a638589a2f95036b4bb7626cfbdde7daf0393
   UIScrollView-InfiniteScroll: 3ef456bcbe759c19f510a383cff96e6647c98c98
 
-PODFILE CHECKSUM: 853df994c1f70e88c51bb92f36bd50c6b28eb5b6
+PODFILE CHECKSUM: a153efed7e1a9b63cbd0abc5aa8d6504b411dba9
 
 COCOAPODS: 1.5.3

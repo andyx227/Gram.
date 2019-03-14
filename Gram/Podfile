@@ -21,4 +21,5 @@ target 'Gram' do
   pod 'UIScrollView-InfiniteScroll', '~> 1.1.0'
   pod 'NVActivityIndicatorView'
   pod 'ActiveLabel'
+  pod 'Toast-Swift', '~> 4.0.0'
 end
