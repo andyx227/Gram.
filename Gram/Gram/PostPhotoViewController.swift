@@ -9,6 +9,11 @@
 import UIKit
 import MultilineTextField
 import NVActivityIndicatorView
+import Toast_Swift
+
+protocol PostPhotoDelegate {
+    func photoPosted()
+}
 
 class PostPhotoViewController: UIViewController, UITextViewDelegate {
     
@@ -20,6 +25,7 @@ class PostPhotoViewController: UIViewController, UITextViewDelegate {
     var photo: UIImage?
     var photoUrl: URL?
     var tags: [String]?
+    var delegate: PostPhotoDelegate?
     
 
     override func viewWillAppear(_ animated: Bool) {
@@ -122,6 +128,7 @@ class PostPhotoViewController: UIViewController, UITextViewDelegate {
                 if ProfileDataCache.photosNoYetFetched == false {  // Photos have been fetched and saved in cache, so prepend uploaded photo into the "loadedPhotos" array in cache
                     ProfileDataCache.loadedPhotos!.insert(uploadedPhotoCard, at: 0)  // Prepend PhotoCard to array saved in cache
                 }
+                self.delegate?.photoPosted()
             }
             
             self.navigationController?.popViewController(animated: true)

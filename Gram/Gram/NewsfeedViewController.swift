@@ -8,7 +8,7 @@
 
 import UIKit
 
-class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, UITabBarControllerDelegate, photoCardCellDelegate, CommentViewControllerDelegate {
+class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, UITabBarControllerDelegate, photoCardCellDelegate, CommentViewControllerDelegate, PostPhotoDelegate {
    
     @IBOutlet weak var searchBarPeople: UISearchBar!
     @IBOutlet weak var newsfeedTableView: UITableView!
@@ -60,6 +60,10 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
 
         newsfeedTableView.reloadData()  // Display the "Loading Cell" (shows the loading indicator)
         getListOfFollowing()  // This funtion will in turn call getNewsfeedPhotos(), which will populate NewsfeedTableView
+    }
+    
+    func photoPosted() {
+        self.view.makeToast("Photo Posted!", duration: 1.0, position: .bottom)
     }
     
     // Allow user to choose photo from album to post
@@ -178,6 +182,7 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
             
             if let peopleList = peopleList {
                 self.people = peopleList
+                self.people.removeAll { $0.userID == user?.userID }
                 self.newsfeedTableView.isHidden = true  // Hide newsfeed TableView in order to show the People Search TableView
                 self.viewNoPhotos.isHidden = true
                 self.searchPeopleTableView.isHidden = false
@@ -537,6 +542,7 @@ extension NewsfeedViewController: UIImagePickerControllerDelegate, UINavigationC
             let photo = info[UIImagePickerController.InfoKey.originalImage] as! UIImage
             postPhotoVC.photo = photo
             postPhotoVC.photoUrl = imgURL
+            postPhotoVC.delegate = self
             self.navigationController?.pushViewController(postPhotoVC, animated: true)
         }
         dismiss(animated: true, completion: nil)

@@ -109,4 +109,8 @@ class JoinCommunityViewController: UIViewController, UITableViewDelegate, UITabl
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
 }
