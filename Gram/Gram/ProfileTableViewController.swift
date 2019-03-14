@@ -52,6 +52,7 @@ UITableViewDataSource, UITableViewDelegate, photoCardCellDelegate, CommentViewCo
         
         if let profileInfo = ProfileTableViewController.profileInfo {
             profile = profileInfo
+            ProfileTableViewController.profileInfo = nil  // Reset
         } else {
             profile = [user!]
         }
@@ -324,7 +325,7 @@ UITableViewDataSource, UITableViewDelegate, photoCardCellDelegate, CommentViewCo
             
             // Format caption before displaying
             if let caption = photos[indexPath.row - 1].caption {
-                cell.caption.attributedText = formatCaption(caption, user: username)
+                cell.caption.attributedText = NSAttributedString(string: "@\(username) " + caption)
             }
             
             return cell

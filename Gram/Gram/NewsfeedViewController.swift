@@ -130,18 +130,20 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
             newsfeedVC.searchPeopleTableView.isHidden = true
             newsfeedVC.newsfeedTableView.isHidden = false
             
-            if photos.count > 0 {  // If there are no cells, no need to auto-scroll to top
-                newsfeedTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)  // Auto scroll to top of NewsfeedTableView
+            if photos.count > 0 {
                 viewNoPhotos.isHidden = true
             } else {
                 viewNoPhotos.isHidden = false
+            }
+            
+            if previouslySelectedTabIndex == 0 && photos.count > 0 {
+                newsfeedTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)  // Auto scroll to top of NewsfeedTableView
             }
             
             previouslySelectedTabIndex = 0
             
         } else if viewController is ProfileTableViewController {
             let profileVC = self.tabBarController?.viewControllers![2] as! ProfileTableViewController
-            changeStatusBarColor(forView: profileVC)
             profileVC.profile = [user!]
             profileVC.firstTimeLoadingView = true
             
@@ -155,6 +157,12 @@ class NewsfeedViewController: UIViewController, UITableViewDelegate, UITableView
             
             profileVC.profileTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)  // Auto scroll to top of ProfileTableView
             previouslySelectedTabIndex = 2
+        } else if viewController is CommunityViewController {
+            let communityVC = self.tabBarController?.viewControllers![1] as! CommunityViewController
+            if previouslySelectedTabIndex == 1 && communityVC.photos.count > 0 {
+                communityVC.communityTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)  // Auto scroll to top of CommunityTableView
+            }
+            previouslySelectedTabIndex = 1
         }
     }
     

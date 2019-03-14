@@ -146,14 +146,16 @@ class PostPhotoViewController: UIViewController, UITextViewDelegate {
     
     private func extractTags(_ caption: String) -> [String] {
         var tags = [String]()
+        let punctuationList = [".", ",", "?", "!", ";", ":", "-"]
         // Tokenize photo caption, delimited by whitespace
         let tokenized_caption = caption.components(separatedBy: " ")
 
         for token in tokenized_caption {
-            if token.contains("#") {  // Hashtags should be in blue
+            if token.contains("#") {
                 var tag = token
                 tag.remove(at: token.startIndex)  // Remove hashtag symbol at beginning of tag word
-                tags.append(tag)
+                tag.removeAll { punctuationList.contains(String($0)) }  // Remove all punctuations from tag word
+                tags.append(tag.lowercased())
             }
         }
         
