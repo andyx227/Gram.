@@ -130,6 +130,7 @@ class CommunityViewController: UIViewController, UITableViewDelegate, UITableVie
             
             let likeCount = photos[indexPath.row].likeCount
             let commentCount = photos[indexPath.row].commentCount
+            cell.lblNumLikesNumComments.text = ""  // Reset
             
             if likeCount == 0 && commentCount == 0 {
                 cell.lblNumLikesNumComments.isHidden = true  // Don't show label if photo has no likes and comments
